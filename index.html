@@ -129,12 +129,12 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">2</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">4</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">4</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">9</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -191,6 +191,540 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/" class="post-title-link" itemprop="url">时间复杂度</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-05-09 16:33:52 / 修改时间：16:33:53" itemprop="dateCreated datePublished" datetime="2021-05-09T16:33:52+08:00">2021-05-09</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" class="post-title-link" itemprop="url">分布式事务</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-06 16:34:18" itemprop="dateCreated datePublished" datetime="2021-05-06T16:34:18+08:00">2021-05-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="分布式事务解决方案"><a href="#分布式事务解决方案" class="headerlink" title="分布式事务解决方案"></a>分布式事务解决方案</h2><h3 id="数据库事务"><a href="#数据库事务" class="headerlink" title="数据库事务"></a>数据库事务</h3><ul>
+<li>原子性(Atomicity )</li>
+<li>一致性( Consistency )</li>
+<li>隔离性或独立性( Isolation)</li>
+<li>持久性(Durabilily)</li>
+</ul>
+<h3 id="分布式理论"><a href="#分布式理论" class="headerlink" title="分布式理论"></a>分布式理论</h3><h4 id="CAP理论"><a href="#CAP理论" class="headerlink" title="CAP理论"></a>CAP理论</h4><p>CAP定理是由加州大学伯克利分校Eric Brewer教授提出来的，他指出WEB服务无法同时满足一下3个属性：</p>
+<ul>
+<li>一致性(Consistency) ： 客户端知道一系列的操作都会同时发   生(生效)</li>
+<li>可用性(Availability) ： 每个操作都必须以可预期的响应结束</li>
+<li>分区容错性(Partition tolerance) ： 即使出现单个组件无法可用,操作依然可以完成</li>
+<li><strong>CAP原则指CAP三者不能同时满足，要么能同时满足CP即同时满足区分容错性和一致性，要么同时满足AP即同时满足区分容错性和可用性。从中可以看出，P是分布式系统的基础，没有区分容错性就谈不上分布式系统了</strong></li>
+</ul>
+<h4 id="BASE理论"><a href="#BASE理论" class="headerlink" title="BASE理论"></a>BASE理论</h4><p>前面讲到分布式系统的CAP原则要么同时满足AP要么同时满足CP，那么BASE理论则是CAP原则权衡的结果。BASE是指Basically Available（基本可用的）,Soft state（软状态）,Eventual consistency（最终一致性）。</p>
+<ul>
+<li><p>Basically Available是指在分布式集群节点中，若某个节点宕机，或者在数据在节点间复制的过程中，只有部分数据不可用，但不影响整个系统的整体的可用性。</p>
+</li>
+<li><p>Soft state是指软状态即这个状态只是一个中间状态，允许数据在节点集群间操作过程中存在存在一个时延，这个中间状态最终会转化为最终状态。</p>
+</li>
+<li><p>Eventual consistency是指数据在分布式集群节点间操作过程中存在时延，与ACID相反，最终一致性不是强一致性，在经过一定时间后，分布式集群节点间的数据拷贝能达到最终一致的状态。</p>
+</li>
+</ul>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><h4 id="两阶段提交-2pc"><a href="#两阶段提交-2pc" class="headerlink" title="两阶段提交(2pc)"></a>两阶段提交(2pc)</h4><ul>
+<li>准备阶段<ul>
+<li>协调者节点向所有参与者节点询问是否可以执行提交操作(vote)，并开始等待各参与者节点的响应。</li>
+<li>参与者节点执行询问发起为止的所有事务操作，并将Undo信息和Redo信息写入日志。（注意：若成功这里其实每个参与者已经执行了事务操作）</li>
+<li>各参与者节点响应协调者节点发起的询问。如果参与者节点的事务操作实际执行成功，则它返回一个”同意”消息；如果参与者节点的事务操作实际执行失败，则它返回一个”中止”消息。由协调者判断是否继续</li>
+</ul>
+</li>
+<li>提交阶段<ul>
+<li>当协调者节点从所有参与者节点获得的相应消息都为”同意”时：</li>
+<li>协调者节点向所有参与者节点发出”正式提交(commit)”的请求。</li>
+<li>参与者节点正式完成操作，并释放在整个事务期间内占用的资源。</li>
+<li>参与者节点向协调者节点发送”完成”消息。</li>
+<li>协调者节点受到所有参与者节点反馈的”完成”消息后，完成事务。</li>
+<li>如果任一参与者节点在第一阶段返回的响应消息为”中止”，或者 协调者节点在第一阶段的询问超时之前无法获取所有参与者节点的响应消息时：<ul>
+<li>协调者节点向所有参与者节点发出”回滚操作(rollback)”的请求。</li>
+<li>参与者节点利用之前写入的Undo信息执行回滚，并释放在整个事务期间内占用的资源。</li>
+<li>参与者节点向协调者节点发送”回滚完成”消息。</li>
+<li>协调者节点受到所有参与者节点反馈的”回滚完成”消息后，取消事务。</li>
+<li>不管最后结果如何，第二阶段都会结束当前事务。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>问题<ul>
+<li>2PC是一个强一致性协议，同时它在实际应用中还存在几个问题：<ul>
+<li>同步阻塞，2PC的两个阶段中，协调者和参与者的通信都是同步的，这会导致整个事务的长时间阻塞</li>
+<li>Coordinator的单点问题</li>
+<li>数据不一致，在Commit阶段，可能存在只有部分参与者收到Commit消息（或处理成功）的情况</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="三阶段提交-3PC"><a href="#三阶段提交-3PC" class="headerlink" title="三阶段提交(3PC)"></a>三阶段提交(3PC)</h4><p>3PC即三阶段提交，它比2PC多了一个阶段，即把原来2PC的准备阶段拆分成CanCommit和PreCommit两个阶段，同时引入超时机制来解决2PC的同步阻塞问题。<br>    <img src="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/3%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%E5%9B%BE.png" class=""><br>但是在我看来3PC并没有解决2PC的根本问题，它只是在2PC的基础上做了一些优化，它增加了一个阶段（也增加了1个RTT）来提高对方可用性的概率，这本质跟TCP的三次握手一样，同样也改为四次握手，五次握手等等。</p>
+<h4 id="补偿事务-TCC-Try-Confirm-Cancel"><a href="#补偿事务-TCC-Try-Confirm-Cancel" class="headerlink" title="补偿事务(TCC:Try-Confirm-Cancel)"></a>补偿事务(TCC:Try-Confirm-Cancel)</h4><ul>
+<li><p>TCC 其实就是采用的补偿机制，其核心思想是：针对每个操作，都要注册一个与其对应的确认和补偿（撤销）操作。它分为三个阶段：</p>
+<ul>
+<li>Try 阶段主要是对业务系统做检测及资源预留</li>
+<li>Confirm 阶段主要是对业务系统做确认提交，Try阶段执行成功并开始执行 Confirm阶段时，默认 Confirm阶段是不会出错的。即：只要Try成功，Confirm一定成功。</li>
+<li>Cancel 阶段主要是在业务执行错误，需要回滚的状态下执行的业务取消，预留资源释放。</li>
+</ul>
+</li>
+<li><p>举个例子，假入 Bob 要向 Smith 转账，思路大概是：<br>  我们有一个本地方法，里面依次调用</p>
+<ul>
+<li>1、首先在 Try 阶段，要先调用远程接口把 Smith 和 Bob 的钱给冻结起来。</li>
+<li>2、在 Confirm 阶段，执行远程调用的转账的操作，转账成功进行解冻。</li>
+<li>3、如果第2步执行成功，那么转账成功，如果第二步执行失败，则调用远程冻结接口对应的解冻方法 (Cancel)。</li>
+</ul>
+</li>
+<li><p>优点： 跟2PC比起来，实现以及流程相对简单了一些，但数据的一致性比2PC也要差一些</p>
+</li>
+<li><p>缺点： 缺点还是比较明显的，在2,3步中都有可能失败。TCC属于应用层的一种补偿方式，所以需要程序员在实现的时候多写很多补偿的代码，在一些场景中，一些业务流程可能用TCC不太好定义及处理。</p>
+</li>
+</ul>
+<h4 id="本地消息表"><a href="#本地消息表" class="headerlink" title="本地消息表"></a>本地消息表</h4><p>本地消息表方案应该是业界内使用最为广泛的，因为它使用简单，成本比较低。<br>本地消息表的方案最初是由eBay提出（完整方案），核心思路是将分布式事务拆分成本地事务进行处理。它的处理流程如下：</p>
+<ul>
+<li>事务发起方把要处理的业务事务和写消息表这两个操作放在同一个本地事务里</li>
+<li>事务发起方有一个定时任务轮询消息表，把没处理的消息发送到消息中间件</li>
+<li>事务被动方从消息中间件获取消息后，返回成功</li>
+<li>事务发起方更新消息状态为已成功  <img src="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/%E6%9C%AC%E5%9C%B0%E6%B6%88%E6%81%AF%E8%A1%A8.png" class=""></li>
+</ul>
+<p>一些分析:</p>
+<ul>
+<li>把业务处理和写消息表放在同一个事务是为了失败/异常后可以同时回滚</li>
+<li>为什么不直接发消息，而是先写消息表？试想，如果发送消息超时了，即不确定消息中间件收到消息没，那么你是重试还是抛异常回滚事务呢？回滚是不行的，因为可能消息中间件已经收到消息，接收方收到消息后做处理，导致双方数据不一致了；重试也是不行的，因为有可能会一直重试失败，导致事务阻塞。  </li>
+<li>基于上述分析，消息的接收方是需要做幂等操作的</li>
+</ul>
+<p>本地消息表方案整体来说还是比较简单、可用的，但是也有以下缺点：</p>
+<ul>
+<li>消息数据和业务数据耦合，消息表需要根据具体的业务场景制定，不能公用。就算可以公用消息表，对于分库的业务来说每个库都是需要消息表的。</li>
+<li>只适用于最终一致的业务场景。例如在 A -&gt; B场景下，在不考虑网络异常、宕机等非业务异常的情况下，A成功的话，B肯定也会成功的。</li>
+</ul>
+<h4 id="Sagas事务模型"><a href="#Sagas事务模型" class="headerlink" title="Sagas事务模型"></a>Sagas事务模型</h4><p>Saga事务模型又叫做长时间运行的事务（Long-running-transaction）, 它是由普林斯顿大学的H.Garcia-Molina等人提出，它描述的是另外一种在没有两阶段提交的的情况下解决分布式系统中复杂的业务事务问题。<br>我们这里说的是一种基于 Sagas 机制的工作流事务模型，这个模型的相关理论目前来说还是比较新的，以至于百度上几乎没有什么相关资料。</p>
+<p>该模型其核心思想就是拆分分布式系统中的长事务为多个短事务，或者叫多个本地事务，然后由 Sagas 工作流引擎负责协调，如果整个流程正常结束，那么就算是业务成功完成，如果在这过程中实现失败，那么Sagas工作流引擎就会以相反的顺序调用补偿操作，重新进行业务回滚。</p>
+<p>比如我们一次关于购买旅游套餐业务操作涉及到三个操作，他们分别是预定车辆，预定宾馆，预定机票，他们分别属于三个不同的远程接口。可能从我们程序的角度来说他们不属于一个事务，但是从业务角度来说是属于同一个事务的。<br>    <img src="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/sagas.png" class=""></p>
+<p>们的执行顺序如上图所示，所以当发生失败时，会依次进行取消的补偿操作。</p>
+<p>因为长事务被拆分了很多个业务流，所以 Sagas 事务模型最重要的一个部件就是工作流或者你也可以叫流程管理器（Process Manager），工作流引擎和Process Manager虽然不是同一个东西，但是在这里，他们的职责是相同的</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/" class="post-title-link" itemprop="url">用户态及内核态</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-06 14:44:38" itemprop="dateCreated datePublished" datetime="2021-05-06T14:44:38+08:00">2021-05-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="为什么要有用户态和内核态"><a href="#为什么要有用户态和内核态" class="headerlink" title="为什么要有用户态和内核态"></a>为什么要有用户态和内核态</h2><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><ul>
+<li><p>Linux所谓的用户态和内核态，本质是对CPU提供的功能的一层封装抽象。</p>
+</li>
+<li><p>现代CPU，其设计目标主要是为了完美高效的实现一个多任务系统，多任务系统的三个核心特征是：</p>
+<ul>
+<li>权限分级</li>
+<li>数据隔离</li>
+<li>任务切换。</li>
+</ul>
+</li>
+<li><p>以X86_64架构为例，</p>
+<ul>
+<li>权限分级通过CPU的多模式机制和分段机制实现，</li>
+<li>数据隔离通过分页机制实现，</li>
+<li>任务切换通过中断机制和任务机制（TR/TSS）实现。</li>
+</ul>
+</li>
+<li><p>内核态和用户态的概念，是Linux为了有效实现CPU的权限分级和数据隔离的目标而出现的，是通过组合CPU的分段机制+分页机制而形成的。</p>
+<ul>
+<li>当CPU处于保护模式下时（X86_64CPU有5种模式，保护模式是其中之一，此时CPU.CR0.PE=1），</li>
+<li>当CPU.CS=系统代码段时（CS.CPL=0）为内核态，此时通过CPU的指令有操控全部寄存器的权限（包括FLAGS和CR寄存器），</li>
+<li>当CPU.CS=用户代码段时（CS.CPL=3）为用户态，此时通过CPU的指令只有操控部分寄存器的权限。</li>
+</ul>
+</li>
+<li><p>所谓“一个进程主动跳进内核态”，是指该进程中的一个执行线程通过INT或者SYSCALL指令，使得当前线程的CS=系统代码段（这里还有不同的细节，不多说了）。</p>
+</li>
+<li><p>每个用户进程都有自己的虚拟地址空间，用户进程之间切换的时候，通过切换页表（CR3）来实现，不用改CS寄存器和DS寄存器。所以没有“代码映射在0-3G”一说。就像班级名称和学号，同样的学号在不同的班级代表不同的人，同样的虚拟地址在不同的页表中代表不同的物理内存空间。</p>
+</li>
+<li><p>内核态允许多个用户线程同时进入，不存在阻塞的现象，尤其是多核CPU的情况下。</p>
+</li>
+<li><p>除了用户线程可以进入内核态之外，还有内核线程，即内核自己要干的事情，这种线程只运行在内核态</p>
+</li>
+<li><p>图1：从CPU的寄存器视角看，指令运行所处的三种CPU状态</p>
+<!-- ![cpu角度](./用户态及内核态/cpu.jpg) -->
+<img src="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/cpu.jpg" class=""></li>
+<li><p>图2：从Linux线程角度看，指令运行所处的两种状态（要么属于某线程，要么黑色切换中）</p>
+<!-- ![linux线程角度](./用户态及内核态/xiancheng.jpg) -->
+<img src="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/xiancheng.jpg" class=""></li>
+<li><p>图3：Linux下，线程类型*CPU状态决定数据空间</p>
+<!-- ![线程类型](./用户态及内核态/yonghu.jpg) -->
+<img src="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/yonghu.jpg" class=""></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/06/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/06/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="post-title-link" itemprop="url">虚拟内存管理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-06 13:47:07" itemprop="dateCreated datePublished" datetime="2021-05-06T13:47:07+08:00">2021-05-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><!-- ![内存管理](./虚拟内存管理/虚拟内存管理.png) -->
+<img src="/2021/05/06/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.png" class="">
+
+<h3 id="连续分配管理方式"><a href="#连续分配管理方式" class="headerlink" title="连续分配管理方式"></a>连续分配管理方式</h3><ul>
+<li>分区式存储管理最大的缺点是碎片问题严重，内存利用率低。</li>
+<li>原因，主要在于连续分配的限制，即它要求每个作用在内存中必须占一个连续的分区。</li>
+<li>如果允许将一个进程分散地装入到许多不相邻的分区中，便可充分地利用内存，而无需再进行“紧凑”。<br>基于这一思想，产生了“非连续分配方式”，或者称为“离散分配方式”。</li>
+</ul>
+<h3 id="实分页存储管理"><a href="#实分页存储管理" class="headerlink" title="实分页存储管理"></a>实分页存储管理</h3><ul>
+<li><p>优点：</p>
+<ul>
+<li>较好地解决了碎片问题</li>
+<li>打破了存储分配的连续性要求</li>
+<li>提高了主存的利用率</li>
+</ul>
+</li>
+<li><p>缺点：</p>
+<ul>
+<li>页内碎片</li>
+<li>动态地址变换、方案实施需耗用额外的系统资源</li>
+<li>存储扩充问题没有解决——作业大小受到限制，可用块数小于作业需求时需等待</li>
+</ul>
+</li>
+</ul>
+<h3 id="虚拟存储管理系统"><a href="#虚拟存储管理系统" class="headerlink" title="虚拟存储管理系统"></a>虚拟存储管理系统</h3><h4 id="局部性原理"><a href="#局部性原理" class="headerlink" title="局部性原理"></a>局部性原理</h4><ul>
+<li><p>指程序在执行过程中的一个较短时期，所执行的指令地址和指令的操作数地址，分别局限于一定区域。还可以表现为：</p>
+<ul>
+<li>时间局部性：一条指令的一次执行和下次执行，一个数据的一次访问和下次访问都集中在一个较短时期内；</li>
+<li>空间局部性：当前指令和邻近的几条指令，当前访问的数据和邻近的数据都集中在一个较小区域内。</li>
+</ul>
+</li>
+<li><p>局部性原理的具体体现：</p>
+<ul>
+<li>程序在执行时，大部分是顺序执行的指令，少部分是转移和过程调用指令。</li>
+<li>过程调用的嵌套深度一般不超过5，因此执行的范围不超过这组嵌套的过程。</li>
+<li>程序中存在相当多的循环结构，它们由少量指令组成，而被多次执行。</li>
+<li>程序中存在相当多对一定数据结构的操作，如数组操作，往往局限在较小范围内。</li>
+</ul>
+</li>
+</ul>
+<h4 id="虚拟存储管理系统的好处"><a href="#虚拟存储管理系统的好处" class="headerlink" title="虚拟存储管理系统的好处"></a>虚拟存储管理系统的好处</h4><ul>
+<li>大程序：可在较小的可用内存中执行较大的用户程序；</li>
+<li>大的用户空间：提供给用户可用的虚拟内存空间通常大于物理内存(real memory)</li>
+<li>并发：可在内存中容纳更多程序并发执行；</li>
+<li>易于开发：与覆盖技术比较，不必影响编程时的程序结构</li>
+</ul>
+<h4 id="虚拟存储技术特征"><a href="#虚拟存储技术特征" class="headerlink" title="虚拟存储技术特征"></a>虚拟存储技术特征</h4><ul>
+<li>不连续性：物理内存分配的不连续，虚拟地址空间使用的不连续（数据段和栈段之间的空闲空间，共享段和动态链接库占用的空间）</li>
+<li>部分交换：与交换技术相比较，虚拟存储的调入和调出是对部分虚拟地址空间进行的；</li>
+<li>大空间：通过物理内存和快速外存相结合，提供大范围的虚拟地址空间</li>
+</ul>
+<h4 id="虚拟存储技术分类"><a href="#虚拟存储技术分类" class="headerlink" title="虚拟存储技术分类"></a>虚拟存储技术分类</h4><ul>
+<li>虚拟页式</li>
+<li>虚拟段式</li>
+<li>虚拟段页式</li>
+</ul>
+<h3 id="虚拟页式存储管理"><a href="#虚拟页式存储管理" class="headerlink" title="虚拟页式存储管理"></a>虚拟页式存储管理</h3><h4 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h4><ul>
+<li>虚拟页式存储管理实际是实分页技术与虚拟存储技术相结合的产物，其分页思想与实分页是一样的。这里的请求调入和置换功能都是比实分页存储管理增加的内容，是实现虚拟存储的主要功能。</li>
+</ul>
+<h4 id="主存页面分配策略"><a href="#主存页面分配策略" class="headerlink" title="主存页面分配策略"></a>主存页面分配策略</h4><ul>
+<li>在虚拟页式存储管理中，内存分配似实分页方式，但还必须考虑解决下面两个问题：<ul>
+<li>（1）是否对各进程采用平均分配策略？<ul>
+<li>a、平均分配。</li>
+<li>b、按进程长度比例分配。</li>
+<li>c、按进程优先级分配。</li>
+<li>d、按进程长度和优先级别分配。</li>
+</ul>
+</li>
+<li>（2）发生缺页中断时，如何为所缺的页面分配内存？<ul>
+<li>a、固定分配局部置换。</li>
+<li>b、可变分配全局置换。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="页面调入策略"><a href="#页面调入策略" class="headerlink" title="页面调入策略"></a>页面调入策略</h4><ul>
+<li><p>（1）请求调入</p>
+<ul>
+<li>当发生页面故障时进行调度，即当进程访问不在内存的页面引发缺页中断时，由系统根据这种访问请求把所缺页面装入内存。</li>
+<li>优点：由请求调入策略装入的页一定会被访问，再加之比较容易实现，故在目前的虚拟存储器中，大多采用此策略。</li>
+<li>缺点：每次仅调入一页，增加了磁盘I/O的启动频率。</li>
+</ul>
+</li>
+<li><p>（ 2）预调入</p>
+<ul>
+<li>也称先行调度，即一页面被访问前就已经预先置入内存，以减少今后的缺页率。</li>
+<li>主要适于进程的许多页存放在外存的连续区域中的情况。有的系统结合请求调入使用，即每次缺页时装入多个页面。</li>
+<li>优点：提高调页的I/O效率。</li>
+<li>缺点：基于预测，若调入的页在以后很少被访问，则效率低。常用于程序装入时的调页。</li>
+</ul>
+</li>
+</ul>
+<h4 id="页面调度算法"><a href="#页面调度算法" class="headerlink" title="页面调度算法"></a>页面调度算法</h4><ul>
+<li>a.最佳淘汰算法：OPT 淘汰以后不用的，但是这是个衡量指标，不能实现太理想化了</li>
+<li>b.FIFO：先进先出，用队列实现</li>
+<li>c.最近最久未使用算法(LRU)：根据调入内存的情况，选择内存中最久未使用的被置换<ul>
+<li>计时法：</li>
+<li>堆栈法：</li>
+<li>多维寄存器</li>
+</ul>
+</li>
+<li>d.二次机会淘汰算法。SC(Second Chance)</li>
+<li>e.时钟淘汰算法：</li>
+<li>f.最近未使用淘汰算法</li>
+</ul>
+<!-- ![淘汰算法比较](./虚拟内存管理/淘汰算法.png) -->
+<img src="/2021/05/06/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E6%B7%98%E6%B1%B0%E7%AE%97%E6%B3%95.png" class="">
+
+<h4 id="缺页中断率因素"><a href="#缺页中断率因素" class="headerlink" title="缺页中断率因素"></a>缺页中断率因素</h4><ul>
+<li>（1）调度算法不合理</li>
+<li>（2）分配给作业的内存块数太少</li>
+<li>（3）页面大小的选择不合理</li>
+<li>（4）用户程序编制的方法不合理</li>
+</ul>
+<p>在mysql中，选择B+树的原因就在于此，为了尽量较少磁盘IO</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/05/mysql%E9%94%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -214,10 +748,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-05-05 20:46:31 / 修改时间：20:47:17" itemprop="dateCreated datePublished" datetime="2021-05-05T20:46:31+08:00">2021-05-05</time>
+              <time title="创建时间：2021-05-05 20:46:31" itemprop="dateCreated datePublished" datetime="2021-05-05T20:46:31+08:00">2021-05-05</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -281,10 +821,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-05-05 20:42:07 / 修改时间：20:45:14" itemprop="dateCreated datePublished" datetime="2021-05-05T20:42:07+08:00">2021-05-05</time>
+              <time title="创建时间：2021-05-05 20:42:07" itemprop="dateCreated datePublished" datetime="2021-05-05T20:42:07+08:00">2021-05-05</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -422,10 +968,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-05-05 17:28:56 / 修改时间：20:39:47" itemprop="dateCreated datePublished" datetime="2021-05-05T17:28:56+08:00">2021-05-05</time>
+              <time title="创建时间：2021-05-05 17:28:56" itemprop="dateCreated datePublished" datetime="2021-05-05T17:28:56+08:00">2021-05-05</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -452,19 +1004,26 @@
 <li>另一个是 InnoDB 在实现 MVCC 时用到的一致性读视图，即 consistent read view，用于支持 RC（Read Committed，读提交）和 RR（Repeatable Read，可重复读）隔离级别的实现。</li>
 </ul>
 <h2 id="MVCC"><a href="#MVCC" class="headerlink" title="MVCC"></a>MVCC</h2><ul>
-<li>在可重复读隔离级别下，事务在启动的时候就“拍了个快照”。注意，这个快照是基于整库的。</li>
-<li>在事务开始的时候向 InnoDB 的事务系统申请的，是按申请顺序严格递增的。</li>
-<li>而每行数据也都是有多个版本的。数据表中的一行记录，其实可能有多个版本 (row)，每个版本有自己的 row trx_id。  <img src="/2021/05/05/mysql%E4%BA%8B%E5%8A%A1/%E4%BA%8B%E5%8A%A1%E6%95%B0%E7%BB%84.png" class="">
-  <img src="%E4%BA%8B%E5%8A%A1%E6%95%B0%E7%BB%84.png" alt="事务数组"></li>
-<li>低水位：已经提交的；高水位：已经开始的事务最大值加1</li>
-<li>如果落在绿色部分，表示这个版本是已提交的事务或者是当前事务自己生成的，这个数据是可见的；</li>
-<li>如果落在红色部分，表示这个版本是由将来启动的事务生成的，是肯定不可见的；</li>
-<li>如果落在黄色部分，那就包括两种情况<ul>
+<li><p>在可重复读隔离级别下，事务在启动的时候就“拍了个快照”。注意，这个快照是基于整库的。</p>
+</li>
+<li><p>在事务开始的时候向 InnoDB 的事务系统申请的，是按申请顺序严格递增的。</p>
+</li>
+<li><p>而每行数据也都是有多个版本的。数据表中的一行记录，其实可能有多个版本 (row)，每个版本有自己的 row trx_id。</p>
+  <img src="/2021/05/05/mysql%E4%BA%8B%E5%8A%A1/%E4%BA%8B%E5%8A%A1%E6%95%B0%E7%BB%84.png" class=""></li>
+<li><p>低水位：已经提交的；高水位：已经开始的事务最大值加1</p>
+</li>
+<li><p>如果落在绿色部分，表示这个版本是已提交的事务或者是当前事务自己生成的，这个数据是可见的；</p>
+</li>
+<li><p>如果落在红色部分，表示这个版本是由将来启动的事务生成的，是肯定不可见的；</p>
+</li>
+<li><p>如果落在黄色部分，那就包括两种情况</p>
+<ul>
 <li>a. 若 row trx_id 在数组中，表示这个版本是由还没提交的事务生成的，不可见；</li>
 <li>b. 若 row trx_id 不在数组中，表示这个版本是已经提交了的事务生成的，可见。</li>
 </ul>
 </li>
-<li>更新逻辑<ul>
+<li><p>更新逻辑</p>
+<ul>
 <li>更新数据都是先读后写的，而这个读，只能读当前的值，称为“当前读”（current read）</li>
 </ul>
 </li>
@@ -490,6 +1049,12 @@
 </li>
 <li><p><strong>幻读</strong></p>
 <p>在一个事务的两次查询中数据笔数不一致，例如有一个事务查询了几列(Row)数据，而另一个事务却在此时插入了新的几列数据，先前的事务在接下来的查询中，就会发现有几列数据是它先前所没有的。</p>
+</li>
+<li><p><strong>一致性读（快照读）</strong></p>
+<p>当不涉及到更新操作时，select通过一致性视图MVCC 实现一致性读</p>
+</li>
+<li><p><strong>当前读</strong></p>
+<p>更新数据都是先读后写的，而这个读，只能读当前的值，称为“当前读”（current read）。</p>
 </li>
 </ul>
 <h3 id="事务隔离级别对照表"><a href="#事务隔离级别对照表" class="headerlink" title="事务隔离级别对照表"></a>事务隔离级别对照表</h3><table>
@@ -641,6 +1206,96 @@ npm install hexo-generator-searchdb --save
   
   
 
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/02/%E6%90%AC%E5%AE%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/02/%E6%90%AC%E5%AE%B6/" class="post-title-link" itemprop="url">搬家</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-02 00:00:00" itemprop="dateCreated datePublished" datetime="2021-05-02T00:00:00+08:00">2021-05-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%85%B6%E4%BB%96/" itemprop="url" rel="index"><span itemprop="name">其他</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Welcome to [sk-xinye] blog (<a href="https://sk-xinye.github.io/">https://sk-xinye.github.io/</a>)! House-moving in labor day. </p>
+<h2 id="搬家方式"><a href="#搬家方式" class="headerlink" title="搬家方式"></a>搬家方式</h2><p>1.安装nodes.js<br>2.创建新的git 仓库<br>3.ssh连接</p>
+<pre><code>ssh-keygen -t rsa -C &quot;@qq.com&quot;
+增加到git中setting ssh
+</code></pre>
+<p>4.hexo</p>
+<pre><code>https://hexo.io/zh-cn/ 
+npm install hexo-cli -g
+hexo init blog
+cd blog
+npm install
+hexo -s p 5555
+hexo g
+hexo d
+npm install hexo-deployer-git --save
+npm install hexo-generator-searchdb --save
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
 
   
 
@@ -707,14 +1362,14 @@ npm install hexo-generator-searchdb --save
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>

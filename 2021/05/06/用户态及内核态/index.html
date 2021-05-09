@@ -20,22 +20,23 @@
     var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
   </script>
 
-  <meta name="description" content="索引常见的索引类型 哈希表 哈希表这种结构适用于只有等值查询的场景    有序数组 有序数组在等值查询和范围查询场景中的性能就都非常优秀，但是当涉及到插入操作时就不行了，所以有序数组索引只适用于静态存储引擎  搜索树  二叉树 可以任意拥有左右两个节点，但是会演变为链表，查询复杂度变高.  二叉搜索树（BST)  左节点小于根节点 右节点大于根节点 时间复杂度最好是O(logn),最坏是演变为链表">
+  <meta name="description" content="为什么要有用户态和内核态基本概念 Linux所谓的用户态和内核态，本质是对CPU提供的功能的一层封装抽象。  现代CPU，其设计目标主要是为了完美高效的实现一个多任务系统，多任务系统的三个核心特征是：  权限分级 数据隔离 任务切换。   以X86_64架构为例，  权限分级通过CPU的多模式机制和分段机制实现， 数据隔离通过分页机制实现， 任务切换通过中断机制和任务机制（TR&#x2F;TSS）实现。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="mysql索引">
-<meta property="og:url" content="https://sk-xinye.github.io/2021/05/05/mysql%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:title" content="用户态及内核态">
+<meta property="og:url" content="https://sk-xinye.github.io/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/index.html">
 <meta property="og:site_name" content="sk-xinyeの博客">
-<meta property="og:description" content="索引常见的索引类型 哈希表 哈希表这种结构适用于只有等值查询的场景    有序数组 有序数组在等值查询和范围查询场景中的性能就都非常优秀，但是当涉及到插入操作时就不行了，所以有序数组索引只适用于静态存储引擎  搜索树  二叉树 可以任意拥有左右两个节点，但是会演变为链表，查询复杂度变高.  二叉搜索树（BST)  左节点小于根节点 右节点大于根节点 时间复杂度最好是O(logn),最坏是演变为链表">
+<meta property="og:description" content="为什么要有用户态和内核态基本概念 Linux所谓的用户态和内核态，本质是对CPU提供的功能的一层封装抽象。  现代CPU，其设计目标主要是为了完美高效的实现一个多任务系统，多任务系统的三个核心特征是：  权限分级 数据隔离 任务切换。   以X86_64架构为例，  权限分级通过CPU的多模式机制和分段机制实现， 数据隔离通过分页机制实现， 任务切换通过中断机制和任务机制（TR&#x2F;TSS）实现。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://sk-xinye.github.io/2021/05/05/mysql%E7%B4%A2%E5%BC%95/11.png">
-<meta property="og:image" content="https://sk-xinye.github.io/2021/05/05/mysql%E7%B4%A2%E5%BC%95/%E7%BA%A2%E9%BB%91%E6%A0%91.png">
-<meta property="article:published_time" content="2021-05-05T12:42:07.000Z">
-<meta property="article:modified_time" content="2021-05-08T13:59:05.020Z">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/cpu.jpg">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/xiancheng.jpg">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/yonghu.jpg">
+<meta property="article:published_time" content="2021-05-06T06:44:38.000Z">
+<meta property="article:modified_time" content="2021-05-08T13:59:05.035Z">
 <meta property="article:author" content="sk-xinye">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://sk-xinye.github.io/2021/05/05/mysql%E7%B4%A2%E5%BC%95/11.png">
+<meta name="twitter:image" content="https://sk-xinye.github.io/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/cpu.jpg">
 
-<link rel="canonical" href="https://sk-xinye.github.io/2021/05/05/mysql%E7%B4%A2%E5%BC%95/">
+<link rel="canonical" href="https://sk-xinye.github.io/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/">
 
 
 <script id="page-configurations">
@@ -48,7 +49,7 @@
   };
 </script>
 
-  <title>mysql索引 | sk-xinyeの博客</title>
+  <title>用户态及内核态 | sk-xinyeの博客</title>
   
 
 
@@ -197,7 +198,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/05/mysql%E7%B4%A2%E5%BC%95/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -210,7 +211,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          mysql索引
+          用户态及内核态
         </h1>
 
         <div class="post-meta">
@@ -220,7 +221,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-05-05 20:42:07" itemprop="dateCreated datePublished" datetime="2021-05-05T20:42:07+08:00">2021-05-05</time>
+              <time title="创建时间：2021-05-06 14:44:38" itemprop="dateCreated datePublished" datetime="2021-05-06T14:44:38+08:00">2021-05-06</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -235,7 +236,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
                 </span>
             </span>
 
@@ -250,79 +251,47 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h2><h3 id="常见的索引类型"><a href="#常见的索引类型" class="headerlink" title="常见的索引类型"></a>常见的索引类型</h3><ul>
-<li><p>哈希表</p>
-<p><strong>哈希表这种结构适用于只有等值查询的场景</strong></p>
-  <img src="/2021/05/05/mysql%E7%B4%A2%E5%BC%95/11.png" class=""></li>
-<li><p>有序数组</p>
-<p><strong>有序数组在等值查询和范围查询场景中的性能就都非常优秀，但是当涉及到插入操作时就不行了，所以有序数组索引只适用于静态存储引擎</strong></p>
+        <h2 id="为什么要有用户态和内核态"><a href="#为什么要有用户态和内核态" class="headerlink" title="为什么要有用户态和内核态"></a>为什么要有用户态和内核态</h2><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><ul>
+<li><p>Linux所谓的用户态和内核态，本质是对CPU提供的功能的一层封装抽象。</p>
 </li>
-<li><p>搜索树</p>
+<li><p>现代CPU，其设计目标主要是为了完美高效的实现一个多任务系统，多任务系统的三个核心特征是：</p>
 <ul>
-<li><p>二叉树</p>
-<p>可以任意拥有左右两个节点，但是会演变为链表，查询复杂度变高.</p>
+<li>权限分级</li>
+<li>数据隔离</li>
+<li>任务切换。</li>
+</ul>
 </li>
-<li><p>二叉搜索树（BST)</p>
+<li><p>以X86_64架构为例，</p>
 <ul>
-<li>左节点小于根节点</li>
-<li>右节点大于根节点</li>
-<li><strong>时间复杂度最好是O(logn),最坏是演变为链表O(n)</strong></li>
+<li>权限分级通过CPU的多模式机制和分段机制实现，</li>
+<li>数据隔离通过分页机制实现，</li>
+<li>任务切换通过中断机制和任务机制（TR/TSS）实现。</li>
 </ul>
 </li>
-<li><p>平衡二叉搜索树（AVL）</p>
+<li><p>内核态和用户态的概念，是Linux为了有效实现CPU的权限分级和数据隔离的目标而出现的，是通过组合CPU的分段机制+分页机制而形成的。</p>
 <ul>
-<li>左右子树高度不会差距超过1</li>
-<li><strong>需要大量的平衡操作，代价比较大，如果插入操作不高的话，AVL树更好点，否则红黑树更好</strong></li>
+<li>当CPU处于保护模式下时（X86_64CPU有5种模式，保护模式是其中之一，此时CPU.CR0.PE=1），</li>
+<li>当CPU.CS=系统代码段时（CS.CPL=0）为内核态，此时通过CPU的指令有操控全部寄存器的权限（包括FLAGS和CR寄存器），</li>
+<li>当CPU.CS=用户代码段时（CS.CPL=3）为用户态，此时通过CPU的指令只有操控部分寄存器的权限。</li>
 </ul>
 </li>
-<li><p>红黑树</p>
-<img src="/2021/05/05/mysql%E7%B4%A2%E5%BC%95/%E7%BA%A2%E9%BB%91%E6%A0%91.png" class="">
-<ul>
-<li>每个节点非红即黑.</li>
-<li>根节点是黑的。</li>
-<li>每个叶节点(叶节点即树尾端NUL指针或NULL节点)都是黑的.</li>
-<li>如果一个节点是红的,那么它的两儿子都是黑的.</li>
-<li>对于任意节点而言,其到叶子点树NIL指针的每条路径都包含相同数目的黑节点.</li>
-</ul>
+<li><p>所谓“一个进程主动跳进内核态”，是指该进程中的一个执行线程通过INT或者SYSCALL指令，使得当前线程的CS=系统代码段（这里还有不同的细节，不多说了）。</p>
 </li>
-<li><p>B树</p>
-<ul>
-<li>定义任意非叶子结点最多只有M个儿子；且M&gt;2；</li>
-<li>根结点的儿子数为[2, M]；</li>
-<li>除根结点以外的非叶子结点的儿子数为[M/2, M]；</li>
-<li>每个结点存放至少M/2-1（取上整）和至多M-1个关键字；（至少2个关键字）</li>
-<li>非叶子结点的关键字个数=指向儿子的指针个数-1；</li>
-<li>非叶子结点的关键字：K[1], K[2], …, K[M-1]；且K[i] &lt; K[i+1]；</li>
-<li>非叶子结点的指针：P[1], P[2], …, P[M]；其中P[1]指向关键字小于K[1]的子树，P[M]指向关</li>
-<li>键字大于K[M-1]的子树，其它P[i]指向关键字属于(K[i-1], K[i])的子树；</li>
-<li>所有叶子结点位于同一层；  </li>
-</ul>
+<li><p>每个用户进程都有自己的虚拟地址空间，用户进程之间切换的时候，通过切换页表（CR3）来实现，不用改CS寄存器和DS寄存器。所以没有“代码映射在0-3G”一说。就像班级名称和学号，同样的学号在不同的班级代表不同的人，同样的虚拟地址在不同的页表中代表不同的物理内存空间。</p>
 </li>
-<li><p>B+树</p>
-<ul>
-<li>相对于 B树来说更适合作为索引</li>
-<li>B+-tree的内部节点并没有指向关键字具体信息的指针,因此其内部节点相对B树更小,如果把所有同一内部节点的关键字存放在同一盘块中,那么盘块所能容纳的关键字数量也越多,一次性读入内存的需要查找的关键字也就越多,相对IO读写次数就降低了.</li>
-<li>由于非终结点并不是最终指向文件内容的结点，而只是叶子结点中关键字的索引。所以任何关键字的查找必须走一条从根结点到叶子结点的路。所有关键字查询的路径长度相同，导致每一个数据的查询效率相当。</li>
-<li>支持范围查询较好，效率较B+树要高很多</li>
-<li>其实选择B+树当索引要涉及到操作系统虚拟内存叶式存储有关，主要的性能瓶颈是在磁盘IO操作，并且为了更好的命中内存，将附近的存储区域一块抽取到内存中</li>
-</ul>
+<li><p>内核态允许多个用户线程同时进入，不存在阻塞的现象，尤其是多核CPU的情况下。</p>
 </li>
-</ul>
+<li><p>除了用户线程可以进入内核态之外，还有内核线程，即内核自己要干的事情，这种线程只运行在内核态</p>
 </li>
-</ul>
-<h3 id="索引相关概念"><a href="#索引相关概念" class="headerlink" title="索引相关概念"></a>索引相关概念</h3><ul>
-<li><p>索引覆盖</p>
-<p>需要查询的内容已经在索引树上，减少了回表，推荐使用索引覆盖</p>
-</li>
-<li><p>最左前缀原则</p>
-<p>针对联合索引，从左边开始依次匹配，可以用来减少索引较多带来的维护问题</p>
-</li>
-<li><p>索引下推</p>
-<p>为了减少回表的次数，Mysql5.6以后引入了索引下推，减少了回表的次数</p>
-</li>
-</ul>
-<h3 id="表操作相关代码"><a href="#表操作相关代码" class="headerlink" title="表操作相关代码"></a>表操作相关代码</h3><ul>
-<li>创建表<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `geek` (</span><br><span class="line">`a` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">`b` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">`c` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">`d` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line"><span class="keyword">PRIMARY</span> KEY (`a`,`b`),</span><br><span class="line">KEY `c` (`c`),</span><br><span class="line">KEY `ca` (`c`,`a`),</span><br><span class="line">KEY `cb` (`c`,`b`)) ENGINE<span class="operator">=</span>InnoDB;</span><br></pre></td></tr></table></figure></li>
+<li><p>图1：从CPU的寄存器视角看，指令运行所处的三种CPU状态</p>
+<!-- ![cpu角度](./用户态及内核态/cpu.jpg) -->
+<img src="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/cpu.jpg" class=""></li>
+<li><p>图2：从Linux线程角度看，指令运行所处的两种状态（要么属于某线程，要么黑色切换中）</p>
+<!-- ![linux线程角度](./用户态及内核态/xiancheng.jpg) -->
+<img src="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/xiancheng.jpg" class=""></li>
+<li><p>图3：Linux下，线程类型*CPU状态决定数据空间</p>
+<!-- ![线程类型](./用户态及内核态/yonghu.jpg) -->
+<img src="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/yonghu.jpg" class=""></li>
 </ul>
 
     </div>
@@ -339,12 +308,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/05/05/mysql%E4%BA%8B%E5%8A%A1/" rel="prev" title="mysql事务">
-      <i class="fa fa-chevron-left"></i> mysql事务
+    <a href="/2021/05/06/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" rel="prev" title="虚拟内存管理">
+      <i class="fa fa-chevron-left"></i> 虚拟内存管理
     </a></div>
       <div class="post-nav-item">
-    <a href="/2021/05/05/mysql%E9%94%81/" rel="next" title="mysql锁">
-      mysql锁 <i class="fa fa-chevron-right"></i>
+    <a href="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" rel="next" title="分布式事务">
+      分布式事务 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -404,7 +373,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95"><span class="nav-number">1.</span> <span class="nav-text">索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E7%B4%A2%E5%BC%95%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.1.</span> <span class="nav-text">常见的索引类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5"><span class="nav-number">1.2.</span> <span class="nav-text">索引相关概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A8%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3%E4%BB%A3%E7%A0%81"><span class="nav-number">1.3.</span> <span class="nav-text">表操作相关代码</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%9C%89%E7%94%A8%E6%88%B7%E6%80%81%E5%92%8C%E5%86%85%E6%A0%B8%E6%80%81"><span class="nav-number">1.</span> <span class="nav-text">为什么要有用户态和内核态</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">基本概念</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

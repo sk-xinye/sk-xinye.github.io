@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="分布式事务解决方案数据库事务 原子性(Atomicity ) 一致性( Consistency ) 隔离性或独立性( Isolation) 持久性(Durabilily)  分布式理论CAP理论CAP定理是由加州大学伯克利分校Eric Brewer教授提出来的，他指出WEB服务无法同时满足一下3个属性：  一致性(Consistency) ： 客户端知道一系列的操作都会同时发   生(生效) 可用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式事务">
+<meta property="og:url" content="https://sk-xinye.github.io/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="分布式事务解决方案数据库事务 原子性(Atomicity ) 一致性( Consistency ) 隔离性或独立性( Isolation) 持久性(Durabilily)  分布式理论CAP理论CAP定理是由加州大学伯克利分校Eric Brewer教授提出来的，他指出WEB服务无法同时满足一下3个属性：  一致性(Consistency) ： 客户端知道一系列的操作都会同时发   生(生效) 可用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/3%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%E5%9B%BE.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/%E6%9C%AC%E5%9C%B0%E6%B6%88%E6%81%AF%E8%A1%A8.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/sagas.png">
+<meta property="article:published_time" content="2021-05-06T08:34:18.000Z">
+<meta property="article:modified_time" content="2021-05-08T13:59:05.027Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sk-xinye.github.io/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/3%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%E5%9B%BE.png">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>分布式事务 | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">9</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式事务
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-06 16:34:18" itemprop="dateCreated datePublished" datetime="2021-05-06T16:34:18+08:00">2021-05-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="分布式事务解决方案"><a href="#分布式事务解决方案" class="headerlink" title="分布式事务解决方案"></a>分布式事务解决方案</h2><h3 id="数据库事务"><a href="#数据库事务" class="headerlink" title="数据库事务"></a>数据库事务</h3><ul>
+<li>原子性(Atomicity )</li>
+<li>一致性( Consistency )</li>
+<li>隔离性或独立性( Isolation)</li>
+<li>持久性(Durabilily)</li>
+</ul>
+<h3 id="分布式理论"><a href="#分布式理论" class="headerlink" title="分布式理论"></a>分布式理论</h3><h4 id="CAP理论"><a href="#CAP理论" class="headerlink" title="CAP理论"></a>CAP理论</h4><p>CAP定理是由加州大学伯克利分校Eric Brewer教授提出来的，他指出WEB服务无法同时满足一下3个属性：</p>
+<ul>
+<li>一致性(Consistency) ： 客户端知道一系列的操作都会同时发   生(生效)</li>
+<li>可用性(Availability) ： 每个操作都必须以可预期的响应结束</li>
+<li>分区容错性(Partition tolerance) ： 即使出现单个组件无法可用,操作依然可以完成</li>
+<li><strong>CAP原则指CAP三者不能同时满足，要么能同时满足CP即同时满足区分容错性和一致性，要么同时满足AP即同时满足区分容错性和可用性。从中可以看出，P是分布式系统的基础，没有区分容错性就谈不上分布式系统了</strong></li>
+</ul>
+<h4 id="BASE理论"><a href="#BASE理论" class="headerlink" title="BASE理论"></a>BASE理论</h4><p>前面讲到分布式系统的CAP原则要么同时满足AP要么同时满足CP，那么BASE理论则是CAP原则权衡的结果。BASE是指Basically Available（基本可用的）,Soft state（软状态）,Eventual consistency（最终一致性）。</p>
+<ul>
+<li><p>Basically Available是指在分布式集群节点中，若某个节点宕机，或者在数据在节点间复制的过程中，只有部分数据不可用，但不影响整个系统的整体的可用性。</p>
+</li>
+<li><p>Soft state是指软状态即这个状态只是一个中间状态，允许数据在节点集群间操作过程中存在存在一个时延，这个中间状态最终会转化为最终状态。</p>
+</li>
+<li><p>Eventual consistency是指数据在分布式集群节点间操作过程中存在时延，与ACID相反，最终一致性不是强一致性，在经过一定时间后，分布式集群节点间的数据拷贝能达到最终一致的状态。</p>
+</li>
+</ul>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><h4 id="两阶段提交-2pc"><a href="#两阶段提交-2pc" class="headerlink" title="两阶段提交(2pc)"></a>两阶段提交(2pc)</h4><ul>
+<li>准备阶段<ul>
+<li>协调者节点向所有参与者节点询问是否可以执行提交操作(vote)，并开始等待各参与者节点的响应。</li>
+<li>参与者节点执行询问发起为止的所有事务操作，并将Undo信息和Redo信息写入日志。（注意：若成功这里其实每个参与者已经执行了事务操作）</li>
+<li>各参与者节点响应协调者节点发起的询问。如果参与者节点的事务操作实际执行成功，则它返回一个”同意”消息；如果参与者节点的事务操作实际执行失败，则它返回一个”中止”消息。由协调者判断是否继续</li>
+</ul>
+</li>
+<li>提交阶段<ul>
+<li>当协调者节点从所有参与者节点获得的相应消息都为”同意”时：</li>
+<li>协调者节点向所有参与者节点发出”正式提交(commit)”的请求。</li>
+<li>参与者节点正式完成操作，并释放在整个事务期间内占用的资源。</li>
+<li>参与者节点向协调者节点发送”完成”消息。</li>
+<li>协调者节点受到所有参与者节点反馈的”完成”消息后，完成事务。</li>
+<li>如果任一参与者节点在第一阶段返回的响应消息为”中止”，或者 协调者节点在第一阶段的询问超时之前无法获取所有参与者节点的响应消息时：<ul>
+<li>协调者节点向所有参与者节点发出”回滚操作(rollback)”的请求。</li>
+<li>参与者节点利用之前写入的Undo信息执行回滚，并释放在整个事务期间内占用的资源。</li>
+<li>参与者节点向协调者节点发送”回滚完成”消息。</li>
+<li>协调者节点受到所有参与者节点反馈的”回滚完成”消息后，取消事务。</li>
+<li>不管最后结果如何，第二阶段都会结束当前事务。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>问题<ul>
+<li>2PC是一个强一致性协议，同时它在实际应用中还存在几个问题：<ul>
+<li>同步阻塞，2PC的两个阶段中，协调者和参与者的通信都是同步的，这会导致整个事务的长时间阻塞</li>
+<li>Coordinator的单点问题</li>
+<li>数据不一致，在Commit阶段，可能存在只有部分参与者收到Commit消息（或处理成功）的情况</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="三阶段提交-3PC"><a href="#三阶段提交-3PC" class="headerlink" title="三阶段提交(3PC)"></a>三阶段提交(3PC)</h4><p>3PC即三阶段提交，它比2PC多了一个阶段，即把原来2PC的准备阶段拆分成CanCommit和PreCommit两个阶段，同时引入超时机制来解决2PC的同步阻塞问题。<br>    <img src="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/3%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%E5%9B%BE.png" class=""><br>但是在我看来3PC并没有解决2PC的根本问题，它只是在2PC的基础上做了一些优化，它增加了一个阶段（也增加了1个RTT）来提高对方可用性的概率，这本质跟TCP的三次握手一样，同样也改为四次握手，五次握手等等。</p>
+<h4 id="补偿事务-TCC-Try-Confirm-Cancel"><a href="#补偿事务-TCC-Try-Confirm-Cancel" class="headerlink" title="补偿事务(TCC:Try-Confirm-Cancel)"></a>补偿事务(TCC:Try-Confirm-Cancel)</h4><ul>
+<li><p>TCC 其实就是采用的补偿机制，其核心思想是：针对每个操作，都要注册一个与其对应的确认和补偿（撤销）操作。它分为三个阶段：</p>
+<ul>
+<li>Try 阶段主要是对业务系统做检测及资源预留</li>
+<li>Confirm 阶段主要是对业务系统做确认提交，Try阶段执行成功并开始执行 Confirm阶段时，默认 Confirm阶段是不会出错的。即：只要Try成功，Confirm一定成功。</li>
+<li>Cancel 阶段主要是在业务执行错误，需要回滚的状态下执行的业务取消，预留资源释放。</li>
+</ul>
+</li>
+<li><p>举个例子，假入 Bob 要向 Smith 转账，思路大概是：<br>  我们有一个本地方法，里面依次调用</p>
+<ul>
+<li>1、首先在 Try 阶段，要先调用远程接口把 Smith 和 Bob 的钱给冻结起来。</li>
+<li>2、在 Confirm 阶段，执行远程调用的转账的操作，转账成功进行解冻。</li>
+<li>3、如果第2步执行成功，那么转账成功，如果第二步执行失败，则调用远程冻结接口对应的解冻方法 (Cancel)。</li>
+</ul>
+</li>
+<li><p>优点： 跟2PC比起来，实现以及流程相对简单了一些，但数据的一致性比2PC也要差一些</p>
+</li>
+<li><p>缺点： 缺点还是比较明显的，在2,3步中都有可能失败。TCC属于应用层的一种补偿方式，所以需要程序员在实现的时候多写很多补偿的代码，在一些场景中，一些业务流程可能用TCC不太好定义及处理。</p>
+</li>
+</ul>
+<h4 id="本地消息表"><a href="#本地消息表" class="headerlink" title="本地消息表"></a>本地消息表</h4><p>本地消息表方案应该是业界内使用最为广泛的，因为它使用简单，成本比较低。<br>本地消息表的方案最初是由eBay提出（完整方案），核心思路是将分布式事务拆分成本地事务进行处理。它的处理流程如下：</p>
+<ul>
+<li>事务发起方把要处理的业务事务和写消息表这两个操作放在同一个本地事务里</li>
+<li>事务发起方有一个定时任务轮询消息表，把没处理的消息发送到消息中间件</li>
+<li>事务被动方从消息中间件获取消息后，返回成功</li>
+<li>事务发起方更新消息状态为已成功  <img src="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/%E6%9C%AC%E5%9C%B0%E6%B6%88%E6%81%AF%E8%A1%A8.png" class=""></li>
+</ul>
+<p>一些分析:</p>
+<ul>
+<li>把业务处理和写消息表放在同一个事务是为了失败/异常后可以同时回滚</li>
+<li>为什么不直接发消息，而是先写消息表？试想，如果发送消息超时了，即不确定消息中间件收到消息没，那么你是重试还是抛异常回滚事务呢？回滚是不行的，因为可能消息中间件已经收到消息，接收方收到消息后做处理，导致双方数据不一致了；重试也是不行的，因为有可能会一直重试失败，导致事务阻塞。  </li>
+<li>基于上述分析，消息的接收方是需要做幂等操作的</li>
+</ul>
+<p>本地消息表方案整体来说还是比较简单、可用的，但是也有以下缺点：</p>
+<ul>
+<li>消息数据和业务数据耦合，消息表需要根据具体的业务场景制定，不能公用。就算可以公用消息表，对于分库的业务来说每个库都是需要消息表的。</li>
+<li>只适用于最终一致的业务场景。例如在 A -&gt; B场景下，在不考虑网络异常、宕机等非业务异常的情况下，A成功的话，B肯定也会成功的。</li>
+</ul>
+<h4 id="Sagas事务模型"><a href="#Sagas事务模型" class="headerlink" title="Sagas事务模型"></a>Sagas事务模型</h4><p>Saga事务模型又叫做长时间运行的事务（Long-running-transaction）, 它是由普林斯顿大学的H.Garcia-Molina等人提出，它描述的是另外一种在没有两阶段提交的的情况下解决分布式系统中复杂的业务事务问题。<br>我们这里说的是一种基于 Sagas 机制的工作流事务模型，这个模型的相关理论目前来说还是比较新的，以至于百度上几乎没有什么相关资料。</p>
+<p>该模型其核心思想就是拆分分布式系统中的长事务为多个短事务，或者叫多个本地事务，然后由 Sagas 工作流引擎负责协调，如果整个流程正常结束，那么就算是业务成功完成，如果在这过程中实现失败，那么Sagas工作流引擎就会以相反的顺序调用补偿操作，重新进行业务回滚。</p>
+<p>比如我们一次关于购买旅游套餐业务操作涉及到三个操作，他们分别是预定车辆，预定宾馆，预定机票，他们分别属于三个不同的远程接口。可能从我们程序的角度来说他们不属于一个事务，但是从业务角度来说是属于同一个事务的。<br>    <img src="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/sagas.png" class=""></p>
+<p>们的执行顺序如上图所示，所以当发生失败时，会依次进行取消的补偿操作。</p>
+<p>因为长事务被拆分了很多个业务流，所以 Sagas 事务模型最重要的一个部件就是工作流或者你也可以叫流程管理器（Process Manager），工作流引擎和Process Manager虽然不是同一个东西，但是在这里，他们的职责是相同的</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/" rel="prev" title="用户态及内核态">
+      <i class="fa fa-chevron-left"></i> 用户态及内核态
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/" rel="next" title="时间复杂度">
+      时间复杂度 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.</span> <span class="nav-text">分布式事务解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1"><span class="nav-number">1.1.</span> <span class="nav-text">数据库事务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA"><span class="nav-number">1.2.</span> <span class="nav-text">分布式理论</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CAP%E7%90%86%E8%AE%BA"><span class="nav-number">1.2.1.</span> <span class="nav-text">CAP理论</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BASE%E7%90%86%E8%AE%BA"><span class="nav-number">1.2.2.</span> <span class="nav-text">BASE理论</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.3.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4-2pc"><span class="nav-number">1.3.1.</span> <span class="nav-text">两阶段提交(2pc)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%89%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4-3PC"><span class="nav-number">1.3.2.</span> <span class="nav-text">三阶段提交(3PC)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A1%A5%E5%81%BF%E4%BA%8B%E5%8A%A1-TCC-Try-Confirm-Cancel"><span class="nav-number">1.3.3.</span> <span class="nav-text">补偿事务(TCC:Try-Confirm-Cancel)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E6%B6%88%E6%81%AF%E8%A1%A8"><span class="nav-number">1.3.4.</span> <span class="nav-text">本地消息表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Sagas%E4%BA%8B%E5%8A%A1%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.3.5.</span> <span class="nav-text">Sagas事务模型</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
