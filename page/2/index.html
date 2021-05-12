@@ -134,7 +134,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">12</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">15</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -187,6 +187,401 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/05/mysql%E9%94%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/05/mysql%E9%94%81/" class="post-title-link" itemprop="url">mysql锁</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-05 20:46:31" itemprop="dateCreated datePublished" datetime="2021-05-05T20:46:31+08:00">2021-05-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/05/mysql%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/05/mysql%E7%B4%A2%E5%BC%95/" class="post-title-link" itemprop="url">mysql索引</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-05 20:42:07" itemprop="dateCreated datePublished" datetime="2021-05-05T20:42:07+08:00">2021-05-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h2><h3 id="常见的索引类型"><a href="#常见的索引类型" class="headerlink" title="常见的索引类型"></a>常见的索引类型</h3><ul>
+<li><p>哈希表</p>
+<p><strong>哈希表这种结构适用于只有等值查询的场景</strong></p>
+  <img src="/2021/05/05/mysql%E7%B4%A2%E5%BC%95/11.png" class=""></li>
+<li><p>有序数组</p>
+<p><strong>有序数组在等值查询和范围查询场景中的性能就都非常优秀，但是当涉及到插入操作时就不行了，所以有序数组索引只适用于静态存储引擎</strong></p>
+</li>
+<li><p>搜索树</p>
+<ul>
+<li><p>二叉树</p>
+<p>可以任意拥有左右两个节点，但是会演变为链表，查询复杂度变高.</p>
+</li>
+<li><p>二叉搜索树（BST)</p>
+<ul>
+<li>左节点小于根节点</li>
+<li>右节点大于根节点</li>
+<li><strong>时间复杂度最好是O(logn),最坏是演变为链表O(n)</strong></li>
+</ul>
+</li>
+<li><p>平衡二叉搜索树（AVL）</p>
+<ul>
+<li>左右子树高度不会差距超过1</li>
+<li><strong>需要大量的平衡操作，代价比较大，如果插入操作不高的话，AVL树更好点，否则红黑树更好</strong></li>
+</ul>
+</li>
+<li><p>红黑树</p>
+<img src="/2021/05/05/mysql%E7%B4%A2%E5%BC%95/%E7%BA%A2%E9%BB%91%E6%A0%91.png" class="">
+<ul>
+<li>每个节点非红即黑.</li>
+<li>根节点是黑的。</li>
+<li>每个叶节点(叶节点即树尾端NUL指针或NULL节点)都是黑的.</li>
+<li>如果一个节点是红的,那么它的两儿子都是黑的.</li>
+<li>对于任意节点而言,其到叶子点树NIL指针的每条路径都包含相同数目的黑节点.</li>
+</ul>
+</li>
+<li><p>B树</p>
+<ul>
+<li>定义任意非叶子结点最多只有M个儿子；且M&gt;2；</li>
+<li>根结点的儿子数为[2, M]；</li>
+<li>除根结点以外的非叶子结点的儿子数为[M/2, M]；</li>
+<li>每个结点存放至少M/2-1（取上整）和至多M-1个关键字；（至少2个关键字）</li>
+<li>非叶子结点的关键字个数=指向儿子的指针个数-1；</li>
+<li>非叶子结点的关键字：K[1], K[2], …, K[M-1]；且K[i] &lt; K[i+1]；</li>
+<li>非叶子结点的指针：P[1], P[2], …, P[M]；其中P[1]指向关键字小于K[1]的子树，P[M]指向关</li>
+<li>键字大于K[M-1]的子树，其它P[i]指向关键字属于(K[i-1], K[i])的子树；</li>
+<li>所有叶子结点位于同一层；  </li>
+</ul>
+</li>
+<li><p>B+树</p>
+<ul>
+<li>相对于 B树来说更适合作为索引</li>
+<li>B+-tree的内部节点并没有指向关键字具体信息的指针,因此其内部节点相对B树更小,如果把所有同一内部节点的关键字存放在同一盘块中,那么盘块所能容纳的关键字数量也越多,一次性读入内存的需要查找的关键字也就越多,相对IO读写次数就降低了.</li>
+<li>由于非终结点并不是最终指向文件内容的结点，而只是叶子结点中关键字的索引。所以任何关键字的查找必须走一条从根结点到叶子结点的路。所有关键字查询的路径长度相同，导致每一个数据的查询效率相当。</li>
+<li>支持范围查询较好，效率较B+树要高很多</li>
+<li>其实选择B+树当索引要涉及到操作系统虚拟内存叶式存储有关，主要的性能瓶颈是在磁盘IO操作，并且为了更好的命中内存，将附近的存储区域一块抽取到内存中</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="索引相关概念"><a href="#索引相关概念" class="headerlink" title="索引相关概念"></a>索引相关概念</h3><ul>
+<li><p>索引覆盖</p>
+<p>需要查询的内容已经在索引树上，减少了回表，推荐使用索引覆盖</p>
+</li>
+<li><p>最左前缀原则</p>
+<p>针对联合索引，从左边开始依次匹配，可以用来减少索引较多带来的维护问题</p>
+</li>
+<li><p>索引下推</p>
+<p>为了减少回表的次数，Mysql5.6以后引入了索引下推，减少了回表的次数</p>
+</li>
+</ul>
+<h3 id="表操作相关代码"><a href="#表操作相关代码" class="headerlink" title="表操作相关代码"></a>表操作相关代码</h3><ul>
+<li>创建表<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> `geek` (</span><br><span class="line">`a` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">`b` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">`c` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">`d` <span class="type">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line"><span class="keyword">PRIMARY</span> KEY (`a`,`b`),</span><br><span class="line">KEY `c` (`c`),</span><br><span class="line">KEY `ca` (`c`,`a`),</span><br><span class="line">KEY `cb` (`c`,`b`)) ENGINE<span class="operator">=</span>InnoDB;</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/05/mysql%E4%BA%8B%E5%8A%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/05/mysql%E4%BA%8B%E5%8A%A1/" class="post-title-link" itemprop="url">mysql事务</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-05 17:28:56" itemprop="dateCreated datePublished" datetime="2021-05-05T17:28:56+08:00">2021-05-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="mysql事务"><a href="#mysql事务" class="headerlink" title="mysql事务"></a>mysql事务</h2><h3 id="视图"><a href="#视图" class="headerlink" title="视图"></a>视图</h3><ul>
+<li>一个是 view。它是一个用查询语句定义的虚拟表，在调用的时候执行查询语句并生成结果。创建视图的语法是 create view … ，而它的查询方法与表一样。</li>
+<li>另一个是 InnoDB 在实现 MVCC 时用到的一致性读视图，即 consistent read view，用于支持 RC（Read Committed，读提交）和 RR（Repeatable Read，可重复读）隔离级别的实现。</li>
+</ul>
+<h2 id="MVCC"><a href="#MVCC" class="headerlink" title="MVCC"></a>MVCC</h2><ul>
+<li><p>在可重复读隔离级别下，事务在启动的时候就“拍了个快照”。注意，这个快照是基于整库的。</p>
+</li>
+<li><p>在事务开始的时候向 InnoDB 的事务系统申请的，是按申请顺序严格递增的。</p>
+</li>
+<li><p>而每行数据也都是有多个版本的。数据表中的一行记录，其实可能有多个版本 (row)，每个版本有自己的 row trx_id。</p>
+  <img src="/2021/05/05/mysql%E4%BA%8B%E5%8A%A1/%E4%BA%8B%E5%8A%A1%E6%95%B0%E7%BB%84.png" class=""></li>
+<li><p>低水位：已经提交的；高水位：已经开始的事务最大值加1</p>
+</li>
+<li><p>如果落在绿色部分，表示这个版本是已提交的事务或者是当前事务自己生成的，这个数据是可见的；</p>
+</li>
+<li><p>如果落在红色部分，表示这个版本是由将来启动的事务生成的，是肯定不可见的；</p>
+</li>
+<li><p>如果落在黄色部分，那就包括两种情况</p>
+<ul>
+<li>a. 若 row trx_id 在数组中，表示这个版本是由还没提交的事务生成的，不可见；</li>
+<li>b. 若 row trx_id 不在数组中，表示这个版本是已经提交了的事务生成的，可见。</li>
+</ul>
+</li>
+<li><p>更新逻辑</p>
+<ul>
+<li>更新数据都是先读后写的，而这个读，只能读当前的值，称为“当前读”（current read）</li>
+</ul>
+</li>
+</ul>
+<h3 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h3><ul>
+<li><p><strong>Atomicity 原子性</strong></p>
+<p> 事务是最小的执行单位，不允许分割。事务的原子性确保动作要么全部完成，要么完全不起作用；</p>
+</li>
+<li><p><strong>Consistency 一致性</strong></p>
+<p>执行事务前后，数据保持一致，多个事务对同一个数据读取的结果是相同的；</p>
+</li>
+<li><p><strong>Isolation 隔离性</strong></p>
+<p>并发访问数据库时，一个用户的事务不被其他事务所干扰，各并发事务之间数据库是独立的；</p>
+</li>
+<li><p><strong>Durability 持久性</strong></p>
+<p> 一个事务被提交之后。它对数据库中数据的改变是持久的，即使数据库发生故障也不应该对其有任何影响。</p>
+</li>
+<li><p><strong>脏读</strong></p>
+<p>某个事务已更新一份数据，另一个事务在此时读取了同一份数据，由于某些原因，前一个RollBack了操作，则后一个事务所读取的数据就会是不正确的。</p>
+</li>
+<li><p><strong>不可重复读</strong></p>
+<p>在一个事务的两次查询之中数据不一致，这可能是两次查询过程中间插入了一个事务更新的原有的数据。</p>
+</li>
+<li><p><strong>幻读</strong></p>
+<p>在一个事务的两次查询中数据笔数不一致，例如有一个事务查询了几列(Row)数据，而另一个事务却在此时插入了新的几列数据，先前的事务在接下来的查询中，就会发现有几列数据是它先前所没有的。</p>
+</li>
+<li><p><strong>一致性读（快照读）</strong></p>
+<p>当不涉及到更新操作时，select通过一致性视图MVCC 实现一致性读</p>
+</li>
+<li><p><strong>当前读</strong></p>
+<p>更新数据都是先读后写的，而这个读，只能读当前的值，称为“当前读”（current read）。</p>
+</li>
+</ul>
+<h3 id="事务隔离级别对照表"><a href="#事务隔离级别对照表" class="headerlink" title="事务隔离级别对照表"></a>事务隔离级别对照表</h3><table>
+<thead>
+<tr>
+<th align="left">隔离级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">READ-UNCOMMITTED</td>
+<td>√</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td align="left">READ-COMMITTED</td>
+<td>×</td>
+<td>√</td>
+<td>√</td>
+</tr>
+<tr>
+<td align="left">REPEATABLE-READ</td>
+<td>×</td>
+<td>×</td>
+<td>√</td>
+</tr>
+<tr>
+<td align="left">SERIALIZABLE</td>
+<td>×</td>
+<td>×</td>
+<td>×</td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>Mysql 默认采用的 <strong>REPEATABLE_READ</strong>隔离级别 Oracle 默认采用的 READ_COMMITTED隔离级别</p>
+</li>
+<li><p>事务隔离机制的实现基于锁机制和并发调度。其中并发调度使用的是MVVC（多版本并发控制），通过保存修改的旧版本信息来支持并发一致性读和回滚等特性。</p>
+</li>
+<li><p>因为隔离级别越低，事务请求的锁越少，所以大部分数据库系统的隔离级别都是READ-COMMITTED(读取提交内容):，但是你要知道的是InnoDB 存储引擎默认使用 <strong>REPEATABLE-READ（可重读）</strong>并不会有任何性能损失。</p>
+</li>
+<li><p>InnoDB 存储引擎在 分布式事务 的情况下一般会用到**SERIALIZABLE(可串行化)**隔离级别。</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -436,7 +831,7 @@ npm install hexo-generator-searchdb --save
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
