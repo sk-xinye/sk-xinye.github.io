@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="消费者与消费组消费者（Consumer）负责订阅Kafka中的主题（Topic），并且从订阅的主题上拉取消息。与其他一些消息中间件不同的是：在Kafka的消费理念中还有一层消费组（Consumer Group）的概念，每个消费者都有一个对应的消费组。当消息发布到主题后，只会被投递给订阅它的每个消费组中的一个消费者。  每一个分区只能被一个消费组中的一个消费者所消费。 但是一味增加消费者个数，并不一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="3.消费者">
+<meta property="og:url" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="消费者与消费组消费者（Consumer）负责订阅Kafka中的主题（Topic），并且从订阅的主题上拉取消息。与其他一些消息中间件不同的是：在Kafka的消费理念中还有一层消费组（Consumer Group）的概念，每个消费者都有一个对应的消费组。当消息发布到主题后，只会被投递给订阅它的每个消费组中的一个消费者。  每一个分区只能被一个消费组中的一个消费者所消费。 但是一味增加消费者个数，并不一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E6%B6%88%E8%B4%B9%E8%80%85%E7%BB%84.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%A3%E7%A0%81.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%A3%E7%A0%812.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E8%AE%A2%E9%98%85%E4%B8%BB%E9%A2%98.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/topicpatition.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/partitionfor.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/consumerrecords.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E6%B6%88%E8%B4%B9%E4%BD%8D%E7%A7%BB.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E5%A4%9A%E7%BA%BF%E7%A8%8B1.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E5%A4%9A%E7%BA%BF%E7%A8%8B3.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E5%85%B6%E4%BB%96%E5%8F%82%E6%95%B01.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E5%85%B6%E4%BB%96%E5%8F%82%E6%95%B02.png">
+<meta property="article:published_time" content="2021-06-22T09:11:12.000Z">
+<meta property="article:modified_time" content="2021-06-24T13:03:12.305Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E6%B6%88%E8%B4%B9%E8%80%85%E7%BB%84.png">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>3.消费者 | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">96</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          3.消费者
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-22 17:11:12" itemprop="dateCreated datePublished" datetime="2021-06-22T17:11:12+08:00">2021-06-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-24 21:03:12" itemprop="dateModified" datetime="2021-06-24T21:03:12+08:00">2021-06-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="消费者与消费组"><a href="#消费者与消费组" class="headerlink" title="消费者与消费组"></a>消费者与消费组</h2><p>消费者（Consumer）负责订阅Kafka中的主题（Topic），并且从订阅的主题上拉取消息。<strong>与其他一些消息中间件不同的是：在Kafka的消费理念中还有一层消费组（Consumer Group）的概念</strong>，每个消费者都有一个对应的消费组。当消息发布到主题后，只会被投递给订阅它的每个消费组中的一个消费者。</p>
+<ul>
+<li>每一个分区只能被一个消费组中的一个消费者所消费。</li>
+<li>但是一味增加消费者个数，并不一定会增加消费能力，对于分区数固定的主题，当消费者个数大于分区数，就会有消费者不能分配到任何分区的情况</li>
+<li>默认分区分配策略partition.assignment.strategy</li>
+<li>消费组是一个逻辑上的概念，它将旗下的消费者归为一类，每一个消费者只隶属于一个消费组。每一个消费组都会有一个固定的名称，消费者在进行消费前需要指定其所属消费组的名称，这个可以通过消费者客户端参数group.id来配置，默认值为空字符串。</li>
+<li>消费者并非逻辑上的概念，它是实际的应用实例，它可以是一个线程，也可以是一个进程。同一个消费组内的消费者既可以部署在同一台机器上，也可以部署在不同的机器上。<img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E6%B6%88%E8%B4%B9%E8%80%85%E7%BB%84.png" class=""></li>
+</ul>
+<h3 id="消息投递模式"><a href="#消息投递模式" class="headerlink" title="消息投递模式"></a>消息投递模式</h3><p>对于消息中间件而言，一般有两种消息投递模式：点对点（P2P，Point-to-Point）模式和发布/订阅（Pub/Sub）模式。kafka都支持，得益于消费者组</p>
+<ul>
+<li>如果所有的消费者都隶属于同一个消费组，那么所有的消息都会被均衡地投递给每一个消费者，即每条消息只会被一个消费者处理，这就相当于点对点模式的应用。</li>
+<li>如果所有的消费者都隶属于不同的消费组，那么所有的消息都会被广播给所有的消费者，即每条消息会被所有的消费者处理，这就相当于发布/订阅模式的应用。</li>
+</ul>
+<h2 id="客户端开发"><a href="#客户端开发" class="headerlink" title="客户端开发"></a>客户端开发</h2><h3 id="主要步骤"><a href="#主要步骤" class="headerlink" title="主要步骤"></a>主要步骤</h3><ul>
+<li>配置消费者客户端参数及创建相应的消费者实例。</li>
+<li>订阅主题。</li>
+<li>拉取消息并消费。</li>
+<li>提交消费位移。</li>
+<li>关闭消费者实例。</li>
+</ul>
+<img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%A3%E7%A0%81.png" class=""> <img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E6%B6%88%E8%B4%B9%E8%80%85%E4%BB%A3%E7%A0%812.png" class="">
+
+<h3 id="必要的参数配置"><a href="#必要的参数配置" class="headerlink" title="必要的参数配置"></a>必要的参数配置</h3><ul>
+<li>在initConfig（）方法，在Kafka消费者客户端KafkaConsumer中有4个参数是必填的。<ul>
+<li>bootstrap.servers：该参数的释义和生产者客户端 KafkaProducer 中的相同，用来 指 定 连 接 Kafka 集 群 所 需 的 broker 地 址 清 单，具 体 内 容 形 式 为host1：port1，host2：post，</li>
+<li>group.id：消费者隶属的消费组的名称，默认值为“”。如果设置为空，则会报出异常：Exception in thread “main” org.apache.kafka.common.errors.InvalidGroupIdException：The configured groupId is invalid。一般而言，这个参数需要设置成具有一定的业务意义的名称。</li>
+<li>key.deserializer 和 value.deserializer：与生产者客户端 KafkaProducer中的key.serializer和value.serializer参数对应。</li>
+</ul>
+</li>
+</ul>
+<h3 id="订阅主题与分区"><a href="#订阅主题与分区" class="headerlink" title="订阅主题与分区"></a>订阅主题与分区</h3><ul>
+<li>订阅主题既可以以集合方式，也可以以正则表达式方式订阅（consumer.subscribe(Pattern.compile(“topic-.*”))），如图的构造函数<img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E8%AE%A2%E9%98%85%E4%B8%BB%E9%A2%98.png" class=""></li>
+<li>如果前后两次订阅了不同的主题，那么消费者以最后一次的为准。</li>
+<li>其中一个构造参数ConsumerRebalance-Listener，这个是用来设置相应的再均衡监听器的</li>
+<li>消费者不仅可以通过KafkaConsumer.subscribe（）方法订阅主题，还可以直接订阅某些主题的特定分区，在KafkaConsumer中还提供了一个assign（）方法来实现这些功能<ul>
+<li>public void assign(Collection&lt; TopicPartition &gt; partitions)</li>
+<li>这个方法只接受一个参数partitions，用来指定需要订阅的分区集合。这里补充说明一下TopicPartition类，在Kafka的客户端中，它用来表示分区</li>
+<li><img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/topicpatition.png" class=""></li>
+<li>TopicPartition类只有2个属性：topic和partition，分别代表分区所属的主题和自身的分区编号，这个类可以和我们通常所说的主题—分区的概念映射起来。</li>
+<li>可以将subscribe 替换为assign consumer.assign(Arrays.asList(new TopicPrtition(“topic-demo”,0)))</li>
+</ul>
+</li>
+<li>KafkaConsumer 中的partitionsFor（）方法可以用来查询指定主题的元数据信息<ul>
+<li>public List&lt; PartitionInfo &gt; partitionsFor(String topic)</li>
+<li><img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/partitionfor.png" class=""></li>
+<li>PartitionInfo类中的属性topic表示主题名称，partition代表分区编号，leader代表分区的leader副本所在的位置，replicas代表分区的AR集合，inSyncReplicas代表分区的ISR集合，offlineReplicas代表分区的OSR集合。</li>
+</ul>
+</li>
+<li>既然有订阅，那么就有取消订阅，可以使用 KafkaConsumer 中的 unsubscribe（）方法来取消主题的订阅。</li>
+</ul>
+<h3 id="反序列化"><a href="#反序列化" class="headerlink" title="反序列化"></a>反序列化</h3><ul>
+<li>Kafka所提供的反序列化器有ByteBufferDeserializer、ByteArrayDeserializer、BytesDeserializer、DoubleDeserializer、FloatDeserializer、IntegerDeserializer、LongDeserializer、ShortDeserializer、StringDeserializer，它们分别用于ByteBuffer、ByteArray、Bytes、Double、Float、Integer、Long、Short 及String类型的反序列化，这些序列化器也都实现了 Deserializer 接口</li>
+<li>与KafkaProducer中提及的Serializer接口一样，Deserializer接口也有三个方法<ul>
+<li>public void configure（Map＜String，？＞ configs，boolean isKey）：用来配置当前类。</li>
+<li>public byte[] serialize（String topic，T data）：用来执行反序列化。如果data为null，那么处理的时候直接返回null而不是抛出一个异常。</li>
+<li>public void close（）：用来关闭当前序列化器。</li>
+</ul>
+</li>
+</ul>
+<h3 id="消息消费"><a href="#消息消费" class="headerlink" title="消息消费"></a>消息消费</h3><ul>
+<li>Kafka中的消费是基于拉模式的。</li>
+<li>Kafka中的消息消费是一个不断轮询的过程，消费者所要做的就是重复地调用poll（）方法，而poll（）方法返回的是所订阅的主题（分区）上的一组消息。</li>
+<li>public ConsumerRecords&lt; k,v &gt; poll(final Duration timeout)</li>
+<li>线程不安全的 <a target="_blank" rel="noopener" href="https://www.pianshen.com/article/88711219115/">https://www.pianshen.com/article/88711219115/</a></li>
+</ul>
+<h4 id="ConsumerRecords"><a href="#ConsumerRecords" class="headerlink" title="ConsumerRecords"></a>ConsumerRecords</h4><img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/consumerrecords.png" class="">
+
+<ul>
+<li>ConsumerRecords类提供了一个records（TopicPartition）方法来获取消息集中指定分区的消息</li>
+<li>ConsumerRecords 类中并没提供与 partitions（）类似的 topics（）方法来查看拉取的消息集中所包含的主题列表，如果要按照主题维度来进行消费，那么只能根据消费者订阅主题时的列表来进行逻辑处理了。下面的示例演示了如何使用ConsumerRecords中的record（String topic）方法：</li>
+</ul>
+<h3 id="位移提交"><a href="#位移提交" class="headerlink" title="位移提交"></a>位移提交</h3><ul>
+<li><p>对于消息在分区中的位置，我们将offset称为“偏移量”；对于消费者消费到的位置，将 offset 称为“位移”，有时候也会更明确地称之为“消费位移”</p>
+<img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E6%B6%88%E8%B4%B9%E4%BD%8D%E7%A7%BB.png" class=""></li>
+<li><p>在 Kafka 中默认的消费位移的提交方式是自动提交 enable.auto.commit 配置，默认值为 true</p>
+</li>
+<li><p>当然这个默认的自动提交不是每消费一条消息就提交一次，而是定期提交，这个定期的周期时间由客户端参数auto.commit.interval.ms配置，默认值为5秒，此参数生效的前提是enable.auto.commit参数为true。</p>
+</li>
+<li><p>自动提交缺点：</p>
+<ul>
+<li>自动位移提交的方式在正常情况下不会发生消息丢失或重复消费的现象，但是在编程的世界里异常无可避免，与此同时，自动位移提交也无法做到精确的位移管理。</li>
+</ul>
+</li>
+<li><p>手动提交</p>
+<ul>
+<li>enable.auto.commit配置为false</li>
+<li>手动提交可以细分为同步提交和异步提交，对应于 KafkaConsumer 中的 commitSync（）和commitAsync（）两种类型的方法</li>
+<li>commitSync（）commitAsync（） 有重复消费问题</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(isRunning.get()):</span><br><span class="line">  ConsumerRecords&lt;String,String&gt; records = consumer.poll(<span class="number">1000</span>)；</span><br><span class="line">  <span class="keyword">for</span> (ConsumerRecord&lt;String,String&gt; record: records)&#123;</span><br><span class="line">    <span class="comment">//do some  logical processing</span></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="控制或关闭消费"><a href="#控制或关闭消费" class="headerlink" title="控制或关闭消费"></a>控制或关闭消费</h3><ul>
+<li>KafkaConsumer中使用pause（）和resume（）方法来分别实现暂停某些分区在拉取操作时返回数据给客户端和恢复某些分区向客户端返回数据的操作</li>
+</ul>
+<h3 id="指定位移消费"><a href="#指定位移消费" class="headerlink" title="指定位移消费"></a>指定位移消费</h3><ul>
+<li>如果将auto.offset.reset参数配置为“earliest”，那么消费者会从起始处，也就是0开始消费</li>
+</ul>
+<h3 id="再均衡"><a href="#再均衡" class="headerlink" title="再均衡"></a>再均衡</h3><ul>
+<li>再均衡是指分区的所属权从一个消费者转移到另一消费者的行为，它为消费组具备高可用性和伸缩性提供保障，使我们可以既方便又安全地删除消费组内的消费者或往消费组内添加消费者。</li>
+<li>不过在再均衡发生期间，消费组内的消费者是无法读取消息的。也就是说，在再均衡发生期间的这一小段时间内，消费组会变得不可用。</li>
+</ul>
+<h3 id="消费者拦截器"><a href="#消费者拦截器" class="headerlink" title="消费者拦截器"></a>消费者拦截器</h3><h3 id="多线程实现"><a href="#多线程实现" class="headerlink" title="多线程实现"></a>多线程实现</h3><ul>
+<li>为了加速消费者的消费能力，我们可以通过多线程的方式实现消息消费。</li>
+<li>KafkaProducer是线程安全的，然而KafkaConsumer却是非线程安全的。</li>
+</ul>
+<h4 id="第一种也是最常见的方式：线程封闭，即为每个线程实例化一个KafkaConsumer对象"><a href="#第一种也是最常见的方式：线程封闭，即为每个线程实例化一个KafkaConsumer对象" class="headerlink" title="第一种也是最常见的方式：线程封闭，即为每个线程实例化一个KafkaConsumer对象"></a>第一种也是最常见的方式：线程封闭，即为每个线程实例化一个KafkaConsumer对象</h4><img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E5%A4%9A%E7%BA%BF%E7%A8%8B1.png" class="">
+
+<ul>
+<li>一个线程对应一个KafkaConsumer实例，我们可以称之为消费线程。</li>
+<li>一个消费线程可以消费一个或多个分区中的消息，所有的消费线程都隶属于同一个消费组。</li>
+<li>这种实现方式的并发度受限于分区的实际个数当消费线程的个数大于分区数时，就有部分消费线程一直处于空闲的状态。</li>
+<li>上面这种多线程的实现方式和开启多个消费进程的方式没有本质上的区别，它的优点是每个线程可以按顺序消费各个分区中的消息。</li>
+<li>缺点也很明显，每个消费线程都要维护一个独立的TCP连接，如果分区数和consumerThreadNum的值都很大，那么会造成不小的系统开销。</li>
+</ul>
+<h4 id="第二种方式是多个消费线程同时消费同一个分区"><a href="#第二种方式是多个消费线程同时消费同一个分区" class="headerlink" title="第二种方式是多个消费线程同时消费同一个分区"></a>第二种方式是多个消费线程同时消费同一个分区</h4><ul>
+<li>通过 assign（）、seek（）等方法实现,这样可以打破原有的消费线程的个数不能超过分区数的限制，进一步提高了消费的能力。</li>
+<li>不过这种实现方式对于位移提交和顺序控制的处理就会变得非常复杂，实际应用中使用得极少，笔者也并不推荐。</li>
+<li>一般而言，分区是消费线程的最小划分单位。</li>
+</ul>
+<h4 id="第三种实现方式，将处理消息模块改成多线程的实现方式"><a href="#第三种实现方式，将处理消息模块改成多线程的实现方式" class="headerlink" title="第三种实现方式，将处理消息模块改成多线程的实现方式"></a>第三种实现方式，将处理消息模块改成多线程的实现方式</h4><p>一般而言，poll（）拉取消息的速度是相当快的，而整体消费的瓶颈也正是在处理消息这一块，如果我们通过一定的方式来改进这一部分，那么我们就能带动整体消费性能的提升。</p>
+<img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E5%A4%9A%E7%BA%BF%E7%A8%8B3.png" class="">
+
+<ul>
+<li>KafkaConsumerThread类对应的是一个消费线程，里面通过线程池的方式来调用 RecordHandler 处理一批批的消息。</li>
+<li>第三种实现方式还可以横向扩展，通过开启多个 KafkaConsumerThread 实例来进一步提升整体的消费能力。</li>
+<li>第三种实现方式相比第一种实现方式而言，除了横向扩展的能力，还可以减少TCP连接对系统资源的消耗，不过缺点就是对于消息的顺序处理就比较困难了。</li>
+</ul>
+<p>对于消费位移的处理可以通过滑动窗口来解决</p>
+<img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3.png" class="">
+
+<ul>
+<li>每一个方格代表一个批次的消息，一个滑动窗口包含若干方格，startOffset标注的是当前滑动窗口的起始位置，endOffset标注的是末尾位置。</li>
+<li>每当startOffset指向的方格中的消息被消费完成，就可以提交这部分的位移，与此同时，窗口向前滑动一格，删除原来startOffset所指方格中对应的消息，并且拉取新的消息进入窗口。</li>
+<li>滑动窗口的大小固定，所对应的用来暂存消息的缓存大小也就固定了，这部分内存开销可控。</li>
+<li>方格大小和滑动窗口的大小同时决定了消费线程的并发数：一个方格对应一个消费线程，对于窗口大小固定的情况，方格越小并行度越高；</li>
+<li>对于方格大小固定的情况，窗口越大并行度越高。</li>
+<li>不过，若窗口设置得过大，不仅会增大内存的开销，而且在发生异常（比如Crash）的情况下也会引起大量的重复消费，同时还考虑线程切换的开销，建议根据实际情况设置一个合理的值，不管是对于方格还是窗口而言，过大或过小都不合适。</li>
+<li>如果一个方格内的消息无法被标记为消费完成，重试失败就转入重试队列，如果还不奏效就转入死信队列</li>
+</ul>
+<h2 id="重要的消费者参数"><a href="#重要的消费者参数" class="headerlink" title="重要的消费者参数"></a>重要的消费者参数</h2><ol>
+<li>fetch.min.bytes<ul>
+<li>该参数用来配置Consumer在一次拉取请求（调用poll（）方法）中能从Kafka中拉取的最小数据量，默认值为1（B）。Kafka在收到Consumer的拉取请求时，如果返回给Consumer的数据量小于这个参数所配置的值，那么它就需要进行等待，直到数据量满足这个参数的配置大小。可以适当调大这个参数的值以提高一定的吞吐量，不过也会造成额外的延迟（latency），对于延迟敏感的应用可能就不可取了。</li>
+</ul>
+</li>
+<li>fetch.max.bytes<ul>
+<li>该参数与fetch.max.bytes参数对应，它用来配置Consumer在一次拉取请求中从Kafka中拉取的最大数据量，默认值为 52428800（B），也就是 50MB。</li>
+<li>与此相关的，Kafka中所能接收的最大消息的大小通过服务端参数message.max.bytes（对应于主题端参数max.message.bytes）来设置。</li>
+</ul>
+</li>
+<li>fetch.max.wait.ms<ul>
+<li>fetch.max.wait.ms参数用于指定Kafka的等待时间，默认值为500（ms）。</li>
+<li>如果Kafka中没有足够多的消息而满足不了fetch.min.bytes参数的要求，那么最终会等待500ms。</li>
+<li>这个参数的设定和Consumer与Kafka之间的延迟也有关系，如果业务应用对延迟敏感，那么可以适当调小这个参数。</li>
+</ul>
+</li>
+<li>max.partition.fetch.bytes<ul>
+<li>这个参数用来配置从每个分区里返回给Consumer的最大数据量，默认值为1048576（B），即1MB。</li>
+<li>这个参数与 fetch.max.bytes 参数相似，只不过前者用来限制一次拉取中每个分区的消息大小，而后者用来限制一次拉取中整体消息的大小。</li>
+<li>同样，如果这个参数设定的值比消息的大小要小，那么也不会造成无法消费，Kafka 为了保持消费逻辑的正常运转不会对此做强硬的限制。</li>
+</ul>
+</li>
+<li>max.poll.records<ul>
+<li>这个参数用来配置Consumer在一次拉取请求中拉取的最大消息数，默认值为500（条）。如果消息的大小都比较小，则可以适当调大这个参数值来提升一定的消费速度。</li>
+</ul>
+</li>
+<li>connections.max.idle.ms<ul>
+<li>这个参数用来指定在多久之后关闭限制的连接，默认值是540000（ms），即9分钟</li>
+</ul>
+</li>
+<li>exclude.internal.topics<ul>
+<li>Kafka中有两个内部的主题：__consumer_offsets和__transaction_state</li>
+<li>exclude.internal.topics用来指定Kafka中的内部主题是否可以向消费者公开，默认值为true。</li>
+<li>如果设置为true，那么只能使用subscribe（Collection）的方式而不能使用subscribe（Pattern）的方式来订阅内部主题，设置为false则没有这个限制。</li>
+</ul>
+</li>
+<li>receive.buffer.bytes<ul>
+<li>这个参数用来设置Socket接收消息缓冲区（SO_RECBUF）的大小，默认值为65536（B），即64KB。</li>
+<li>如果设置为-1，则使用操作系统的默认值。</li>
+<li>如果Consumer与Kafka处于不同的机房，则可以适当调大这个参数值。</li>
+</ul>
+</li>
+<li>send.buffer.bytes<ul>
+<li>这个参数用来设置Socket发送消息缓冲区（SO_SNDBUF）的大小，默认值为131072（B），即128KB。</li>
+<li>与receive.buffer.bytes参数一样，如果设置为-1，则使用操作系统的默认值。</li>
+</ul>
+</li>
+<li>request.timeout.ms<ul>
+<li>这个参数用来配置Consumer等待请求响应的最长时间，默认值为30000（ms）。</li>
+</ul>
+</li>
+<li>metadata.max.age.ms<ul>
+<li>这个参数用来配置元数据的过期时间，默认值为300000（ms），即5分钟。</li>
+<li>如果元数据在此参数所限定的时间范围内没有进行更新，则会被强制更新，即使没有任何分区变化或有新的broker加入。</li>
+</ul>
+</li>
+<li>reconnect.backoff.ms<ul>
+<li>这个参数用来配置尝试重新连接指定主机之前的等待时间（也称为退避时间），避免频繁地连接主机，默认值为50（ms）。</li>
+<li>这种机制适用于消费者向broker发送的所有请求。</li>
+</ul>
+</li>
+<li>retry.backoff.ms<ul>
+<li>个参数用来配置尝试重新发送失败的请求到指定的主题分区之前的等待（退避）时间，避免在某些故障情况下频繁地重复发送，默认值为100（ms）。</li>
+</ul>
+</li>
+<li>isolation.level<ul>
+<li>这个参数用来配置消费者的事务隔离级别。</li>
+<li>字符串类型，有效值为“read_uncommitted”和“read_committed”，表示消费者所消费到的位置，如果设置为“read_committed”，那么消费者就会忽略事务未提交的消息，即只能消费到 LSO（LastStableOffset）的位置，默认情况下为“read_uncommitted”，即可以消费到HW（High Watermark）处的位置。</li>
+</ul>
+</li>
+</ol>
+<img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E5%85%B6%E4%BB%96%E5%8F%82%E6%95%B01.png" class="">
+<img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E5%85%B6%E4%BB%96%E5%8F%82%E6%95%B02.png" class="">
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/" rel="prev" title="2.生产者">
+      <i class="fa fa-chevron-left"></i> 2.生产者
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/06/24/4-%E4%B8%BB%E9%A2%98%E4%B8%8E%E5%88%86%E5%8C%BA/" rel="next" title="4.主题与分区">
+      4.主题与分区 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B6%88%E8%B4%B9%E8%80%85%E4%B8%8E%E6%B6%88%E8%B4%B9%E7%BB%84"><span class="nav-number">1.</span> <span class="nav-text">消费者与消费组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E6%8A%95%E9%80%92%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">消息投递模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%BC%80%E5%8F%91"><span class="nav-number">2.</span> <span class="nav-text">客户端开发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%AD%A5%E9%AA%A4"><span class="nav-number">2.1.</span> <span class="nav-text">主要步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%85%E8%A6%81%E7%9A%84%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE"><span class="nav-number">2.2.</span> <span class="nav-text">必要的参数配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A2%E9%98%85%E4%B8%BB%E9%A2%98%E4%B8%8E%E5%88%86%E5%8C%BA"><span class="nav-number">2.3.</span> <span class="nav-text">订阅主题与分区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">2.4.</span> <span class="nav-text">反序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E6%B6%88%E8%B4%B9"><span class="nav-number">2.5.</span> <span class="nav-text">消息消费</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ConsumerRecords"><span class="nav-number">2.5.1.</span> <span class="nav-text">ConsumerRecords</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%8D%E7%A7%BB%E6%8F%90%E4%BA%A4"><span class="nav-number">2.6.</span> <span class="nav-text">位移提交</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E6%88%96%E5%85%B3%E9%97%AD%E6%B6%88%E8%B4%B9"><span class="nav-number">2.7.</span> <span class="nav-text">控制或关闭消费</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E5%AE%9A%E4%BD%8D%E7%A7%BB%E6%B6%88%E8%B4%B9"><span class="nav-number">2.8.</span> <span class="nav-text">指定位移消费</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%8D%E5%9D%87%E8%A1%A1"><span class="nav-number">2.9.</span> <span class="nav-text">再均衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B6%88%E8%B4%B9%E8%80%85%E6%8B%A6%E6%88%AA%E5%99%A8"><span class="nav-number">2.10.</span> <span class="nav-text">消费者拦截器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.11.</span> <span class="nav-text">多线程实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E7%A7%8D%E4%B9%9F%E6%98%AF%E6%9C%80%E5%B8%B8%E8%A7%81%E7%9A%84%E6%96%B9%E5%BC%8F%EF%BC%9A%E7%BA%BF%E7%A8%8B%E5%B0%81%E9%97%AD%EF%BC%8C%E5%8D%B3%E4%B8%BA%E6%AF%8F%E4%B8%AA%E7%BA%BF%E7%A8%8B%E5%AE%9E%E4%BE%8B%E5%8C%96%E4%B8%80%E4%B8%AAKafkaConsumer%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.11.1.</span> <span class="nav-text">第一种也是最常见的方式：线程封闭，即为每个线程实例化一个KafkaConsumer对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E7%A7%8D%E6%96%B9%E5%BC%8F%E6%98%AF%E5%A4%9A%E4%B8%AA%E6%B6%88%E8%B4%B9%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%97%B6%E6%B6%88%E8%B4%B9%E5%90%8C%E4%B8%80%E4%B8%AA%E5%88%86%E5%8C%BA"><span class="nav-number">2.11.2.</span> <span class="nav-text">第二种方式是多个消费线程同时消费同一个分区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E7%A7%8D%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F%EF%BC%8C%E5%B0%86%E5%A4%84%E7%90%86%E6%B6%88%E6%81%AF%E6%A8%A1%E5%9D%97%E6%94%B9%E6%88%90%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">2.11.3.</span> <span class="nav-text">第三种实现方式，将处理消息模块改成多线程的实现方式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E8%A6%81%E7%9A%84%E6%B6%88%E8%B4%B9%E8%80%85%E5%8F%82%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">重要的消费者参数</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">96</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

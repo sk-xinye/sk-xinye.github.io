@@ -129,12 +129,12 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">13</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">45</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">96</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -191,7 +191,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/12/%E4%BA%8C%E5%88%86/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/05/%E7%BC%93%E5%AD%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -205,7 +205,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/12/%E4%BA%8C%E5%88%86/" class="post-title-link" itemprop="url">二分</a>
+            <a href="/2021/06/05/%E7%BC%93%E5%AD%98/" class="post-title-link" itemprop="url">缓存</a>
         </h2>
 
         <div class="post-meta">
@@ -215,14 +215,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-05-12 08:14:17" itemprop="dateCreated datePublished" datetime="2021-05-12T08:14:17+08:00">2021-05-12</time>
+              <time title="创建时间：2021-06-05 16:55:30" itemprop="dateCreated datePublished" datetime="2021-06-05T16:55:30+08:00">2021-06-05</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-21 07:31:49" itemprop="dateModified" datetime="2021-05-21T07:31:49+08:00">2021-05-21</time>
+                <time title="修改时间：2021-06-06 13:22:55" itemprop="dateModified" datetime="2021-06-06T13:22:55+08:00">2021-06-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -230,7 +230,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
                 </span>
             </span>
 
@@ -245,289 +245,112 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="易出错"><a href="#易出错" class="headerlink" title="易出错"></a>易出错</h2><ul>
-<li><ol>
-<li>循环退出条件<br>注意是 low&lt;=high，而不是 low &lt; high</li>
-</ol>
-</li>
-<li><ol start="2">
-<li>mid 的取值<br>mid = low+((high-low)&gt;&gt;1)</li>
-</ol>
-</li>
-<li><ol start="3">
-<li>low 和 high 的更新<br>low=mid+1，high=mid-1</li>
-</ol>
-</li>
+          <h2 id="缓存特征"><a href="#缓存特征" class="headerlink" title="缓存特征"></a>缓存特征</h2><ul>
+<li>第一个特征：在一个层次化的系统中，缓存一定是一个快速子系统，数据存在缓存中时，能避免每次从慢速子系统中存取数据。对应到互联网应用来说，Redis 就是快速子系统，而数据库就是慢速子系统了。</li>
+<li>第二个特征：缓存系统的容量大小总是小于后端慢速系统的，我们不可能把所有数据都放在缓存系统中。</li>
 </ul>
-<h2 id="普通二分"><a href="#普通二分" class="headerlink" title="普通二分"></a>普通二分</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">common_search</span>(<span class="params">arr,dest</span>):</span></span><br><span class="line">    low ,high = <span class="number">0</span>,<span class="built_in">len</span>(arr)</span><br><span class="line">    <span class="keyword">while</span>(low&lt;=high):</span><br><span class="line">        mid = low+((high-low)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span>(arr[mid]==dest):</span><br><span class="line">            <span class="keyword">return</span> mid</span><br><span class="line">        <span class="keyword">elif</span> arr[mid]&lt;dest:</span><br><span class="line">            low = mid+<span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> arr[mid]&gt;dest:</span><br><span class="line">            high = mid-<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="查找第一个等于给定元素值"><a href="#查找第一个等于给定元素值" class="headerlink" title="查找第一个等于给定元素值"></a>查找第一个等于给定元素值</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">first_dest</span>(<span class="params">arr,dest</span>):</span></span><br><span class="line">    low,high = <span class="number">0</span>,<span class="built_in">len</span>(arr)-<span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span>(low&lt;=high):</span><br><span class="line">        mid = low + ((high-low)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span>(arr[mid]&lt;dest):</span><br><span class="line">            low = mid +<span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> arr[mid]&gt;dest:</span><br><span class="line">            high = mid -<span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> mid ==<span class="number">0</span> <span class="keyword">or</span> arr[mid-<span class="number">1</span>]!=dest:</span><br><span class="line">                <span class="keyword">return</span> mid</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                high = mid -<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="查找最后一个等于给定元素"><a href="#查找最后一个等于给定元素" class="headerlink" title="查找最后一个等于给定元素"></a>查找最后一个等于给定元素</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">last_dest</span>(<span class="params">arr,dest</span>):</span></span><br><span class="line">    low,high = <span class="number">0</span>,<span class="built_in">len</span>(dest)-<span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span>(low&lt;=high):</span><br><span class="line">        mid = low + ((high-low)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span> (arr[mid] &lt; dest):</span><br><span class="line">            low = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> arr[mid] &gt; dest:</span><br><span class="line">            high = mid - <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> mid==<span class="built_in">len</span>(arr)-<span class="number">1</span> <span class="keyword">or</span> arr[mid+<span class="number">1</span>]!= dest:</span><br><span class="line">                <span class="keyword">return</span> mid</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                low = mid +<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="查找第一个大于等于给定元素"><a href="#查找第一个大于等于给定元素" class="headerlink" title="查找第一个大于等于给定元素"></a>查找第一个大于等于给定元素</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">first_gte_dest</span>(<span class="params">arr,dest</span>):</span></span><br><span class="line">    low,high = <span class="number">0</span>,<span class="built_in">len</span>(arr)-<span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span>(low&lt;=high):</span><br><span class="line">        mid = low + ((high-low)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span> arr[mid]&gt;=dest:</span><br><span class="line">            <span class="keyword">if</span> mid==<span class="number">0</span> <span class="keyword">or</span> arr[mid-<span class="number">1</span>]&lt;dest:</span><br><span class="line">                <span class="keyword">return</span> mid</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                high = mid-<span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            low = mid +<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="查找最后一个小于等于给定元素"><a href="#查找最后一个小于等于给定元素" class="headerlink" title="查找最后一个小于等于给定元素"></a>查找最后一个小于等于给定元素</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">last_lt_dest</span>(<span class="params">arr,dest</span>):</span></span><br><span class="line">    low,high = <span class="number">0</span>,<span class="built_in">len</span>(arr)-<span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span>(low&lt;=high):</span><br><span class="line">        mid = low+((high-low)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span> arr[mid]&lt;=dest:</span><br><span class="line">            <span class="keyword">if</span> mid==<span class="built_in">len</span>(arr)-<span class="number">1</span> <span class="keyword">or</span> arr[mid +<span class="number">1</span>]&gt;dest:</span><br><span class="line">                <span class="keyword">return</span> mid</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                low = mid+<span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            high = mid-<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="x平方根"><a href="#x平方根" class="headerlink" title="x平方根"></a>x平方根</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">mySqrt</span>(<span class="params">self, x</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type x: int</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        l,r,ans = <span class="number">0</span>,x,-<span class="number">1</span></span><br><span class="line">        <span class="keyword">while</span> l&lt;=r:</span><br><span class="line">            mid = l+((r-l)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">if</span> mid*mid&lt;=x:</span><br><span class="line">                ans = mid</span><br><span class="line">                l=mid+<span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                r=mid-<span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> ans</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/12/%E6%8E%92%E5%BA%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/12/%E6%8E%92%E5%BA%8F/" class="post-title-link" itemprop="url">排序</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-12 07:51:13" itemprop="dateCreated datePublished" datetime="2021-05-12T07:51:13+08:00">2021-05-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-17 08:12:21" itemprop="dateModified" datetime="2021-05-17T08:12:21+08:00">2021-05-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="冒泡"><a href="#冒泡" class="headerlink" title="冒泡"></a>冒泡</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 冒泡排序，a表示数组，n表示数组大小</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bubbleSort</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line"> <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    <span class="comment">// 提前退出冒泡循环的标志位</span></span><br><span class="line">    <span class="keyword">boolean</span> flag = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n - i - <span class="number">1</span>; ++j) &#123;</span><br><span class="line">      <span class="keyword">if</span> (a[j] &gt; a[j+<span class="number">1</span>]) &#123; <span class="comment">// 交换</span></span><br><span class="line">        <span class="keyword">int</span> tmp = a[j];</span><br><span class="line">        a[j] = a[j+<span class="number">1</span>];</span><br><span class="line">        a[j+<span class="number">1</span>] = tmp;</span><br><span class="line">        flag = <span class="keyword">true</span>;  <span class="comment">// 表示有数据交换      </span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!flag) <span class="keyword">break</span>;  <span class="comment">// 没有数据交换，提前退出</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 插入排序，a表示数组，n表示数组大小</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insertionSort</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    <span class="keyword">int</span> value = a[i];</span><br><span class="line">    <span class="keyword">int</span> j = i - <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 查找插入的位置</span></span><br><span class="line">    <span class="keyword">for</span> (; j &gt;= <span class="number">0</span>; --j) &#123;</span><br><span class="line">      <span class="keyword">if</span> (a[j] &gt; value) &#123;</span><br><span class="line">        a[j+<span class="number">1</span>] = a[j];  <span class="comment">// 数据移动</span></span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    a[j+<span class="number">1</span>] = value; <span class="comment">// 插入数据</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="归并"><a href="#归并" class="headerlink" title="归并"></a>归并</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">递推公式：</span><br><span class="line">merge_sort(p…r) = merge(merge_sort(p…q), merge_sort(q+<span class="number">1</span>…r))</span><br><span class="line"></span><br><span class="line">终止条件：</span><br><span class="line">p &gt;= r 不用再继续分解</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge</span>(<span class="params">arr</span>):</span></span><br><span class="line">    merge_sort(arr,<span class="number">0</span>,<span class="built_in">len</span>(arr)-<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge_sort</span>(<span class="params">arr,start,end</span>):</span></span><br><span class="line">    <span class="keyword">if</span> start&gt;=end:</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    mid = start + ((end-start)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">    merge_sort(arr,start,mid)</span><br><span class="line">    merge_sort(arr,mid+<span class="number">1</span>,end)</span><br><span class="line">    merge_all(arr,start,mid,end)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge_all</span>(<span class="params">arr,start,mid,end</span>):</span></span><br><span class="line">    i,j = start,mid+<span class="number">1</span></span><br><span class="line">    tmp = []</span><br><span class="line">    <span class="keyword">while</span> i&lt;=mid <span class="keyword">and</span> j&lt;=end:</span><br><span class="line">        <span class="keyword">if</span> arr[i]&lt;=arr[j]:</span><br><span class="line">            tmp.append(arr[i])</span><br><span class="line">            i+=<span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            tmp.append(arr[j])</span><br><span class="line">            j+=<span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> i&lt;=mid: tmp.extend(arr[i:mid+<span class="number">1</span>])</span><br><span class="line">    <span class="keyword">if</span> j&lt;=end: tmp.extend(arr[j:end+<span class="number">1</span>])</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(tmp)):</span><br><span class="line">        arr[i+start] = tmp[i]</span><br></pre></td></tr></table></figure>
-
-<h2 id="快排"><a href="#快排" class="headerlink" title="快排"></a>快排</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">递推公式：</span><br><span class="line">quick_sort(p…r) = quick_sort(p…q-<span class="number">1</span>) + quick_sort(q+<span class="number">1</span>… r)</span><br><span class="line"></span><br><span class="line">终止条件：</span><br><span class="line">p &gt;= r</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">quick</span>(<span class="params">arr</span>):</span></span><br><span class="line">    quick_sort(arr,<span class="number">0</span>,<span class="built_in">len</span>(arr)-<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">quick_sort</span>(<span class="params">arr,start,end</span>):</span></span><br><span class="line">    <span class="keyword">if</span> start&gt;=end:</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    partition = get_partition(arr,start,end)</span><br><span class="line">    quick_sort(arr,start,partition-<span class="number">1</span>)</span><br><span class="line">    quick_sort(arr,partition+<span class="number">1</span>,end)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_partition</span>(<span class="params">arr,start,end</span>):</span></span><br><span class="line">    tmp = arr[end]</span><br><span class="line">    i = start</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(start,end):</span><br><span class="line">        <span class="keyword">if</span> arr[j]&lt;tmp:</span><br><span class="line">            arr[i],arr[j]= arr[j],arr[i]</span><br><span class="line">            i+=<span class="number">1</span></span><br><span class="line">    arr[i],arr[end]= arr[end],arr[i]</span><br><span class="line">    <span class="keyword">return</span> i</span><br></pre></td></tr></table></figure>
-
-<h2 id="O-n-找数组中最大元素"><a href="#O-n-找数组中最大元素" class="headerlink" title="O(n)找数组中最大元素"></a>O(n)找数组中最大元素</h2><p>我们选择数组区间 A[0…n-1]的最后一个元素 A[n-1]作为 pivot，对数组 A[0…n-1]原地分区，这样数组就分成了三部分，A[0…p-1]、A[p]、A[p+1…n-1]。如果 p+1=K，那 A[p]就是要求解的元素；如果 K&gt;p+1, 说明第 K 大元素出现在 A[p+1…n-1]区间，我们再按照上面的思路递归地在 A[p+1…n-1]这个区间内查找。同理，如果 K</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_k</span>(<span class="params">arr,k</span>):</span></span><br><span class="line">    k(arr,<span class="number">0</span>,<span class="built_in">len</span>(arr-<span class="number">1</span>))</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">k</span>(<span class="params">arr,start,end,k</span>):</span></span><br><span class="line">    <span class="keyword">if</span> start&gt;=end:</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    partition = get_partition(arr,start,end,k)</span><br><span class="line">    <span class="keyword">if</span> arr[partition+<span class="number">1</span>] == k:</span><br><span class="line">        <span class="keyword">return</span> arr[partition+<span class="number">1</span>]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="堆排序"><a href="#堆排序" class="headerlink" title="堆排序"></a>堆排序</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">heapify</span>(<span class="params">arr,last_num,top_num</span>):</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        max_num = top_num</span><br><span class="line">        <span class="keyword">if</span> top_num*<span class="number">2</span>&lt;=last_num <span class="keyword">and</span> arr[top_num]&lt;arr[top_num*<span class="number">2</span>]: max_num = top_num*<span class="number">2</span></span><br><span class="line">        <span class="keyword">if</span> top_num*<span class="number">2</span>+<span class="number">1</span>&lt;=last_num <span class="keyword">and</span> arr[max_num]&lt;arr[top_num*<span class="number">2</span>+<span class="number">1</span>]: max_num = top_num*<span class="number">2</span>+<span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> top_num == max_num: <span class="keyword">break</span></span><br><span class="line">        arr[top_num],arr[max_num] = arr[max_num],arr[top_num]</span><br><span class="line">        top_num = max_num</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_heap</span>(<span class="params">arr,last_num</span>):</span></span><br><span class="line">    i = last_num//<span class="number">2</span></span><br><span class="line">    <span class="keyword">while</span>(i&gt;=<span class="number">1</span>):</span><br><span class="line">        heapify(arr,last_num,i)</span><br><span class="line">        i-=<span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">heap_sort</span>(<span class="params">arr,last_num</span>):</span></span><br><span class="line">    build_heap(arr,last_num)</span><br><span class="line">    s = last_num</span><br><span class="line">    <span class="keyword">while</span>(s&gt;<span class="number">1</span>):</span><br><span class="line">        arr[<span class="number">1</span>],arr[s] = arr[s],arr[<span class="number">1</span>]</span><br><span class="line">        s-=<span class="number">1</span></span><br><span class="line">        heapify(arr,s,<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">topk </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_least_numbers</span>(<span class="params">arr,k</span>):</span></span><br><span class="line">    <span class="keyword">if</span> k==<span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">list</span>()</span><br><span class="line">    hp = [-x <span class="keyword">for</span> x <span class="keyword">in</span> arr[:k]]</span><br><span class="line">    heapq.heapify(hp)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(k,<span class="built_in">len</span>(arr)):</span><br><span class="line">        <span class="keyword">if</span> -hp[<span class="number">0</span>]&gt;arr[i]:</span><br><span class="line">            heapq.heappop(hp)</span><br><span class="line">            heapq.heappush(hp,-arr[i])</span><br><span class="line">    ans = [-x <span class="keyword">for</span> x <span class="keyword">in</span> hp]</span><br><span class="line">    <span class="keyword">return</span>  ans</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getMaxNumbers</span>(<span class="params">arr,k</span>):</span></span><br><span class="line">    <span class="keyword">if</span> k == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">list</span>()</span><br><span class="line">    hp = [x <span class="keyword">for</span> x <span class="keyword">in</span> arr[:k]]</span><br><span class="line">    heapq.heapify(hp)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(k, <span class="built_in">len</span>(arr)):</span><br><span class="line">        <span class="keyword">if</span> hp[<span class="number">0</span>] &lt; arr[i]:</span><br><span class="line">            heapq.heappop(hp)</span><br><span class="line">            heapq.heappush(hp, arr[i])</span><br><span class="line">    ans = [x <span class="keyword">for</span> x <span class="keyword">in</span> hp]</span><br><span class="line">    <span class="keyword">return</span> ans</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/12/%E9%80%92%E5%BD%92/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/12/%E9%80%92%E5%BD%92/" class="post-title-link" itemprop="url">递归</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-12 07:35:47" itemprop="dateCreated datePublished" datetime="2021-05-12T07:35:47+08:00">2021-05-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-25 07:32:32" itemprop="dateModified" datetime="2021-05-25T07:32:32+08:00">2021-05-25</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h2><ul>
-<li><ol>
-<li>一个问题的解可以分解为几个子问题的解</li>
-</ol>
+<h2 id="Redis-缓存处理请求的两种情况"><a href="#Redis-缓存处理请求的两种情况" class="headerlink" title="Redis 缓存处理请求的两种情况"></a>Redis 缓存处理请求的两种情况</h2><ul>
+<li><p>缓存命中：Redis 中有相应数据，就直接读取 Redis，性能非常快。</p>
 </li>
-<li><ol start="2">
-<li>这个问题与分解之后的子问题，除了数据规模不同，求解思路完全一样</li>
-</ol>
-</li>
-<li><ol start="3">
-<li>存在递归终止条件</li>
-</ol>
-</li>
+<li><p>缓存缺失：Redis 中没有保存相应数据，就从后端数据库中读取数据，性能就会变慢。而且，一旦发生缓存缺失，为了让后续请求能从缓存中读取到数据，我们需要把缺失的数据写入 Redis，这个过程叫作缓存更新。</p>
+<img src="/2021/06/05/%E7%BC%93%E5%AD%98/%E7%BC%93%E5%AD%98%E4%BD%BF%E7%94%A8.jpg" class=""></li>
 </ul>
-<h2 id="如何编写递归"><a href="#如何编写递归" class="headerlink" title="如何编写递归"></a>如何编写递归</h2><ul>
-<li>写递归代码的关键就是找到如何将大问题分解为小问题的规律</li>
-<li>并且基于此写出递推公式</li>
-<li>然后再推敲终止条件</li>
-<li>最后将递推公式和终止条件翻译成代码。</li>
+<p>使用 Redis 缓存时，我们基本有三个操作：</p>
+<ul>
+<li>应用读取数据时，需要先读取 Redis；</li>
+<li>发生缓存缺失时，需要从数据库读取数据；</li>
+<li>发生缓存缺失时，还需要更新缓存。</li>
 </ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 递推公式：f(n) = f(n-1)+f(n-2)</span></span><br><span class="line"><span class="comment">// 条件n ==1 n==2 </span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">2</span>) <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// hasSolvedList可以理解成一个Map，key是n，value是f(n)</span></span><br><span class="line">  <span class="keyword">if</span> (hasSolvedList.containsKey(n)) &#123;</span><br><span class="line">    <span class="keyword">return</span> hasSolvedList.get(n);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">int</span> ret = f(n-<span class="number">1</span>) + f(n-<span class="number">2</span>);</span><br><span class="line">  hasSolvedList.put(n, ret);</span><br><span class="line">  <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">2</span>) <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">int</span> pre = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">int</span> prepre = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">3</span>; i &lt;= n; ++i) &#123;</span><br><span class="line">    ret = pre + prepre;</span><br><span class="line">    prepre = pre;</span><br><span class="line">    pre = ret;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Redis-作为旁路缓存的使用操作"><a href="#Redis-作为旁路缓存的使用操作" class="headerlink" title="Redis 作为旁路缓存的使用操作"></a>Redis 作为旁路缓存的使用操作</h2><p>我们也把 Redis 称为旁路缓存，也就是说，读取缓存、读取数据库和更新缓存的操作都需要在应用程序中来完成。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">String cacheKey = “productid_11010003”;</span><br><span class="line">String cacheValue = redisCache.get(cacheKey)；</span><br><span class="line"><span class="comment">//缓存命中</span></span><br><span class="line"><span class="keyword">if</span> ( cacheValue != NULL)</span><br><span class="line">   <span class="keyword">return</span> cacheValue;</span><br><span class="line"><span class="comment">//缓存缺失</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">   cacheValue = getProductFromDB();</span><br><span class="line">   redisCache.put(cacheValue)  <span class="comment">//缓存更新</span></span><br></pre></td></tr></table></figure>
 
-      
-    </div>
+<h2 id="缓存的类型"><a href="#缓存的类型" class="headerlink" title="缓存的类型"></a>缓存的类型</h2><h3 id="只读缓存"><a href="#只读缓存" class="headerlink" title="只读缓存"></a>只读缓存</h3>  <img src="/2021/06/05/%E7%BC%93%E5%AD%98/%E5%8F%AA%E8%AF%BB%E7%BC%93%E5%AD%98.jpg" class="">
 
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+<ul>
+<li>读请求正常发给redis进行查询</li>
+<li>所有的写请求直接请求数据库，并删除redis中的缓存</li>
+</ul>
+<h3 id="读写缓存"><a href="#读写缓存" class="headerlink" title="读写缓存"></a>读写缓存</h3><ul>
+<li>所有的写请求也会发送到缓存，在缓存中直接对数据进行增删改操作。</li>
+<li>这也就是说，应用的最新数据可能会丢失，给应用业务带来风险。</li>
+<li>会有同步直写和异步写回两种策略。其中，同步直写策略优先保证数据可靠性，而异步写回策略优先提供快速响应。  <img src="/2021/06/05/%E7%BC%93%E5%AD%98/%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5%E5%86%99%E5%9B%9E.jpg" class=""></li>
+</ul>
+<p>区别：</p>
+<p>1、使用只读缓存时，是先把修改写到后端数据库中，再把缓存中的数据删除。当下次访问这个数据时，会以后端数据库中的值为准，重新加载到缓存中。这样做的优点是，数据库和缓存可以保证完全一致，并且缓存中永远保留的是经常访问的热点数据。缺点是每次修改操作都会把缓存中的数据删除，之后访问时都会先触发一次缓存缺失，然后从后端数据库加载数据到缓存中，这个过程访问延迟会变大。</p>
+<p>2、使用读写缓存时，是同时修改数据库和缓存中的值。这样做的优点是，被修改后的数据永远在缓存中存在，下次访问时，能够直接命中缓存，不用再从后端数据库中查询，这个过程拥有比较好的性能，比较适合先修改又立即访问的业务场景。但缺点是在高并发场景下，如果存在多个操作同时修改同一个值的情况，可能会导致缓存和数据库的不一致。</p>
+<p>3、当使用只读缓存时，如果修改数据库失败了，那么缓存中的数据也不会被删除，此时数据库和缓存中的数据依旧保持一致。而使用读写缓存时，如果是先修改缓存，后修改数据库，如果缓存修改成功，而数据库修改失败了，那么此时数据库和缓存数据就不一致了。如果先修改数据库，再修改缓存，也会产生上面所说的并发场景下的不一致。</p>
+<p>我个人总结，只读缓存是牺牲了一定的性能，优先保证数据库和缓存的一致性，它更适合对于一致性要求比较要高的业务场景。而如果对于数据库和缓存一致性要求不高，或者不存在并发修改同一个值的情况，那么使用读写缓存就比较合适，它可以保证更好的访问性能。</p>
+<h2 id="缓存满了：缓存数据的淘汰机制"><a href="#缓存满了：缓存数据的淘汰机制" class="headerlink" title="缓存满了：缓存数据的淘汰机制"></a>缓存满了：缓存数据的淘汰机制</h2><h3 id="设置多大的缓存容量合适"><a href="#设置多大的缓存容量合适" class="headerlink" title="设置多大的缓存容量合适"></a>设置多大的缓存容量合适</h3><p>我会建议把缓存容量设置为总数据量的 15% 到 30%，兼顾访问性能和内存空间开销。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CONFIG SET maxmemory 4gb</span><br></pre></td></tr></table></figure>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/11/%E6%A0%88/">
+<h3 id="Redis-缓存有哪些淘汰策略"><a href="#Redis-缓存有哪些淘汰策略" class="headerlink" title="Redis 缓存有哪些淘汰策略"></a>Redis 缓存有哪些淘汰策略</h3><img src="/2021/06/05/%E7%BC%93%E5%AD%98/%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5.jpg" class="">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/11/%E6%A0%88/" class="post-title-link" itemprop="url">栈</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-11 07:58:07" itemprop="dateCreated datePublished" datetime="2021-05-11T07:58:07+08:00">2021-05-11</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-14 07:20:59" itemprop="dateModified" datetime="2021-05-14T07:20:59+08:00">2021-05-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>先进后出，后进先出；<br>当某个数据集合只涉及在一端插入和删除数据，并且满足后进先出、先进后出的特性，这时我们就应该首选“栈”这种数据结构。</p>
-<h3 id="栈操作"><a href="#栈操作" class="headerlink" title="栈操作"></a>栈操作</h3><ul>
-<li><p>有效括号</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">isValid</span>(<span class="params">self, s</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type s: str</span></span><br><span class="line"><span class="string">        :rtype: bool</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(s)%<span class="number">2</span>!=<span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        stack = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> s:</span><br><span class="line">            <span class="keyword">if</span> i ==<span class="string">&#x27;(&#x27;</span>: stack.append(<span class="string">&#x27;)&#x27;</span>)</span><br><span class="line">            <span class="keyword">elif</span> i==<span class="string">&quot;&#123;&quot;</span>: stack.append(<span class="string">&quot;&#125;&quot;</span>)</span><br><span class="line">            <span class="keyword">elif</span> i==<span class="string">&quot;[&quot;</span>: stack.append(<span class="string">&quot;]&quot;</span>)</span><br><span class="line">            <span class="keyword">elif</span> <span class="keyword">not</span> stack <span class="keyword">or</span> stack.pop() != i: <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">if</span> stack:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure></li>
-<li><p>最小栈</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MinStack</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        initialize your data structure here.</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        self.cache = []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">push</span>(<span class="params">self, val</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type val: int</span></span><br><span class="line"><span class="string">        :rtype: None</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> self.cache:</span><br><span class="line">            self.cache.append((val,val))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.cache.append((val,<span class="built_in">min</span>(val,self.cache[-<span class="number">1</span>][<span class="number">1</span>])))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">pop</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :rtype: None</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">return</span> self.cache.pop()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">top</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">return</span> self.cache[-<span class="number">1</span>][<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getMin</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">return</span> self.cache[-<span class="number">1</span>][<span class="number">1</span>]</span><br></pre></td></tr></table></figure></li>
+<ul>
+<li>不进行数据淘汰的策略，只有 <strong>noeviction（默认）</strong> 这一种。</li>
+<li>在设置了过期时间的数据中进行淘汰，包括 volatile-random、volatile-ttl、volatile-lru、volatile-lfu（Redis 4.0 后新增）四种。</li>
+<li>在所有数据范围内进行淘汰，包括 allkeys-lru、allkeys-random、allkeys-lfu（Redis 4.0 后新增）三种。</li>
+</ul>
+<h4 id="LRU"><a href="#LRU" class="headerlink" title="LRU"></a>LRU</h4><p>LRU 算法的全称是 Least Recently Used，从名字上就可以看出，这是按照最近最少使用的原则来筛选数据，最不常用的数据会被筛选出来，而最近频繁使用的数据会留在缓存中。</p>
+<ul>
+<li>LRU 算法在实际实现时，需要用链表管理所有的缓存数据，这会带来额外的空间开销。而且，当有数据被访问时，需要在链表上把该数据移动到 MRU 端，如果有大量数据被访问，就会带来很多链表移动操作，会很耗时，进而会降低 Redis 缓存性能。</li>
+<li>Redis 默认会记录每个数据的最近一次访问的时间戳（由键值对数据结构 RedisObject 中的 lru 字段记录）。然后，Redis 在决定淘汰的数据时，第一次会随机选出 N 个数据，把它们作为一个候选集合。接下来，Redis 会比较这 N 个数据的 lru 字段，把 lru 字段值最小的数据从缓存中淘汰出去。</li>
+</ul>
+<h4 id="如何处理被淘汰的数据"><a href="#如何处理被淘汰的数据" class="headerlink" title="如何处理被淘汰的数据"></a>如何处理被淘汰的数据</h4><p>一般来说，一旦被淘汰的数据选定后，如果这个数据是干净数据，那么我们就直接删除；如果这个数据是脏数据，我们需要把它写回数据库，</p>
+<h2 id="使用redis缓存带来的问题"><a href="#使用redis缓存带来的问题" class="headerlink" title="使用redis缓存带来的问题"></a>使用redis缓存带来的问题</h2><p>概括来说有 4 个方面：缓存中的数据和数据库中的不一致；缓存雪崩；缓存击穿和缓存穿透。</p>
+<h3 id="缓存中的数据和数据库中的不一致"><a href="#缓存中的数据和数据库中的不一致" class="headerlink" title="缓存中的数据和数据库中的不一致"></a>缓存中的数据和数据库中的不一致</h3><h4 id="缓存和数据库的数据不一致是如何发生的"><a href="#缓存和数据库的数据不一致是如何发生的" class="headerlink" title="缓存和数据库的数据不一致是如何发生的"></a>缓存和数据库的数据不一致是如何发生的</h4><p>首先，我们得清楚“数据的一致性”具体是啥意思。其实，这里的“一致性”包含了两种情况：</p>
+<ul>
+<li>缓存中有数据，那么，缓存的数据值需要和数据库中的值相同；</li>
+<li>缓存中本身没有数据，那么，数据库中的值必须是最新值。</li>
+</ul>
+<p>只读缓存中删改数据造成的数据不一致：</p>
+<ul>
+<li>如果发生删改操作，应用既要更新数据库，也要在缓存中删除数据。这两个操作如果无法保证原子性，也就是说，要不都完成，要不都没完成，此时，就会出现数据不一致问题了。<img src="/2021/06/05/%E7%BC%93%E5%AD%98/%E5%8F%AA%E8%AF%BB%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE%E5%BA%93%E5%A4%B1%E8%B4%A5.jpg" class="">
+<img src="/2021/06/05/%E7%BC%93%E5%AD%98/%E5%8F%AA%E8%AF%BB%E5%88%A0%E9%99%A4%E7%BC%93%E5%AD%98%E5%A4%B1%E8%B4%A5.jpg" class=""></li>
+</ul>
+<p>如何解决呢：</p>
+<ul>
+<li>重试机制。</li>
+</ul>
+<h3 id="缓存雪崩"><a href="#缓存雪崩" class="headerlink" title="缓存雪崩"></a>缓存雪崩</h3><p>缓存雪崩是指大量的应用请求无法在 Redis 缓存中进行处理，紧接着，应用将大量请求发送到数据库层，导致数据库层的压力激增。</p>
+<ul>
+<li>首先，我们可以避免给大量的数据设置相同的过期时间。如果业务层的确要求有些数据同时失效，你可以在用 EXPIRE 命令给每个数据设置过期时间时，给这些数据的过期时间增加一个较小的随机数（例如，随机增加 1~3 分钟），这样一来，不同数据的过期时间有所差别，但差别又不会太大，既避免了大量数据同时过期，同时也保证了这些数据基本在相近的时间失效，仍然能满足业务需求。</li>
+<li>所谓的服务降级，是指发生缓存雪崩时，针对不同的数据采取不同的处理方式<ul>
+<li>当业务应用访问的是非核心数据（例如电商商品属性）时，暂时停止从缓存中查询这些数据，而是直接返回预定义信息、空值或是错误信息；</li>
+<li>当业务应用访问的是核心数据（例如电商商品库存）时，仍然允许查询缓存，如果缓存缺失，也可以继续通过数据库读取。</li>
+</ul>
+</li>
+<li>第一个建议，是在业务系统中实现服务熔断或请求限流机制。</li>
+<li>我给你的第二个建议就是事前预防。</li>
+</ul>
+<h3 id="缓存击穿"><a href="#缓存击穿" class="headerlink" title="缓存击穿"></a>缓存击穿</h3><p>缓存击穿是指，针对某个访问非常频繁的热点数据的请求，无法在缓存中进行处理，紧接着，访问该数据的大量请求，一下子都发送到了后端数据库，导致了数据库压力激增，会影响数据库处理其他请求。缓存击穿的情况，经常发生在热点数据过期失效时，</p>
+<ul>
+<li>对于访问特别频繁的热点数据，我们就不设置过期时间了。这样一来，对热点数据的访问请求，都可以在缓存中进行处理，而 Redis 数万级别的高吞吐量可以很好地应对大量的并发请求访问。</li>
+</ul>
+<h3 id="缓存穿透"><a href="#缓存穿透" class="headerlink" title="缓存穿透"></a>缓存穿透</h3><p>缓存穿透是指要访问的数据既不在 Redis 缓存中，也不在数据库中，导致请求在访问缓存时，发生缓存缺失，再去访问数据库时，发现数据库中也没有要访问的数据。</p>
+<ul>
+<li><p>第一种方案是，缓存空值或缺省值。</p>
+</li>
+<li><p>第二种方案是，使用布隆过滤器快速判断数据是否存在，避免从数据库中查询数据是否存在，减轻数据库压力。</p>
+<img src="/2021/06/05/%E7%BC%93%E5%AD%98/%E9%9B%AA%E5%B4%A9%E5%87%BB%E7%A9%BF%E7%A9%BF%E9%80%8F.jpg" class=""></li>
+</ul>
+<p>建议：</p>
+<ul>
+<li>针对缓存雪崩，合理地设置数据过期时间，以及搭建高可靠缓存集群；</li>
+<li>针对缓存击穿，在缓存访问非常频繁的热点数据时，不要设置过期时间；</li>
+<li>针对缓存穿透，提前在入口前端实现恶意请求检测，或者规范数据库的数据删除操作，避免误删除。</li>
+</ul>
+<h2 id="并发访问方法"><a href="#并发访问方法" class="headerlink" title="并发访问方法"></a>并发访问方法</h2><ul>
+<li>对临界区加锁，但是会导致系统并发性能降低</li>
+<li>把多个操作在 Redis 中实现成一个操作，也就是单命令操作；<ul>
+<li>Redis 提供了 INCR/DECR 命令，把这三个操作转变为一个原子操作了。INCR/DECR 命令可以对数据进行增值 / 减值操作，而且它们本身就是单个命令操作，Redis 在执行它们时，本身就具有互斥性。</li>
+</ul>
+</li>
+<li>把多个操作写到一个 Lua 脚本中，以原子性方式执行单个 Lua 脚本。<ul>
+<li><a target="_blank" rel="noopener" href="https://haicoder.net/note/redis-interview/redis-interview-redis-lua-script.html">https://haicoder.net/note/redis-interview/redis-interview-redis-lua-script.html</a> redis 面试提</li>
+<li>由于 Lua 脚本是提交到 Redis server 进行一次性执行的，整个执行过程中不会被其他任何工作打断，其它任何脚本或者命令都无法执行,也就不会引起竞争条件，从而本身就实现了事务的原子性</li>
+<li>在执行脚本时，不会执行其他脚本或Redis命令。这个语义类似于MULTI（开启事务）/EXEC（触发事务，一并执行事务中的所有命令）。从所有其他客户端的角度来看，脚本的效果要么仍然不可见，要么已经完成。<br><a target="_blank" rel="noopener" href="https://blog.csdn.net/mingtianhaiyouwo/article/details/51199489">https://blog.csdn.net/mingtianhaiyouwo/article/details/51199489</a> lua 原理<img src="/2021/06/05/%E7%BC%93%E5%AD%98/lua.png" class=""></li>
+</ul>
+</li>
 </ul>
 
       
@@ -548,7 +371,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/09/%E9%93%BE%E8%A1%A8/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/02/%E5%BD%B1%E5%93%8Dredis%E6%80%A7%E8%83%BD%E5%9B%A0%E7%B4%A0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -562,7 +385,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/09/%E9%93%BE%E8%A1%A8/" class="post-title-link" itemprop="url">链表</a>
+            <a href="/2021/06/02/%E5%BD%B1%E5%93%8Dredis%E6%80%A7%E8%83%BD%E5%9B%A0%E7%B4%A0/" class="post-title-link" itemprop="url">影响redis性能因素</a>
         </h2>
 
         <div class="post-meta">
@@ -572,14 +395,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-05-09 17:49:37" itemprop="dateCreated datePublished" datetime="2021-05-09T17:49:37+08:00">2021-05-09</time>
+              <time title="创建时间：2021-06-02 21:19:33" itemprop="dateCreated datePublished" datetime="2021-06-02T21:19:33+08:00">2021-06-02</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-17 08:12:23" itemprop="dateModified" datetime="2021-05-17T08:12:23+08:00">2021-05-17</time>
+                <time title="修改时间：2021-06-04 08:16:50" itemprop="dateModified" datetime="2021-06-04T08:16:50+08:00">2021-06-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -587,7 +410,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
                 </span>
             </span>
 
@@ -602,575 +425,147 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="常见缓存"><a href="#常见缓存" class="headerlink" title="常见缓存"></a>常见缓存</h2><ul>
-<li>先进先出策略 FIFO（First In，First Out）</li>
-<li>最少使用策略 LFU（Least Frequently Used）</li>
-<li>最近最少使用策略 LRU（Least Recently Used）  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">josephus1</span>(<span class="params">num, k, m</span>):</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">约瑟夫环（约瑟夫问题）是一个数学的应用问题：</span></span><br><span class="line"><span class="string">已知num个人（以编号1，2，3...n分别表示）围坐在一张圆桌周围。</span></span><br><span class="line"><span class="string">从编号为k的人开始报数，数到m的那个人出列；</span></span><br><span class="line"><span class="string">他的下一个人又从1开始报数，数到m的那个人又出列；</span></span><br><span class="line"><span class="string">依此规律重复下去，直到圆桌周围的人全部出列。</span></span><br><span class="line"><span class="string">:param num:总人数</span></span><br><span class="line"><span class="string">:param k:开始的编号</span></span><br><span class="line"><span class="string">:param m:数到m的出列</span></span><br><span class="line"><span class="string">:return:</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">alist = [x + <span class="number">1</span> <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">range</span>(num)]</span><br><span class="line"><span class="built_in">print</span>(alist)  <span class="comment"># [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]</span></span><br><span class="line"></span><br><span class="line">index, step = k-<span class="number">1</span>, m  <span class="comment"># 从1号开始报数，数到3的那个人出列</span></span><br><span class="line"><span class="keyword">while</span> <span class="built_in">len</span>(alist) &gt; <span class="number">1</span>:</span><br><span class="line">    index = (index + step - <span class="number">1</span>) % <span class="built_in">len</span>(alist)  <span class="comment"># 列表的索引</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;出去的数：&#x27;</span>, alist[index])</span><br><span class="line">    <span class="comment"># del alist[index]</span></span><br><span class="line">    alist.pop(index)</span><br><span class="line"><span class="keyword">return</span> <span class="string">&#x27;最后的一个数：%s&#x27;</span> % alist[<span class="number">0</span>]</span><br><span class="line"><span class="built_in">print</span>(josephus1(<span class="number">13</span>, <span class="number">1</span>, <span class="number">3</span>)) </span><br></pre></td></tr></table></figure></li>
+          <h2 id="影响redis性能的5大因素"><a href="#影响redis性能的5大因素" class="headerlink" title="影响redis性能的5大因素"></a>影响redis性能的5大因素</h2><ul>
+<li>Redis 内部的阻塞式操作；</li>
+<li>CPU 核和 NUMA 架构的影响；</li>
+<li>Redis 关键系统配置；</li>
+<li>Redis 内存碎片；</li>
+<li>Redis 缓冲区。</li>
 </ul>
-<h3 id="LRU实现"><a href="#LRU实现" class="headerlink" title="LRU实现"></a>LRU实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, capacity</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    :type capacity: int</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    self.capacity = capacity</span><br><span class="line">    self.cache = collections.OrderedDict()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, key</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    :type key: int</span></span><br><span class="line"><span class="string">    :rtype: int</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> key <span class="keyword">not</span> <span class="keyword">in</span> self.cache:</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span></span><br><span class="line">    value = self.cache.pop(key)    </span><br><span class="line">    self.cache[key]=value</span><br><span class="line">    <span class="keyword">return</span> value</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">put</span>(<span class="params">self, key, value</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    :type key: int</span></span><br><span class="line"><span class="string">    :type value: int</span></span><br><span class="line"><span class="string">    :rtype: None</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> key <span class="keyword">in</span> self.cache:</span><br><span class="line">        self.cache.pop(key)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">if</span> self.capacity==<span class="number">0</span>:</span><br><span class="line">            self.cache.popitem(last=<span class="literal">False</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.capacity -=<span class="number">1</span></span><br><span class="line">    self.cache[key] = value</span><br></pre></td></tr></table></figure>
-
-<h2 id="链表操作"><a href="#链表操作" class="headerlink" title="链表操作"></a>链表操作</h2><h3 id="指针含义"><a href="#指针含义" class="headerlink" title="指针含义"></a>指针含义</h3><ul>
-<li>有些语言有“指针”的概念，比如 C 语言；有些语言没有指针，取而代之的是“引用”，比如 Java、Python。不管是“指针”还是“引用”，实际上，它们的意思都是一样的，都是存储所指对象的内存地址。</li>
-<li><strong>将某个变量赋值给指针，实际上就是将这个变量的地址赋值给指针，或者反过来说，指针中存储了这个变量的内存地址，指向了这个变量，通过指针就能找到这个变量。</strong></li>
+<h2 id="Redis-内部的阻塞式操作"><a href="#Redis-内部的阻塞式操作" class="headerlink" title="Redis 内部的阻塞式操作"></a>Redis 内部的阻塞式操作</h2><h3 id="Redis-实例有哪些阻塞点"><a href="#Redis-实例有哪些阻塞点" class="headerlink" title="Redis 实例有哪些阻塞点"></a>Redis 实例有哪些阻塞点</h3><ul>
+<li>客户端：网络 IO，键值对增删改查操作，数据库操作；</li>
+<li>磁盘：生成 RDB 快照，记录 AOF 日志，AOF 日志重写；</li>
+<li>主从节点：主库生成、传输 RDB 文件，从库接收 RDB 文件、清空数据库、加载 RDB 文件；</li>
+<li>切片集群实例：向其他实例传输哈希槽信息，数据迁移。<img src="/2021/06/02/%E5%BD%B1%E5%93%8Dredis%E6%80%A7%E8%83%BD%E5%9B%A0%E7%B4%A0/%E9%98%BB%E5%A1%9E%E6%93%8D%E4%BD%9C.jpg" class=""></li>
 </ul>
-<h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><img src="/2021/05/09/%E9%93%BE%E8%A1%A8/%E6%8C%87%E9%92%88%E6%93%8D%E4%BD%9C.jpg" class="">
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">错误实现</span><br><span class="line">p-&gt;next = x;  <span class="comment">// 将p的next指针指向x结点；</span></span><br><span class="line">x-&gt;next = p-&gt;next;  <span class="comment">// 将x的结点的next指针指向b结点；</span></span><br><span class="line"></span><br><span class="line">正确</span><br><span class="line">new_node-&gt;next = p-&gt;next;</span><br><span class="line">p-&gt;next = new_node;</span><br><span class="line"></span><br><span class="line">删除节点</span><br><span class="line">p-&gt;next = p-&gt;next-&gt;next;</span><br></pre></td></tr></table></figure>
-
-<p>我们插入结点时，一定要注意操作的顺序，<br>要先将结点 x 的 next 指针指向结点 b，<br>再把结点 a 的 next 指针指向结点 x，<br>这样才不会丢失指针，导致内存泄漏。</p>
-<h3 id="利用哨兵"><a href="#利用哨兵" class="headerlink" title="利用哨兵"></a>利用哨兵</h3><p>在头节点前插入哨兵，指向头节点，这样下来，当遇到头节点为空，或者末尾节点为空的时候，就不用多余的判断了，可以继续使用上面的操作</p>
-<h3 id="重点留意边界问题"><a href="#重点留意边界问题" class="headerlink" title="重点留意边界问题"></a>重点留意边界问题</h3><ul>
-<li>如果链表为空时，代码是否能正常工作？</li>
-<li>如果链表只包含一个结点时，代码是否能正常工作？</li>
-<li>如果链表只包含两个结点时，代码是否能正常工作？</li>
-<li>代码逻辑在处理头结点和尾结点的时候，是否能正常工作？、</li>
+<h3 id="阻塞点"><a href="#阻塞点" class="headerlink" title="阻塞点"></a>阻塞点</h3><ul>
+<li>第一个阻塞点：集合全量查询和聚合操作。</li>
+<li>bigkey 删除操作就是 Redis 的第二个阻塞点</li>
+<li>Redis 的第三个阻塞点：清空数据库。</li>
+<li>第四个阻塞点了：AOF 日志同步写（罗盘方式）。 RDB生成及Aof重写采用子进程</li>
+<li>从库加载 RDB 文件就成为了 Redis 的第五个阻塞点。</li>
 </ul>
-<h3 id="常见链表操作"><a href="#常见链表操作" class="headerlink" title="常见链表操作"></a>常见链表操作</h3><ul>
-<li>单链表反转</li>
+<h3 id="上面的阻塞点可以异步执行吗"><a href="#上面的阻塞点可以异步执行吗" class="headerlink" title="上面的阻塞点可以异步执行吗"></a>上面的阻塞点可以异步执行吗</h3><ul>
+<li>第一个阻塞点，是在关键路径上的读，需要给客户端返回结果，不能异步执行</li>
+<li>第二三个阻塞点，可以不用返回结果，可以异步</li>
+<li>第四个，可以异步</li>
+<li>第五个是</li>
 </ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">reverseList</span>(<span class="params">self, head</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        pre = <span class="literal">None</span></span><br><span class="line">        cur = head</span><br><span class="line">        <span class="keyword">while</span> cur <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            tmp = cur.<span class="built_in">next</span></span><br><span class="line">            cur.<span class="built_in">next</span> = pre</span><br><span class="line">            pre = cur</span><br><span class="line">            cur = tmp</span><br><span class="line">        <span class="keyword">return</span> pre </span><br></pre></td></tr></table></figure>
+<h3 id="异步的子线程机制"><a href="#异步的子线程机制" class="headerlink" title="异步的子线程机制"></a>异步的子线程机制</h3><p>Redis 主线程启动后，会使用操作系统提供的 pthread_create 函数创建 3 个子线程，分别由它们负责 AOF 日志写操作、键值对删除以及文件关闭的异步执行。</p>
+<img src="/2021/06/02/%E5%BD%B1%E5%93%8Dredis%E6%80%A7%E8%83%BD%E5%9B%A0%E7%B4%A0/%E5%BC%82%E6%AD%A5.jpg" class="">
 
 <ul>
-<li>链表中环的检测</li>
+<li>删除<ul>
+<li>键值对删除：当你的集合类型中有大量元素（例如有百万级别或千万级别元素）需要删除时，我建议你使用 UNLINK 命令。</li>
+<li>清空数据库：可以在 FLUSHDB 和 FLUSHALL 命令后加上 ASYNC 选项，这样就可以让后台子线程异步地清空数据库，如下所示：</li>
 </ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">hasCycle</span>(<span class="params">self, head</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        是否有环</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :rtype: bool</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        fast,slow = head,head</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            <span class="keyword">if</span> fast <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span>  fast.<span class="built_in">next</span> <span class="keyword">is</span>  <span class="literal">None</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">            slow,fast = slow.<span class="built_in">next</span> , fast.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">            <span class="keyword">if</span> slow == fast:</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">detectCycle</span>(<span class="params">self, head</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        环的位置</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        slow,fast = head,head</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            <span class="keyword">if</span> fast <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> fast.<span class="built_in">next</span> <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">            slow,fast = slow.<span class="built_in">next</span>,fast.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">            <span class="keyword">if</span> slow==fast:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        slow = head</span><br><span class="line">        <span class="keyword">while</span>(slow!=fast):</span><br><span class="line">            slow,fast = slow.<span class="built_in">next</span>,fast.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">return</span> slow</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>两个有序的链表合并</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">mergeTwoLists</span>(<span class="params">self, l1, l2</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type l1: ListNode</span></span><br><span class="line"><span class="string">        :type l2: ListNode</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        pre = ListNode()</span><br><span class="line">        result = pre</span><br><span class="line">        <span class="keyword">while</span> l1 <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">and</span> l2 <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">if</span> l1.val &lt;= l2.val:</span><br><span class="line">                result.<span class="built_in">next</span> = l1</span><br><span class="line">                l1 = l1.<span class="built_in">next</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                result.<span class="built_in">next</span> = l2</span><br><span class="line">                l2= l2.<span class="built_in">next</span></span><br><span class="line">            result = result.<span class="built_in">next</span></span><br><span class="line">        result.<span class="built_in">next</span> = l1 <span class="keyword">if</span> l1 <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> l2 </span><br><span class="line">        <span class="keyword">return</span> pre.<span class="built_in">next</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>删除链表倒数第 n 个结点</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">removeNthFromEnd</span>(<span class="params">self, head, n</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :type n: int</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        pre  = ListNode(-<span class="number">1</span>,head)</span><br><span class="line">        fast = pre</span><br><span class="line">        slow = pre</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>,n+<span class="number">2</span>):</span><br><span class="line">            fast = fast.<span class="built_in">next</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">while</span>(fast!=<span class="literal">None</span>):</span><br><span class="line">            fast = fast.<span class="built_in">next</span></span><br><span class="line">            slow = slow.<span class="built_in">next</span></span><br><span class="line">        slow.<span class="built_in">next</span> = slow.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">return</span> pre.<span class="built_in">next</span></span><br><span class="line">        </span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>求链表的中间结点</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">middleNode</span>(<span class="params">self, head</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">if</span> head <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> head.<span class="built_in">next</span> ==<span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> head</span><br><span class="line">        slow,fast = head,head</span><br><span class="line">        <span class="keyword">while</span>(fast !=<span class="literal">None</span> <span class="keyword">and</span> fast.<span class="built_in">next</span> !=<span class="literal">None</span>):</span><br><span class="line">            slow = slow.<span class="built_in">next</span></span><br><span class="line">            fast = fast.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">return</span> slow</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>两两交换节点</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">swapPairs</span>(<span class="params">self, head</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">if</span> head <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> head.<span class="built_in">next</span> <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> head</span><br><span class="line">        tmp = head.<span class="built_in">next</span></span><br><span class="line">        head.<span class="built_in">next</span> = self.swapPairs(tmp.<span class="built_in">next</span>)</span><br><span class="line">        tmp.<span class="built_in">next</span> = head</span><br><span class="line">        <span class="keyword">return</span> tmp</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/09/%E6%95%B0%E7%BB%84/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/09/%E6%95%B0%E7%BB%84/" class="post-title-link" itemprop="url">数组</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-09 17:22:45" itemprop="dateCreated datePublished" datetime="2021-05-09T17:22:45+08:00">2021-05-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-17 08:12:23" itemprop="dateModified" datetime="2021-05-17T08:12:23+08:00">2021-05-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
-<li><p>数组（Array）是一种线性表数据结构。它用一组连续的内存空间，来存储一组具有相同类型的数据。</p>
-</li>
-<li><p>第一是线性表（Linear List）。顾名思义，线性表就是数据排成像一条线一样的结构。</p>
-<img src="/2021/05/09/%E6%95%B0%E7%BB%84/%E7%BA%BF%E6%80%A7%E8%A1%A8.jpg" class=""></li>
-<li><p>非线性表，比如二叉树、堆、图等。</p>
-<img src="/2021/05/09/%E6%95%B0%E7%BB%84/%E9%9D%9E%E7%BA%BF%E6%80%A7%E8%A1%A8.jpg" class=""></li>
-<li><p><strong>链表适合插入、删除，时间复杂度 O(1),数组支持随机访问，根据下标随机访问的时间复杂度为 O(1)</strong></p>
 </li>
 </ul>
-<h2 id="低效的“插入”和“删除”"><a href="#低效的“插入”和“删除”" class="headerlink" title="低效的“插入”和“删除”"></a>低效的“插入”和“删除”</h2><ul>
-<li>如果需要数组有序，需要挪动数组数据，很低效</li>
-<li>如果不需要有序，只需要将要插入位置的数据插入到末尾，然后将数据进行插入即可</li>
-<li>删除操作时，可以先进行标记，有必要的时候在进行数组移动</li>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FLUSHDB ASYNC</span><br><span class="line">FLUSHALL AYSNC</span><br></pre></td></tr></table></figure>
+
+<h3 id="建议"><a href="#建议" class="headerlink" title="建议"></a>建议</h3><p>集合全量查询和聚合操作、从库加载 RDB 文件是在关键路径上，无法使用异步操作来完成。对于这两个阻塞点，我也给你两个小建议。</p>
+<ul>
+<li>集合全量查询和聚合操作：可以使用 SCAN 命令，分批读取数据，再在客户端进行聚合计算；</li>
+<li>从库加载 RDB 文件：把主库的数据量大小控制在 2~4GB 左右，以保证 RDB 文件能以较快的速度加载。</li>
 </ul>
-<h2 id="经验总结"><a href="#经验总结" class="headerlink" title="经验总结"></a>经验总结</h2><ul>
-<li><ol>
-<li>Java ArrayList 无法存储基本类型，比如 int、long，需要封装为 Integer、Long 类，而 Autoboxing、Unboxing 则有一定的性能消耗，所以如果特别关注性能，或者希望使用基本类型，就可以选用数组。</li>
+<h2 id="CPU-核和-NUMA-架构的影响"><a href="#CPU-核和-NUMA-架构的影响" class="headerlink" title="CPU 核和 NUMA 架构的影响"></a>CPU 核和 NUMA 架构的影响</h2><h3 id="主流的-CPU-架构"><a href="#主流的-CPU-架构" class="headerlink" title="主流的 CPU 架构"></a>主流的 CPU 架构</h3><ul>
+<li>一个 CPU 处理器中一般有多个运行核心，我们把一个运行核心称为一个物理核，每个物理核都可以运行应用程序。每个物理核都拥有私有的一级缓存（Level 1 cache，简称 L1 cache），包括一级指令缓存和一级数据缓存，以及私有的二级缓存（Level 2 cache，简称 L2 cache）。</li>
+<li>在主流的服务器上，一个 CPU 处理器会有 10 到 20 多个物理核。同时，为了提升服务器的处理能力，服务器上通常还会有多个 CPU 处理器（也称为多 CPU Socket），每个处理器有自己的物理核（包括 L1、L2 缓存），L3 缓存，以及连接的内存，同时，不同处理器间通过总线连接。<img src="/2021/06/02/%E5%BD%B1%E5%93%8Dredis%E6%80%A7%E8%83%BD%E5%9B%A0%E7%B4%A0/cpu.jpg" class="">
+<img src="/2021/06/02/%E5%BD%B1%E5%93%8Dredis%E6%80%A7%E8%83%BD%E5%9B%A0%E7%B4%A0/%E4%B8%89%E7%BA%A7%E7%BC%93%E5%AD%98.jpg" class="">
+<img src="/2021/06/02/%E5%BD%B1%E5%93%8Dredis%E6%80%A7%E8%83%BD%E5%9B%A0%E7%B4%A0/%E5%A4%9Acpu%E5%A4%84%E7%90%86%E5%99%A8.jpg" class=""></li>
+</ul>
+<p>问题1：在多 CPU 架构上，应用程序可以在不同的处理器上运行</p>
+<ul>
+<li>远端内存访问。和访问 Socket 直接连接的内存相比，远端内存访问会增加应用程序的延迟。</li>
+<li>所以，我们也把这个架构称为非统一内存访问架构（Non-Uniform Memory Access，NUMA 架构）</li>
+<li>如果在 CPU 多核场景下，Redis 实例被频繁调度到不同 CPU 核上运行的话，那么，对 Redis 实例的请求处理时间影响就更大了。每调度一次，一些请求就会受到运行时信息、指令和数据重新加载过程的影响，这就会导致某些请求的延迟明显高于其他请求。</li>
+</ul>
+<p>解决：我们可以使用 taskset 命令把一个程序绑定在一个核上运行。</p>
+<ul>
+<li>taskset -c 0 ./redis-server 就把 Redis 实例绑在了 0 号核上，其中，“-c”选项用于设置要绑定的核编号。</li>
+</ul>
+<p>问题2：当网络中断处理程序、Redis 实例分别和 CPU 核绑定后，就会有一个潜在的风险</p>
+<ul>
+<li>如果网络中断处理程序和 Redis 实例各自所绑的 CPU 核不在同一个 CPU Socket 上，那么，Redis 实例读取网络数据时，就需要跨 CPU Socket 访问内存，这个过程会花费较多时间。<img src="/2021/06/02/%E5%BD%B1%E5%93%8Dredis%E6%80%A7%E8%83%BD%E5%9B%A0%E7%B4%A0/%E7%BD%91%E7%BB%9C%E4%B8%AD%E6%96%AD.jpg" class=""></li>
+<li>在 CPU 的 NUMA 架构下，对 CPU 核的编号规则，并不是先把一个 CPU Socket 中的所有逻辑核编完，再对下一个 CPU Socket 中的逻辑核编码，而是先给每个 CPU Socket 中每个物理核的第一个逻辑核依次编号，再给每个 CPU Socket 中的物理核的第二个逻辑核依次编号 可以通过lscpu查看</li>
+</ul>
+<h3 id="绑核的风险和解决方案"><a href="#绑核的风险和解决方案" class="headerlink" title="绑核的风险和解决方案"></a>绑核的风险和解决方案</h3><h4 id="方案一：一个-Redis-实例对应绑一个物理核"><a href="#方案一：一个-Redis-实例对应绑一个物理核" class="headerlink" title="方案一：一个 Redis 实例对应绑一个物理核"></a>方案一：一个 Redis 实例对应绑一个物理核</h4><p>在给 Redis 实例绑核时，我们不要把一个实例和一个逻辑核绑定，而要和一个物理核绑定，也就是说，把一个物理核的 2 个逻辑核都用上。<br>taskset -c 0,12 ./redis-server</p>
+<h4 id="方案二：优化-Redis-源码"><a href="#方案二：优化-Redis-源码" class="headerlink" title="方案二：优化 Redis 源码"></a>方案二：优化 Redis 源码</h4><p>这个方案就是通过修改 Redis 源码，把子进程和后台线程绑到不同的 CPU 核上。6.0以后支持配置绑核</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//线程函数</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">worker</span><span class="params">(<span class="keyword">int</span> bind_cpu)</span></span>&#123;</span><br><span class="line">    <span class="keyword">cpu_set_t</span> cpuset;  <span class="comment">//创建位图变量</span></span><br><span class="line">    CPU_ZERO(&amp;cpu_set); <span class="comment">//位图变量所有位设置0</span></span><br><span class="line">    CPU_SET(bind_cpu, &amp;cpuset); <span class="comment">//根据输入的bind_cpu编号，把位图对应为设置为1</span></span><br><span class="line">    sched_setaffinity(<span class="number">0</span>, <span class="keyword">sizeof</span>(cpuset), &amp;cpuset); <span class="comment">//把程序绑定在cpu_set_t结构位图中为1的逻辑核</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//实际线程函数工作</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">pthread_t</span> pthread1</span><br><span class="line">    <span class="comment">//把创建的pthread1绑在编号为3的逻辑核上</span></span><br><span class="line">    pthread_create(&amp;pthread1, <span class="literal">NULL</span>, (<span class="keyword">void</span> *)worker, <span class="number">3</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><h3 id="redis-真的变慢了吗"><a href="#redis-真的变慢了吗" class="headerlink" title="redis 真的变慢了吗"></a>redis 真的变慢了吗</h3><ul>
+<li>一个最直接的方法，就是查看 Redis 的响应延迟。</li>
+<li>基于当前环境下的 Redis 基线性能做判断。</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">./redis-cli --intrinsic-latency 120</span><br><span class="line">Max latency so far: 17 microseconds.</span><br><span class="line">Max latency so far: 44 microseconds.</span><br><span class="line">Max latency so far: 94 microseconds.</span><br><span class="line">Max latency so far: 110 microseconds.</span><br><span class="line">Max latency so far: 119 microseconds.</span><br><span class="line"></span><br><span class="line">36481658 total runs (avg latency: 3.2893 microseconds / 3289.32 nanoseconds per run).</span><br><span class="line">Worst run took 36x longer than the average latency.</span><br></pre></td></tr></table></figure>
+
+<h3 id="如何应对-Redis-变慢"><a href="#如何应对-Redis-变慢" class="headerlink" title="如何应对 Redis 变慢"></a>如何应对 Redis 变慢</h3><img src="/2021/06/02/%E5%BD%B1%E5%93%8Dredis%E6%80%A7%E8%83%BD%E5%9B%A0%E7%B4%A0/%E5%BD%B1%E5%93%8D%E5%9B%A0%E7%B4%A0.jpg" class="">
+
+<ul>
+<li>查找原因</li>
+<li>逐一解决</li>
+</ul>
+<h3 id="Redis-自身操作特性的影响"><a href="#Redis-自身操作特性的影响" class="headerlink" title="Redis 自身操作特性的影响"></a>Redis 自身操作特性的影响</h3><ol>
+<li>慢查询命令<br>解决：<ul>
+<li>用其他高效命令代替。比如说，如果你需要返回一个 SET 中的所有成员时，不要使用 SMEMBERS 命令，而是要使用 SSCAN 多次迭代返回，避免一次返回大量数据，造成线程阻塞。</li>
+<li>当你需要执行排序、交集、并集操作时，可以在客户端完成，而不要用 SORT、SUNION、SINTER 这些命令，以免拖慢 Redis 实例。</li>
+<li>KEYS 命令一般不被建议用于生产环境中。</li>
+</ul>
+</li>
+<li>过期 key 操作<br>删除操作是阻塞的（Redis 4.0 后可以用异步线程机制来减少阻塞影响）<br>解决：<ul>
+<li>排查过期 key 的时间设置，并根据实际使用需求，设置不同的过期时间。</li>
+</ul>
+</li>
+<li>文件系统：AOF 模式<br>依赖于系统命令write fsync<ul>
+<li>AOF 重写会对磁盘进行大量 IO 操作，同时，fsync 又需要等到数据写到磁盘后才能返回，所以，当 AOF 重写的压力比较大时，就会导致 fsync 被阻塞。</li>
+<li>当主线程使用后台子线程执行了一次 fsync，需要再次把新接收的操作记录写回磁盘时，如果主线程发现上一次的 fsync 还没有执行完，那么它就会阻塞。所以，如果后台子线程执行的 fsync 频繁阻塞的话（比如 AOF 重写占用了大量的磁盘 IO 带宽），主线程也会阻塞，导致 Redis 性能变慢。<img src="/2021/06/02/%E5%BD%B1%E5%93%8Dredis%E6%80%A7%E8%83%BD%E5%9B%A0%E7%B4%A0/AOF%E9%A3%8E%E9%99%A9.jpg" class="">
+解决：</li>
+<li>no-appendfsync-on-rewrite yes</li>
+<li>采用固态 硬盘作为AOF日志的写入设备</li>
+</ul>
+</li>
+<li>操作系统：swap<br>解决：<ul>
+<li>增加内存</li>
+<li>扩展集群</li>
+</ul>
+</li>
+<li>内存大页<ul>
+<li>Redis 就会采用写时复制机制时需要加载更多的内存2MB 与平时的4KB相比要好的多<br>解决：<br>echo never /sys/kernel/mm/transparent_hugepage/enabled 关闭内存大页</li>
+</ul>
+</li>
 </ol>
-</li>
-<li><ol start="2">
-<li>如果数据操作非常简大小事先已知，并且对数据的单，用不到 ArrayList 提供的大部分方法，也可以直接使用数组。</li>
-</ol>
-</li>
-<li><ol start="3">
-<li>还有一个是我个人的喜好，当要表示多维数组时，用数组往往会更加直观。比如 Object[][] array；而用容器的话则需要这样定义：ArrayList &gt; array。</li>
-</ol>
-</li>
-<li>我总结一下，对于业务开发，直接使用容器就足够了，省时省力。毕竟损耗一丢丢性能，完全不会影响到系统整体的性能。但如果你是做一些非常底层的开发，比如开发网络框架，性能的优化需要做到极致，这个时候数组就会优于容器，成为首选。</li>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li>获取 Redis 实例在当前环境下的基线性能。</li>
+<li>是否用了慢查询命令？如果是的话，就使用其他命令替代慢查询命令，或者把聚合计算命令放在客户端做。</li>
+<li>是否对过期 key 设置了相同的过期时间？对于批量删除的 key，可以在每个 key 的过期时间上加一个随机数，避免同时删除。</li>
+<li>是否存在 bigkey？ 对于 bigkey 的删除操作，如果你的 Redis 是 4.0 及以上的版本，可以直接利用异步线程机制减少主线程阻塞；如果是 Redis 4.0 以前的版本，可以使用 SCAN 命令迭代删除；</li>
+<li>对于 bigkey 的集合查询和聚合操作，可以使用 SCAN 命令在客户端完成。</li>
+<li>Redis AOF 配置级别是什么？业务层面是否的确需要这一可靠性级别？如果我们需要高性能，同时也允许数据丢失，可以将配置项 no-appendfsync-on-rewrite 设置为 yes，避免 AOF 重写和 fsync 竞争磁盘 IO 资源，导致 Redis 延迟增加。当然， 如果既需要高性能又需要高可靠性，最好使用高速固态盘作为 AOF 日志的写入盘。</li>
+<li>Redis 实例的内存使用是否过大？发生 swap 了吗？如果是的话，就增加机器内存，或者是使用 Redis 集群，分摊单机 Redis 的键值对数量和内存压力。同时，要避免出现 Redis 和其他内存需求大的应用共享机器的情况。</li>
+<li>在 Redis 实例的运行环境中，是否启用了透明大页机制？如果是的话，直接关闭内存大页机制就行了。</li>
+<li>是否运行了 Redis 主从集群？如果是的话，把主库实例的数据量大小控制在 2~4GB，以免主从复制时，从库因加载大的 RDB 文件而阻塞。</li>
+<li>是否使用了多核 CPU 或 NUMA 架构的机器运行 Redis 实例？使用多核 CPU 时，可以给 Redis 实例绑定物理核；使用 NUMA 架构时，注意把 Redis 实例和网络中断处理程序运行在同一个 CPU Socket 上。</li>
 </ul>
-<h2 id="为什么要从0开始不是1"><a href="#为什么要从0开始不是1" class="headerlink" title="为什么要从0开始不是1"></a>为什么要从0开始不是1</h2><ul>
-<li>如果从0开始，那a[k]的寻址公式即：a[k]_address = base_address + k * type_size</li>
-<li>如果从1开始，那a[K]的寻址公式即：a[k]_address = base_address + (k-1)*type_size,每次多一个减法操作</li>
-<li>历史原因 C语言最开始就用的0 ，然后别的语言都开始模仿，久而久之</li>
-</ul>
-<h2 id="题"><a href="#题" class="headerlink" title="题"></a>题</h2><h3 id="三数之和"><a href="#三数之和" class="headerlink" title="三数之和"></a>三数之和</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">threeSum</span>(<span class="params">self, nums</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type nums: List[int]</span></span><br><span class="line"><span class="string">        :rtype: List[List[int]]</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        nums.sort()</span><br><span class="line">        result = []</span><br><span class="line">        k = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>,<span class="built_in">len</span>(nums)-<span class="number">2</span>):</span><br><span class="line">            <span class="keyword">if</span> nums[k]&gt;<span class="number">0</span>:<span class="keyword">break</span></span><br><span class="line">            <span class="keyword">if</span> k&gt;<span class="number">0</span> <span class="keyword">and</span> nums[k]==nums[k-<span class="number">1</span>]:<span class="keyword">continue</span></span><br><span class="line">            i,j = k+<span class="number">1</span>,<span class="built_in">len</span>(nums)-<span class="number">1</span></span><br><span class="line">            <span class="keyword">while</span> i&lt;j:</span><br><span class="line">                s = nums[i] + nums[k]+ nums[j]</span><br><span class="line">                <span class="keyword">if</span> s&lt;<span class="number">0</span>:</span><br><span class="line">                    i+=<span class="number">1</span></span><br><span class="line">                    <span class="keyword">while</span> i&lt;j <span class="keyword">and</span> nums[i]==nums[i-<span class="number">1</span>]:i+=<span class="number">1</span></span><br><span class="line">                <span class="keyword">elif</span> s&gt;<span class="number">0</span>:</span><br><span class="line">                    j-=<span class="number">1</span></span><br><span class="line">                    <span class="keyword">while</span> i&lt;j <span class="keyword">and</span> nums[j]==nums[j+<span class="number">1</span>]:j-=<span class="number">1</span></span><br><span class="line">                <span class="keyword">elif</span> s==<span class="number">0</span>:</span><br><span class="line">                    result.append([nums[k],nums[i],nums[j]])</span><br><span class="line">                    i+=<span class="number">1</span></span><br><span class="line">                    j-=<span class="number">1</span></span><br><span class="line">                    <span class="keyword">while</span> i&lt;j <span class="keyword">and</span> nums[i]==nums[i-<span class="number">1</span>]:i+=<span class="number">1</span></span><br><span class="line">                    <span class="keyword">while</span> i&lt;j <span class="keyword">and</span> nums[j]==nums[j+<span class="number">1</span>]:j-=<span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
-
-<h3 id="两数之和"><a href="#两数之和" class="headerlink" title="两数之和"></a>两数之和</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">twoSum</span>(<span class="params">self, nums, target</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type nums: List[int]</span></span><br><span class="line"><span class="string">        :type target: int</span></span><br><span class="line"><span class="string">        :rtype: List[int]</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        cache = &#123;&#125;</span><br><span class="line">        <span class="keyword">for</span> i,num <span class="keyword">in</span> <span class="built_in">enumerate</span>(nums):</span><br><span class="line">            <span class="keyword">if</span> num <span class="keyword">in</span> cache:</span><br><span class="line">                <span class="keyword">return</span> [cache[num],i]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                cache[target-num]=i</span><br><span class="line">        <span class="keyword">return</span> []</span><br></pre></td></tr></table></figure>
-
-<h3 id="多数元素"><a href="#多数元素" class="headerlink" title="多数元素"></a>多数元素</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">majorityElement</span>(<span class="params">self, nums</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type nums: List[int]</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        nums.sort()</span><br><span class="line">        <span class="keyword">return</span> nums[<span class="built_in">len</span>(nums)//<span class="number">2</span>]</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/" class="post-title-link" itemprop="url">时间复杂度</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-09 16:33:52" itemprop="dateCreated datePublished" datetime="2021-05-09T16:33:52+08:00">2021-05-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-14 07:20:59" itemprop="dateModified" datetime="2021-05-14T07:20:59+08:00">2021-05-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h2><h3 id="大O复杂度表示法"><a href="#大O复杂度表示法" class="headerlink" title="大O复杂度表示法"></a>大O复杂度表示法</h3><pre><code>所有代码的执行时间 T(n) 与每行代码的执行次数 f(n) 成正比。
-</code></pre>
-<img src="/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/%E5%A4%A7O%E8%A1%A8%E7%A4%BA%E6%B3%95.png" class="">
-
-<h3 id="时间复杂度分析"><a href="#时间复杂度分析" class="headerlink" title="时间复杂度分析"></a>时间复杂度分析</h3><ul>
-<li><ol>
-<li>只关注循环执行次数最多的一段代码<br>我们在分析一个算法、一段代码的时间复杂度的时候，也只关注循环执行次数最多的那一段代码就可以了</li>
-</ol>
-</li>
-<li><ol start="2">
-<li>加法法则：总复杂度等于量级最大的那段代码的复杂度<br>总的时间复杂度就等于量级最大的那段代码的时间复杂度</li>
-</ol>
-</li>
-<li><ol start="3">
-<li>乘法法则：嵌套代码的复杂度等于嵌套内外代码复杂度的乘积</li>
-</ol>
-</li>
-</ul>
-<h3 id="几种常见的时间复杂度"><a href="#几种常见的时间复杂度" class="headerlink" title="几种常见的时间复杂度"></a>几种常见的时间复杂度</h3><img src="/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6.jpg" class="">
-
-<h4 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h4><ul>
-<li>我们可以粗略地分为两类，多项式量级和非多项式量级。其中，非多项式量级只有两个：O(2n) 和 O(n!)。</li>
-<li>我们把时间复杂度为非多项式量级的算法问题叫作 NP（Non-Deterministic Polynomial，非确定多项式）问题。</li>
-</ul>
-<h4 id="具体分析"><a href="#具体分析" class="headerlink" title="具体分析"></a>具体分析</h4><ul>
-<li><ol>
-<li>O(1)</li>
-</ol>
-<p>  一般情况下，只要算法中不存在循环语句、递归语句，即使有成千上万行的代码，其时间复杂度也是Ο(1)。</p>
-</li>
-<li><ol start="2">
-<li>O(logn)、O(nlogn)</li>
-</ol>
-<p>归并排序、快速排序的时间复杂度都是 O(nlogn)</p>
-</li>
-<li><ol start="3">
-<li>O(m+n)、O(m*n)</li>
-</ol>
-</li>
-</ul>
-<h2 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h2><pre><code>渐进时间复杂度，表示算法的执行时间与数据规模之间的增长关系。类比一下，空间复杂度全称就是渐进空间复杂度（asymptotic space complexity），表示算法的存储空间与数据规模之间的增长关系。
-我们常见的空间复杂度就是 O(1)、O(n)、O(n2 )，像 O(logn)、O(nlogn) 这样的对数阶复杂度平时都用不到。
-</code></pre>
-<img src="/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/%E5%A4%8D%E6%9D%82%E5%BA%A6%E6%9B%B2%E7%BA%BF.jpg" class="">
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" class="post-title-link" itemprop="url">分布式事务</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-06 16:34:18" itemprop="dateCreated datePublished" datetime="2021-05-06T16:34:18+08:00">2021-05-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="分布式事务解决方案"><a href="#分布式事务解决方案" class="headerlink" title="分布式事务解决方案"></a>分布式事务解决方案</h2><h3 id="数据库事务"><a href="#数据库事务" class="headerlink" title="数据库事务"></a>数据库事务</h3><ul>
-<li>原子性(Atomicity )</li>
-<li>一致性( Consistency )</li>
-<li>隔离性或独立性( Isolation)</li>
-<li>持久性(Durabilily)</li>
-</ul>
-<h3 id="分布式理论"><a href="#分布式理论" class="headerlink" title="分布式理论"></a>分布式理论</h3><h4 id="CAP理论"><a href="#CAP理论" class="headerlink" title="CAP理论"></a>CAP理论</h4><p>CAP定理是由加州大学伯克利分校Eric Brewer教授提出来的，他指出WEB服务无法同时满足一下3个属性：</p>
-<ul>
-<li>一致性(Consistency) ： 客户端知道一系列的操作都会同时发   生(生效)</li>
-<li>可用性(Availability) ： 每个操作都必须以可预期的响应结束</li>
-<li>分区容错性(Partition tolerance) ： 即使出现单个组件无法可用,操作依然可以完成</li>
-<li><strong>CAP原则指CAP三者不能同时满足，要么能同时满足CP即同时满足区分容错性和一致性，要么同时满足AP即同时满足区分容错性和可用性。从中可以看出，P是分布式系统的基础，没有区分容错性就谈不上分布式系统了</strong></li>
-</ul>
-<h4 id="BASE理论"><a href="#BASE理论" class="headerlink" title="BASE理论"></a>BASE理论</h4><p>前面讲到分布式系统的CAP原则要么同时满足AP要么同时满足CP，那么BASE理论则是CAP原则权衡的结果。BASE是指Basically Available（基本可用的）,Soft state（软状态）,Eventual consistency（最终一致性）。</p>
-<ul>
-<li><p>Basically Available是指在分布式集群节点中，若某个节点宕机，或者在数据在节点间复制的过程中，只有部分数据不可用，但不影响整个系统的整体的可用性。</p>
-</li>
-<li><p>Soft state是指软状态即这个状态只是一个中间状态，允许数据在节点集群间操作过程中存在存在一个时延，这个中间状态最终会转化为最终状态。</p>
-</li>
-<li><p>Eventual consistency是指数据在分布式集群节点间操作过程中存在时延，与ACID相反，最终一致性不是强一致性，在经过一定时间后，分布式集群节点间的数据拷贝能达到最终一致的状态。</p>
-</li>
-</ul>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><h4 id="两阶段提交-2pc"><a href="#两阶段提交-2pc" class="headerlink" title="两阶段提交(2pc)"></a>两阶段提交(2pc)</h4><ul>
-<li>准备阶段<ul>
-<li>协调者节点向所有参与者节点询问是否可以执行提交操作(vote)，并开始等待各参与者节点的响应。</li>
-<li>参与者节点执行询问发起为止的所有事务操作，并将Undo信息和Redo信息写入日志。（注意：若成功这里其实每个参与者已经执行了事务操作）</li>
-<li>各参与者节点响应协调者节点发起的询问。如果参与者节点的事务操作实际执行成功，则它返回一个”同意”消息；如果参与者节点的事务操作实际执行失败，则它返回一个”中止”消息。由协调者判断是否继续</li>
+<h2 id="内存碎片"><a href="#内存碎片" class="headerlink" title="内存碎片"></a>内存碎片</h2><p>命令：<br>   INFO memory，mem_fragmentation_ratio 大于 1.5，需要引起注意</p>
+<h3 id="如何清理内存碎片"><a href="#如何清理内存碎片" class="headerlink" title="如何清理内存碎片"></a>如何清理内存碎片</h3><ul>
+<li>当 Redis 发生内存碎片后，一个“简单粗暴”的方法就是重启 Redis 实例。<ul>
+<li>当 Redis 发生内存碎片后，一个“简单粗暴”的方法就是重启 Redis 实例。</li>
+<li>即使 Redis 数据持久化了，我们还需要通过 AOF 或 RDB 进行恢复，恢复时长取决于 AOF 或 RDB 的大小，如果只有一个 Redis 实例，恢复阶段无法提供服务。</li>
 </ul>
 </li>
-<li>提交阶段<ul>
-<li>当协调者节点从所有参与者节点获得的相应消息都为”同意”时：</li>
-<li>协调者节点向所有参与者节点发出”正式提交(commit)”的请求。</li>
-<li>参与者节点正式完成操作，并释放在整个事务期间内占用的资源。</li>
-<li>参与者节点向协调者节点发送”完成”消息。</li>
-<li>协调者节点受到所有参与者节点反馈的”完成”消息后，完成事务。</li>
-<li>如果任一参与者节点在第一阶段返回的响应消息为”中止”，或者 协调者节点在第一阶段的询问超时之前无法获取所有参与者节点的响应消息时：<ul>
-<li>协调者节点向所有参与者节点发出”回滚操作(rollback)”的请求。</li>
-<li>参与者节点利用之前写入的Undo信息执行回滚，并释放在整个事务期间内占用的资源。</li>
-<li>参与者节点向协调者节点发送”回滚完成”消息。</li>
-<li>协调者节点受到所有参与者节点反馈的”回滚完成”消息后，取消事务。</li>
-<li>不管最后结果如何，第二阶段都会结束当前事务。</li>
+<li>自动清理<ul>
+<li>config set activedefrag yes</li>
+<li>active-defrag-ignore-bytes 100mb：表示内存碎片的字节数达到 100MB 时，开始清理；</li>
+<li>active-defrag-threshold-lower 10：表示内存碎片空间占操作系统分配给 Redis 的总空间比例达到 10% 时，开始清理。为了尽可能减少碎片清理对 Redis 正常请求处理</li>
+<li>active-defrag-cycle-min 25： 表示自动清理过程所用 CPU 时间的比例不低于 25%，保证清理能正常开展；</li>
+<li>active-defrag-cycle-max 75：表示自动清理过程所用 CPU 时间的比例不高于 75%，一旦超过，就停止清理，从而避免在清理时，大量的内存拷贝阻塞 Redis，导致响应延迟升高。</li>
 </ul>
 </li>
 </ul>
-</li>
-<li>问题<ul>
-<li>2PC是一个强一致性协议，同时它在实际应用中还存在几个问题：<ul>
-<li>同步阻塞，2PC的两个阶段中，协调者和参与者的通信都是同步的，这会导致整个事务的长时间阻塞</li>
-<li>Coordinator的单点问题</li>
-<li>数据不一致，在Commit阶段，可能存在只有部分参与者收到Commit消息（或处理成功）的情况</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="三阶段提交-3PC"><a href="#三阶段提交-3PC" class="headerlink" title="三阶段提交(3PC)"></a>三阶段提交(3PC)</h4><p>3PC即三阶段提交，它比2PC多了一个阶段，即把原来2PC的准备阶段拆分成CanCommit和PreCommit两个阶段，同时引入超时机制来解决2PC的同步阻塞问题。<br>    <img src="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/3%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%E5%9B%BE.png" class=""><br>但是在我看来3PC并没有解决2PC的根本问题，它只是在2PC的基础上做了一些优化，它增加了一个阶段（也增加了1个RTT）来提高对方可用性的概率，这本质跟TCP的三次握手一样，同样也改为四次握手，五次握手等等。</p>
-<h4 id="补偿事务-TCC-Try-Confirm-Cancel"><a href="#补偿事务-TCC-Try-Confirm-Cancel" class="headerlink" title="补偿事务(TCC:Try-Confirm-Cancel)"></a>补偿事务(TCC:Try-Confirm-Cancel)</h4><ul>
-<li><p>TCC 其实就是采用的补偿机制，其核心思想是：针对每个操作，都要注册一个与其对应的确认和补偿（撤销）操作。它分为三个阶段：</p>
-<ul>
-<li>Try 阶段主要是对业务系统做检测及资源预留</li>
-<li>Confirm 阶段主要是对业务系统做确认提交，Try阶段执行成功并开始执行 Confirm阶段时，默认 Confirm阶段是不会出错的。即：只要Try成功，Confirm一定成功。</li>
-<li>Cancel 阶段主要是在业务执行错误，需要回滚的状态下执行的业务取消，预留资源释放。</li>
-</ul>
-</li>
-<li><p>举个例子，假入 Bob 要向 Smith 转账，思路大概是：<br>  我们有一个本地方法，里面依次调用</p>
-<ul>
-<li>1、首先在 Try 阶段，要先调用远程接口把 Smith 和 Bob 的钱给冻结起来。</li>
-<li>2、在 Confirm 阶段，执行远程调用的转账的操作，转账成功进行解冻。</li>
-<li>3、如果第2步执行成功，那么转账成功，如果第二步执行失败，则调用远程冻结接口对应的解冻方法 (Cancel)。</li>
-</ul>
-</li>
-<li><p>优点： 跟2PC比起来，实现以及流程相对简单了一些，但数据的一致性比2PC也要差一些</p>
-</li>
-<li><p>缺点： 缺点还是比较明显的，在2,3步中都有可能失败。TCC属于应用层的一种补偿方式，所以需要程序员在实现的时候多写很多补偿的代码，在一些场景中，一些业务流程可能用TCC不太好定义及处理。</p>
-</li>
-</ul>
-<h4 id="本地消息表"><a href="#本地消息表" class="headerlink" title="本地消息表"></a>本地消息表</h4><p>本地消息表方案应该是业界内使用最为广泛的，因为它使用简单，成本比较低。<br>本地消息表的方案最初是由eBay提出（完整方案），核心思路是将分布式事务拆分成本地事务进行处理。它的处理流程如下：</p>
-<ul>
-<li>事务发起方把要处理的业务事务和写消息表这两个操作放在同一个本地事务里</li>
-<li>事务发起方有一个定时任务轮询消息表，把没处理的消息发送到消息中间件</li>
-<li>事务被动方从消息中间件获取消息后，返回成功</li>
-<li>事务发起方更新消息状态为已成功  <img src="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/%E6%9C%AC%E5%9C%B0%E6%B6%88%E6%81%AF%E8%A1%A8.png" class=""></li>
-</ul>
-<p>一些分析:</p>
-<ul>
-<li>把业务处理和写消息表放在同一个事务是为了失败/异常后可以同时回滚</li>
-<li>为什么不直接发消息，而是先写消息表？试想，如果发送消息超时了，即不确定消息中间件收到消息没，那么你是重试还是抛异常回滚事务呢？回滚是不行的，因为可能消息中间件已经收到消息，接收方收到消息后做处理，导致双方数据不一致了；重试也是不行的，因为有可能会一直重试失败，导致事务阻塞。  </li>
-<li>基于上述分析，消息的接收方是需要做幂等操作的</li>
-</ul>
-<p>本地消息表方案整体来说还是比较简单、可用的，但是也有以下缺点：</p>
-<ul>
-<li>消息数据和业务数据耦合，消息表需要根据具体的业务场景制定，不能公用。就算可以公用消息表，对于分库的业务来说每个库都是需要消息表的。</li>
-<li>只适用于最终一致的业务场景。例如在 A -&gt; B场景下，在不考虑网络异常、宕机等非业务异常的情况下，A成功的话，B肯定也会成功的。</li>
-</ul>
-<h4 id="Sagas事务模型"><a href="#Sagas事务模型" class="headerlink" title="Sagas事务模型"></a>Sagas事务模型</h4><p>Saga事务模型又叫做长时间运行的事务（Long-running-transaction）, 它是由普林斯顿大学的H.Garcia-Molina等人提出，它描述的是另外一种在没有两阶段提交的的情况下解决分布式系统中复杂的业务事务问题。<br>我们这里说的是一种基于 Sagas 机制的工作流事务模型，这个模型的相关理论目前来说还是比较新的，以至于百度上几乎没有什么相关资料。</p>
-<p>该模型其核心思想就是拆分分布式系统中的长事务为多个短事务，或者叫多个本地事务，然后由 Sagas 工作流引擎负责协调，如果整个流程正常结束，那么就算是业务成功完成，如果在这过程中实现失败，那么Sagas工作流引擎就会以相反的顺序调用补偿操作，重新进行业务回滚。</p>
-<p>比如我们一次关于购买旅游套餐业务操作涉及到三个操作，他们分别是预定车辆，预定宾馆，预定机票，他们分别属于三个不同的远程接口。可能从我们程序的角度来说他们不属于一个事务，但是从业务角度来说是属于同一个事务的。<br>    <img src="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/sagas.png" class=""></p>
-<p>们的执行顺序如上图所示，所以当发生失败时，会依次进行取消的补偿操作。</p>
-<p>因为长事务被拆分了很多个业务流，所以 Sagas 事务模型最重要的一个部件就是工作流或者你也可以叫流程管理器（Process Manager），工作流引擎和Process Manager虽然不是同一个东西，但是在这里，他们的职责是相同的</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/" class="post-title-link" itemprop="url">用户态及内核态</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-06 14:44:38" itemprop="dateCreated datePublished" datetime="2021-05-06T14:44:38+08:00">2021-05-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="为什么要有用户态和内核态"><a href="#为什么要有用户态和内核态" class="headerlink" title="为什么要有用户态和内核态"></a>为什么要有用户态和内核态</h2><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><ul>
-<li><p>Linux所谓的用户态和内核态，本质是对CPU提供的功能的一层封装抽象。</p>
-</li>
-<li><p>现代CPU，其设计目标主要是为了完美高效的实现一个多任务系统，多任务系统的三个核心特征是：</p>
-<ul>
-<li>权限分级</li>
-<li>数据隔离</li>
-<li>任务切换。</li>
-</ul>
-</li>
-<li><p>以X86_64架构为例，</p>
-<ul>
-<li>权限分级通过CPU的多模式机制和分段机制实现，</li>
-<li>数据隔离通过分页机制实现，</li>
-<li>任务切换通过中断机制和任务机制（TR/TSS）实现。</li>
-</ul>
-</li>
-<li><p>内核态和用户态的概念，是Linux为了有效实现CPU的权限分级和数据隔离的目标而出现的，是通过组合CPU的分段机制+分页机制而形成的。</p>
-<ul>
-<li>当CPU处于保护模式下时（X86_64CPU有5种模式，保护模式是其中之一，此时CPU.CR0.PE=1），</li>
-<li>当CPU.CS=系统代码段时（CS.CPL=0）为内核态，此时通过CPU的指令有操控全部寄存器的权限（包括FLAGS和CR寄存器），</li>
-<li>当CPU.CS=用户代码段时（CS.CPL=3）为用户态，此时通过CPU的指令只有操控部分寄存器的权限。</li>
-</ul>
-</li>
-<li><p>所谓“一个进程主动跳进内核态”，是指该进程中的一个执行线程通过INT或者SYSCALL指令，使得当前线程的CS=系统代码段（这里还有不同的细节，不多说了）。</p>
-</li>
-<li><p>每个用户进程都有自己的虚拟地址空间，用户进程之间切换的时候，通过切换页表（CR3）来实现，不用改CS寄存器和DS寄存器。所以没有“代码映射在0-3G”一说。就像班级名称和学号，同样的学号在不同的班级代表不同的人，同样的虚拟地址在不同的页表中代表不同的物理内存空间。</p>
-</li>
-<li><p>内核态允许多个用户线程同时进入，不存在阻塞的现象，尤其是多核CPU的情况下。</p>
-</li>
-<li><p>除了用户线程可以进入内核态之外，还有内核线程，即内核自己要干的事情，这种线程只运行在内核态</p>
-</li>
-<li><p>图1：从CPU的寄存器视角看，指令运行所处的三种CPU状态</p>
-<!-- ![cpu角度](./用户态及内核态/cpu.jpg) -->
-<img src="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/cpu.jpg" class=""></li>
-<li><p>图2：从Linux线程角度看，指令运行所处的两种状态（要么属于某线程，要么黑色切换中）</p>
-<!-- ![linux线程角度](./用户态及内核态/xiancheng.jpg) -->
-<img src="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/xiancheng.jpg" class=""></li>
-<li><p>图3：Linux下，线程类型*CPU状态决定数据空间</p>
-<!-- ![线程类型](./用户态及内核态/yonghu.jpg) -->
-<img src="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/yonghu.jpg" class=""></li>
+<h3 id="缓冲区溢出"><a href="#缓冲区溢出" class="headerlink" title="缓冲区溢出"></a>缓冲区溢出</h3><ul>
+<li>针对命令数据发送过快过大的问题，对于普通客户端来说可以避免 bigkey，而对于复制缓冲区来说，就是避免过大的 RDB 文件。</li>
+<li>针对命令数据处理较慢的问题，解决方案就是减少 Redis 主线程上的阻塞操作，例如使用异步的删除操作。</li>
+<li>针对缓冲区空间过小的问题，解决方案就是使用 client-output-buffer-limit 配置项设置合理的输出缓冲区、复制缓冲区和复制积压缓冲区大小。当然，我们不要忘了，输入缓冲区的大小默认是固定的，我们无法通过配置来修改它，除非直接去修改 Redis 源码。</li>
 </ul>
 
       
@@ -1191,7 +586,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/06/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/02/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1205,7 +600,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/06/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" class="post-title-link" itemprop="url">虚拟内存管理</a>
+            <a href="/2021/06/02/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" class="post-title-link" itemprop="url">消息队列</a>
         </h2>
 
         <div class="post-meta">
@@ -1214,23 +609,17 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-05-06 13:47:07" itemprop="dateCreated datePublished" datetime="2021-05-06T13:47:07+08:00">2021-05-06</time>
+              <time title="创建时间：2021-06-02 19:34:45 / 修改时间：21:57:34" itemprop="dateCreated datePublished" datetime="2021-06-02T19:34:45+08:00">2021-06-02</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
                 </span>
             </span>
 
@@ -1245,122 +634,758 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><!-- ![内存管理](./虚拟内存管理/虚拟内存管理.png) -->
-<img src="/2021/05/06/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.png" class="">
+          <h2 id="消息队列的消息存取需求"><a href="#消息队列的消息存取需求" class="headerlink" title="消息队列的消息存取需求"></a>消息队列的消息存取需求</h2><img src="/2021/06/02/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97.jpg" class="">
 
-<h3 id="连续分配管理方式"><a href="#连续分配管理方式" class="headerlink" title="连续分配管理方式"></a>连续分配管理方式</h3><ul>
-<li>分区式存储管理最大的缺点是碎片问题严重，内存利用率低。</li>
-<li>原因，主要在于连续分配的限制，即它要求每个作用在内存中必须占一个连续的分区。</li>
-<li>如果允许将一个进程分散地装入到许多不相邻的分区中，便可充分地利用内存，而无需再进行“紧凑”。<br>基于这一思想，产生了“非连续分配方式”，或者称为“离散分配方式”。</li>
-</ul>
-<h3 id="实分页存储管理"><a href="#实分页存储管理" class="headerlink" title="实分页存储管理"></a>实分页存储管理</h3><ul>
-<li><p>优点：</p>
 <ul>
-<li>较好地解决了碎片问题</li>
-<li>打破了存储分配的连续性要求</li>
-<li>提高了主存的利用率</li>
+<li>需求一：消息保序</li>
+<li>需求二：重复消息处理</li>
+<li>需求三：消息可靠性保证</li>
+</ul>
+<h2 id="基于-List-的消息队列解决方案"><a href="#基于-List-的消息队列解决方案" class="headerlink" title="基于 List 的消息队列解决方案"></a>基于 List 的消息队列解决方案</h2><ul>
+<li>LPUSH RPOP 天然保序</li>
+<li>读取时，存在while(true) 浪费cpu 内存的风险；BRPOP 命令也称为阻塞式读取，客户端在没有读到队列数据时，自动阻塞，直到有新的数据写入队列，再开始读取新数据。</li>
+<li>消费者程序本身能对重复消息进行判断。并且生产者需要带上全局唯一ID<ul>
+<li>LPUSH mq “101030001:stock:5” 就把一条全局 ID 为 101030001、库存量为 5 的消息插入了消息队列</li>
 </ul>
 </li>
-<li><p>缺点：</p>
-<ul>
-<li>页内碎片</li>
-<li>动态地址变换、方案实施需耗用额外的系统资源</li>
-<li>存储扩充问题没有解决——作业大小受到限制，可用块数小于作业需求时需等待</li>
-</ul>
-</li>
-</ul>
-<h3 id="虚拟存储管理系统"><a href="#虚拟存储管理系统" class="headerlink" title="虚拟存储管理系统"></a>虚拟存储管理系统</h3><h4 id="局部性原理"><a href="#局部性原理" class="headerlink" title="局部性原理"></a>局部性原理</h4><ul>
-<li><p>指程序在执行过程中的一个较短时期，所执行的指令地址和指令的操作数地址，分别局限于一定区域。还可以表现为：</p>
-<ul>
-<li>时间局部性：一条指令的一次执行和下次执行，一个数据的一次访问和下次访问都集中在一个较短时期内；</li>
-<li>空间局部性：当前指令和邻近的几条指令，当前访问的数据和邻近的数据都集中在一个较小区域内。</li>
-</ul>
-</li>
-<li><p>局部性原理的具体体现：</p>
-<ul>
-<li>程序在执行时，大部分是顺序执行的指令，少部分是转移和过程调用指令。</li>
-<li>过程调用的嵌套深度一般不超过5，因此执行的范围不超过这组嵌套的过程。</li>
-<li>程序中存在相当多的循环结构，它们由少量指令组成，而被多次执行。</li>
-<li>程序中存在相当多对一定数据结构的操作，如数组操作，往往局限在较小范围内。</li>
+<li>为了留存消息，List 类型提供了 BRPOPLPUSH 命令，这个命令的作用是让消费者程序从一个 List 中读取消息，同时，Redis 会把这个消息再插入到另一个 List（可以叫作备份 List）留存。这样一来，如果消费者程序读了消息但没能正常处理，等它重启后，就可以从备份 List 中重新读取消息并进行处理了<img src="/2021/06/02/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/brpoplpush.jpg" class=""></li>
+<li>问题：生产者消息发送很快，而消费者处理消息的速度比较慢，这就导致 List 中的消息越积越多，给 Redis 的内存带来很大压力。<ul>
+<li>所以需要消费者组的支持，stream支持消费者组</li>
 </ul>
 </li>
 </ul>
-<h4 id="虚拟存储管理系统的好处"><a href="#虚拟存储管理系统的好处" class="headerlink" title="虚拟存储管理系统的好处"></a>虚拟存储管理系统的好处</h4><ul>
-<li>大程序：可在较小的可用内存中执行较大的用户程序；</li>
-<li>大的用户空间：提供给用户可用的虚拟内存空间通常大于物理内存(real memory)</li>
-<li>并发：可在内存中容纳更多程序并发执行；</li>
-<li>易于开发：与覆盖技术比较，不必影响编程时的程序结构</li>
+<h2 id="基于-Streams-的消息队列解决方案"><a href="#基于-Streams-的消息队列解决方案" class="headerlink" title="基于 Streams 的消息队列解决方案"></a>基于 Streams 的消息队列解决方案</h2><h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><ul>
+<li>XADD：插入消息，保证有序，可以自动生成全局唯一 ID；</li>
+<li>XREAD：用于读取消息，可以按 ID 读取数据；</li>
+<li>XREADGROUP：按消费组形式读取消息；</li>
+<li>XPENDING 和 XACK：XPENDING 命令可以用来查询每个消费组内所有消费者已读取但尚未确认的消息，而 XACK 命令用于向消息队列确认消息处理已完成。</li>
 </ul>
-<h4 id="虚拟存储技术特征"><a href="#虚拟存储技术特征" class="headerlink" title="虚拟存储技术特征"></a>虚拟存储技术特征</h4><ul>
-<li>不连续性：物理内存分配的不连续，虚拟地址空间使用的不连续（数据段和栈段之间的空闲空间，共享段和动态链接库占用的空间）</li>
-<li>部分交换：与交换技术相比较，虚拟存储的调入和调出是对部分虚拟地址空间进行的；</li>
-<li>大空间：通过物理内存和快速外存相结合，提供大范围的虚拟地址空间</li>
-</ul>
-<h4 id="虚拟存储技术分类"><a href="#虚拟存储技术分类" class="headerlink" title="虚拟存储技术分类"></a>虚拟存储技术分类</h4><ul>
-<li>虚拟页式</li>
-<li>虚拟段式</li>
-<li>虚拟段页式</li>
-</ul>
-<h3 id="虚拟页式存储管理"><a href="#虚拟页式存储管理" class="headerlink" title="虚拟页式存储管理"></a>虚拟页式存储管理</h3><h4 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h4><ul>
-<li>虚拟页式存储管理实际是实分页技术与虚拟存储技术相结合的产物，其分页思想与实分页是一样的。这里的请求调入和置换功能都是比实分页存储管理增加的内容，是实现虚拟存储的主要功能。</li>
-</ul>
-<h4 id="主存页面分配策略"><a href="#主存页面分配策略" class="headerlink" title="主存页面分配策略"></a>主存页面分配策略</h4><ul>
-<li>在虚拟页式存储管理中，内存分配似实分页方式，但还必须考虑解决下面两个问题：<ul>
-<li>（1）是否对各进程采用平均分配策略？<ul>
-<li>a、平均分配。</li>
-<li>b、按进程长度比例分配。</li>
-<li>c、按进程优先级分配。</li>
-<li>d、按进程长度和优先级别分配。</li>
-</ul>
-</li>
-<li>（2）发生缺页中断时，如何为所缺的页面分配内存？<ul>
-<li>a、固定分配局部置换。</li>
-<li>b、可变分配全局置换。</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="页面调入策略"><a href="#页面调入策略" class="headerlink" title="页面调入策略"></a>页面调入策略</h4><ul>
-<li><p>（1）请求调入</p>
-<ul>
-<li>当发生页面故障时进行调度，即当进程访问不在内存的页面引发缺页中断时，由系统根据这种访问请求把所缺页面装入内存。</li>
-<li>优点：由请求调入策略装入的页一定会被访问，再加之比较容易实现，故在目前的虚拟存储器中，大多采用此策略。</li>
-<li>缺点：每次仅调入一页，增加了磁盘I/O的启动频率。</li>
-</ul>
-</li>
-<li><p>（ 2）预调入</p>
-<ul>
-<li>也称先行调度，即一页面被访问前就已经预先置入内存，以减少今后的缺页率。</li>
-<li>主要适于进程的许多页存放在外存的连续区域中的情况。有的系统结合请求调入使用，即每次缺页时装入多个页面。</li>
-<li>优点：提高调页的I/O效率。</li>
-<li>缺点：基于预测，若调入的页在以后很少被访问，则效率低。常用于程序装入时的调页。</li>
-</ul>
-</li>
-</ul>
-<h4 id="页面调度算法"><a href="#页面调度算法" class="headerlink" title="页面调度算法"></a>页面调度算法</h4><ul>
-<li>a.最佳淘汰算法：OPT 淘汰以后不用的，但是这是个衡量指标，不能实现太理想化了</li>
-<li>b.FIFO：先进先出，用队列实现</li>
-<li>c.最近最久未使用算法(LRU)：根据调入内存的情况，选择内存中最久未使用的被置换<ul>
-<li>计时法：</li>
-<li>堆栈法：</li>
-<li>多维寄存器</li>
-</ul>
-</li>
-<li>d.二次机会淘汰算法。SC(Second Chance)</li>
-<li>e.时钟淘汰算法：</li>
-<li>f.最近未使用淘汰算法</li>
-</ul>
-<!-- ![淘汰算法比较](./虚拟内存管理/淘汰算法.png) -->
-<img src="/2021/05/06/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/%E6%B7%98%E6%B1%B0%E7%AE%97%E6%B3%95.png" class="">
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Redis 是一个非常轻量级的键值数据库，部署一个 Redis 实例就是启动一个进程，部署 Redis 集群，也就是部署多个 Redis 实例。而 Kafka、RabbitMQ 部署时，涉及额外的组件，例如 Kafka 的运行就需要再部署 ZooKeeper。相比 Redis 来说，Kafka 和 RabbitMQ 一般被认为是重量级的消息队列。</p>
 
-<h4 id="缺页中断率因素"><a href="#缺页中断率因素" class="headerlink" title="缺页中断率因素"></a>缺页中断率因素</h4><ul>
-<li>（1）调度算法不合理</li>
-<li>（2）分配给作业的内存块数太少</li>
-<li>（3）页面大小的选择不合理</li>
-<li>（4）用户程序编制的方法不合理</li>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/02/%E9%9B%86%E5%90%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/02/%E9%9B%86%E5%90%88/" class="post-title-link" itemprop="url">集合</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-06-02 07:39:06 / 修改时间：21:05:25" itemprop="dateCreated datePublished" datetime="2021-06-02T07:39:06+08:00">2021-06-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="常用的集合统计模式"><a href="#常用的集合统计模式" class="headerlink" title="常用的集合统计模式"></a>常用的集合统计模式</h2><h3 id="聚合统计"><a href="#聚合统计" class="headerlink" title="聚合统计"></a>聚合统计</h3><ul>
+<li>统计多个集合的共有元素（交集统计）；SINTERSTORE destination key1 [key2] 返回给定所有集合的交集并存储在 destination 中</li>
+<li>把两个集合相比，统计其中一个集合独有的元素（差集统计）；SDIFFSTORE destination key1 [key2] 返回给定所有集合的差集并存储在 destination 中</li>
+<li>统计多个集合的所有元素（并集统计）。SUNIONSTORE destination key1 [key2] 所有给定集合的并集存储在 destination 集合中</li>
+<li>例如统计新增用户数 可以用两个set ,一个全局的，一个当天的</li>
 </ul>
-<p>在mysql中，选择B+树的原因就在于此，为了尽量较少磁盘IO</p>
+<p>Set 的差集、并集和交集的计算复杂度较高，在数据量较大的情况下，如果直接执行这些计算，会导致 Redis 实例阻塞。所以，我给你分享一个小建议：你可以从主从集群中选择一个从库，让它专门负责聚合计算，或者是把数据读取到客户端，在客户端来完成聚合统计，这样就可以规避阻塞主库实例和其他从库实例的风险了。</p>
+<h3 id="排序统计"><a href="#排序统计" class="headerlink" title="排序统计"></a>排序统计</h3><ul>
+<li>比如统计最新评论时，就要用到有序集合了，redis集合中List 和 Sorted Set 是有序集合</li>
+<li>List 是按照元素进入 List 的顺序进行排序的，而 Sorted Set 可以根据元素的权重来排序</li>
+<li>在面对需要展示最新列表、排行榜等场景时，如果数据更新频繁或者需要分页显示，建议你优先考虑使用 Sorted Set。</li>
+</ul>
+<h3 id="二值状态统计bitmap"><a href="#二值状态统计bitmap" class="headerlink" title="二值状态统计bitmap"></a>二值状态统计bitmap</h3><ul>
+<li>比如统计多人的签到情况，<ul>
+<li>SETBIT uid:sign:3000:202008 2 1</li>
+<li>GETBIT uid:sign:3000:202008 2</li>
+<li>BITCOUNT uid:sign:3000:202008<img src="/2021/06/02/%E9%9B%86%E5%90%88/bitmap%E4%B8%8E.jpg" class=""></li>
+</ul>
+</li>
+</ul>
+<h3 id="基数统计HyperLogLog"><a href="#基数统计HyperLogLog" class="headerlink" title="基数统计HyperLogLog"></a>基数统计HyperLogLog</h3><ul>
+<li>基数统计就是指统计一个集合中不重复的元素个数。对应到我们刚才介绍的场景中，就是统计网页的 UV。<ul>
+<li>PFADD page1:uv user1 user2 user3 user4 user5</li>
+<li>对于基数统计来说，如果集合元素量达到亿级别而且不需要精确统计时，我建议你使用 HyperLogLog。</li>
+</ul>
+</li>
+</ul>
+<h2 id="GEO"><a href="#GEO" class="headerlink" title="GEO"></a>GEO</h2><h3 id="面向-LBS-Location-Based-Service，LBS-应用的-GEO-数据类型"><a href="#面向-LBS-Location-Based-Service，LBS-应用的-GEO-数据类型" class="headerlink" title="面向 LBS(Location-Based Service，LBS) 应用的 GEO 数据类型"></a>面向 LBS(Location-Based Service，LBS) 应用的 GEO 数据类型</h3>  <img src="/2021/06/02/%E9%9B%86%E5%90%88/%E7%BD%91%E7%BA%A6%E8%BD%A6.jpg" class="">
+
+<ul>
+<li>底层是sorted set</li>
+<li>利用了GeoHash 的编码方法（以区间定0、1来进行编码）</li>
+</ul>
+<h2 id="自定义结合类型"><a href="#自定义结合类型" class="headerlink" title="自定义结合类型"></a>自定义结合类型</h2>  <img src="/2021/06/02/%E9%9B%86%E5%90%88/redisobject.jpg" class="">
+
+<ul>
+<li>type：表示值的类型，涵盖了我们前面学习的五大基本类型；</li>
+<li>encoding：是值的编码方式，用来表示 Redis 中实现各个基本类型的底层数据结构，例如 SDS、压缩列表、哈希表、跳表等；</li>
+<li>lru：记录了这个对象最后一次被访问的时间，用于淘汰过期的键值对；</li>
+<li>refcount：记录了对象的引用计数；</li>
+<li>*ptr：是指向数据的指针。</li>
+</ul>
+<h2 id="基于-RedisTimeSeries-模块保存时间序列数据"><a href="#基于-RedisTimeSeries-模块保存时间序列数据" class="headerlink" title="基于 RedisTimeSeries 模块保存时间序列数据"></a>基于 RedisTimeSeries 模块保存时间序列数据</h2><ul>
+<li><p>RedisTimeSeries 是 Redis 的一个扩展模块。它专门面向时间序列数据提供了数据类型和访问接口，并且支持在 Redis 实例上直接对数据进行按时间范围的聚合计算。</p>
+</li>
+<li><p>当用于时间序列数据存取时，RedisTimeSeries 的操作主要有 5 个：</p>
+<ul>
+<li><p>用 TS.CREATE 命令创建时间序列数据集合；<br>TS.CREATE device:temperature RETENTION 600000 LABELS device_id 1</p>
+</li>
+<li><p>用 TS.ADD 命令插入数据；<br>TS.ADD device:temperature 1596416700 25.1<br>1596416700<br>TS.GET device:temperature<br>25.1</p>
+</li>
+<li><p>用 TS.GET 命令读取最新数据；</p>
+</li>
+<li><p>用 TS.MGET 命令按标签过滤查询数据集合；</p>
+</li>
+<li><p>用 TS.RANGE 支持聚合计算的范围查询。</p>
+</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/01/string/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/01/string/" class="post-title-link" itemprop="url">string</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-01 21:25:39" itemprop="dateCreated datePublished" datetime="2021-06-01T21:25:39+08:00">2021-06-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-02 08:14:46" itemprop="dateModified" datetime="2021-06-02T08:14:46+08:00">2021-06-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="string类型的问题"><a href="#string类型的问题" class="headerlink" title="string类型的问题"></a>string类型的问题</h2><ul>
+<li>当使用string保存大量数据时，例如保存图片id:存储id 时，1亿张图片用了6.4G 内存，会造成RDB生成相应变慢的问题</li>
+<li>就是它保存数据时所消耗的内存空间较多。</li>
+</ul>
+<h2 id="为什么-String-类型内存开销大-64K-整数"><a href="#为什么-String-类型内存开销大-64K-整数" class="headerlink" title="为什么 String 类型内存开销大(64K,整数)"></a>为什么 String 类型内存开销大(64K,整数)</h2><ul>
+<li>当你保存 64 位有符号整数时，String 类型会把它保存为一个 8 字节的 Long 类型整数，这种保存方式通常也叫作 int 编码方式。</li>
+<li>当你保存的数据中包含字符时，String 类型就会用简单动态字符串（Simple Dynamic String，SDS）结构体来保存 <img src="/2021/06/01/string/SDS.jpg" class="">
+<ul>
+<li>buf：字节数组，保存实际数据。为了表示字节数组的结束，Redis 会自动在数组最后加一个“\0”，这就会额外占用 1 个字节的开销。</li>
+<li>len：占 4 个字节，表示 buf 的已用长度。</li>
+<li>alloc：也占个 4 字节，表示 buf 的实际分配长度，一般大于 len。</li>
+</ul>
+</li>
+<li>因为 Redis 的数据类型有很多，而且，不同数据类型都有些相同的元数据要记录（比如最后一次访问的时间、被引用的次数等），所以，Redis 会用一个 RedisObject 结构体来统一记录这些元数据，同时指向实际数据。一个 RedisObject 包含了 8 字节的元数据和一个 8 字节指针 <img src="/2021/06/01/string/redisobj.jpg" class="">
+ <img src="/2021/06/01/string/quan.jpg" class=""></li>
+<li>6.4g 中4.8g保存了元数据</li>
+</ul>
+<h2 id="用什么数据结构可以节省内存"><a href="#用什么数据结构可以节省内存" class="headerlink" title="用什么数据结构可以节省内存"></a>用什么数据结构可以节省内存</h2><p>Redis 有一种底层数据结构，叫压缩列表（ziplist），这是一种非常节省内存的结构。</p>
+<img src="/2021/06/01/string/%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8.jpg" class="">
+
+<ul>
+<li>表头有三个字段 zlbytes、zltail 和 zllen，分别表示列表长度、列表尾的偏移量，以及列表中的 entry 个数。压缩列表尾还有一个 zlend，表示列表结束。</li>
+<li>减少dictEntry的个数来进行压缩</li>
+</ul>
+<h2 id="如何用集合类型保存单值的键值对"><a href="#如何用集合类型保存单值的键值对" class="headerlink" title="如何用集合类型保存单值的键值对"></a>如何用集合类型保存单值的键值对</h2><p>可以采用基于 Hash 类型的二级编码方法。这里说的二级编码，就是把一个单值的数据拆分成两部分，前一部分作为 Hash 集合的 key，后一部分作为 Hash 集合的 value，这样一来，我们就可以把单值数据保存到 Hash 集合中了。</p>
+<ul>
+<li>以图片 ID 1101000060 和图片存储对象 ID 3302000080 为例，我们可以把图片 ID 的前 7 位（1101000）作为 Hash 类型的键，把图片 ID 的最后 3 位（060）和图片存储对象 ID 分别作为 Hash 类型值中的 key 和 value。  </li>
+<li>Redis Hash 类型的两种底层实现结构，分别是压缩列表和哈希表。一旦超过了阈值，Hash 类型就会用哈希表来保存数据了。<ul>
+<li>hash-max-ziplist-entries：表示用压缩列表保存时哈希集合中的最大元素个数。</li>
+<li>hash-max-ziplist-value：表示用压缩列表保存时哈希集合中单个元素的最大长度。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/01/%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/01/%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/" class="post-title-link" itemprop="url">镜像制作</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-01 10:53:30" itemprop="dateCreated datePublished" datetime="2021-06-01T10:53:30+08:00">2021-06-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-30 08:10:35" itemprop="dateModified" datetime="2021-06-30T08:10:35+08:00">2021-06-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="docker基本操作"><a href="#docker基本操作" class="headerlink" title="docker基本操作"></a>docker基本操作</h2><p>docker tag IMAGEID(镜像id) REPOSITORY:TAG（仓库：标签） 修改标签，仓库名</p>
+<p>docker rmi IMAGEID(镜像id) 删除镜像<br>docker rm container(容器id) 删除容器</p>
+<p>docker save -o es.tar dr.z/elasticsearch/elasticsearch-oss:6.3.2 保存镜像<br>docker load &lt; /root/docker_result/images/es.tar 加载镜像<br>docker load -i zs_theft.xz 加载镜像</p>
+<p>docker cp container(容器id):/opt/py ./ 拷贝容器内容到本地<br>docker cp ./ container(容器id):/opt/py  拷贝本地到容器内容<br>docker commit container(容器id) centos-vim  保存容器为镜像</p>
+<p>docker run -it IMAGEID(镜像id) /bin/bash 运行并进入镜像</p>
+<h2 id="将-pip-源修改为阿里云源"><a href="#将-pip-源修改为阿里云源" class="headerlink" title="将 pip 源修改为阿里云源"></a>将 pip 源修改为阿里云源</h2><p>pip config list 查看当前 pip 的配置</p>
+<p>接着修改配置文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip config set global.index-url http://mirrors.aliyun.com/pypi/simple/</span><br><span class="line">pip config set install.trusted-host mirrors.aliyun.com</span><br></pre></td></tr></table></figure>
+
+<h2 id="删除镜像失败"><a href="#删除镜像失败" class="headerlink" title="删除镜像失败"></a>删除镜像失败</h2><p>docker rmi $(docker images –filter “dangling=true” -q –no-trunc)<br>docker rmi images</p>
+<h2 id="linux-操作"><a href="#linux-操作" class="headerlink" title="linux 操作"></a>linux 操作</h2><p>rm -rf  ./test_chk_ln 删除软连接<br>ln -s 源文件 软链接</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/01/%E5%88%87%E7%89%87%E9%9B%86%E7%BE%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/01/%E5%88%87%E7%89%87%E9%9B%86%E7%BE%A4/" class="post-title-link" itemprop="url">切片集群</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-01 07:58:46" itemprop="dateCreated datePublished" datetime="2021-06-01T07:58:46+08:00">2021-06-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-02 08:14:46" itemprop="dateModified" datetime="2021-06-02T08:14:46+08:00">2021-06-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="rdb引发的问题"><a href="#rdb引发的问题" class="headerlink" title="rdb引发的问题"></a>rdb引发的问题</h2><p>当数据量较大时，fork 操作时常会受数据量的影响，如果数据量过大，就会导致主线程被阻塞过长时间，此时使用切片集群就是个好的方案。</p>
+<img src="/2021/06/01/%E5%88%87%E7%89%87%E9%9B%86%E7%BE%A4/%E5%88%87%E7%89%87%E9%9B%86%E7%BE%A4.jpg" class="">
+
+<h2 id="如何保存更多数据"><a href="#如何保存更多数据" class="headerlink" title="如何保存更多数据"></a>如何保存更多数据</h2><ul>
+<li>纵向扩展：升级单个 Redis 实例的资源配置，包括增加内存容量、增加磁盘容量、使用更高配置的 CPU。就像下图中，原来的实例内存是 8GB，硬盘是 50GB，纵向扩展后，内存增加到 24GB，磁盘增加到 150GB。</li>
+<li>横向扩展：横向增加当前 Redis 实例的个数，就像下图中，原来使用 1 个 8GB 内存、50GB 磁盘的实例，现在使用三个相同配置的实例。</li>
+</ul>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>在只使用单个实例的时候，数据存在哪儿，客户端访问哪儿，都是非常明确的，但是，切片集群不可避免地涉及到多个实例的分布式管理问题。要想把切片集群用起来，我们就需要解决两大问题：</p>
+<ul>
+<li>数据切片后，在多个实例之间如何分布？</li>
+<li>客户端怎么确定想要访问的数据在哪个实例上？</li>
+</ul>
+<h2 id="数据切片和实例的对应分布关系"><a href="#数据切片和实例的对应分布关系" class="headerlink" title="数据切片和实例的对应分布关系"></a>数据切片和实例的对应分布关系</h2><p>实际上，切片集群是一种保存大量数据的通用机制，这个机制可以有不同的实现方案。在 Redis 3.0 之前，官方并没有针对切片集群提供具体的方案。<strong>从 3.0 开始，官方提供了一个名为 Redis Cluster 的方案，用于实现切片集群。Redis Cluster 方案中就规定了数据和实例的对应规则。</strong></p>
+<ul>
+<li>具体来说，Redis Cluster 方案采用哈希槽（Hash Slot，接下来我会直接称之为 Slot），来处理数据和实例之间的映射关系。在 Redis Cluster 方案中，一个切片集群共有 16384 个哈希槽，这些哈希槽类似于数据分区，每个键值对都会根据它的 key，被映射到一个哈希槽中。</li>
+<li>具体的映射过程分为两大步：首先根据键值对的 key，按照CRC16 算法计算一个 16 bit 的值；然后，再用这个 16bit 值对 16384 取模，得到 0~16383 范围内的模数，每个模数代表一个相应编号的哈希槽。关于 CRC16 算法，不是这节课的重点，你简单看下链接中的资料就可以了。</li>
+<li>哈希槽与实例的映射关系可以手动配置或者默认均匀分布在各个实例之间</li>
+</ul>
+<img src="/2021/06/01/%E5%88%87%E7%89%87%E9%9B%86%E7%BE%A4/slot.jpg" class="">
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h 172.16.19.3 –p 6379 cluster addslots 0,1</span><br><span class="line">redis-cli -h 172.16.19.4 –p 6379 cluster addslots 2,3</span><br><span class="line">redis-cli -h 172.16.19.5 –p 6379 cluster addslots 4</span><br></pre></td></tr></table></figure>
+
+<h2 id="客户端如何定位数据"><a href="#客户端如何定位数据" class="headerlink" title="客户端如何定位数据"></a>客户端如何定位数据</h2><img src="/2021/06/01/%E5%88%87%E7%89%87%E9%9B%86%E7%BE%A4/%E9%87%8D%E5%AE%9A%E5%90%91.jpg" class="">
+
+<p>集群的实例增减，或者是为了实现负载均衡而进行的数据重新分布，会导致哈希槽和实例的映射关系发生变化，客户端发送请求时，会收到命令执行报错信息。了解了 MOVED 和 ASK 命令，你就不会为这类报错而头疼了。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/31/%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/31/%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/" class="post-title-link" itemprop="url">哨兵机制</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-31 21:22:33" itemprop="dateCreated datePublished" datetime="2021-05-31T21:22:33+08:00">2021-05-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-01 08:16:16" itemprop="dateModified" datetime="2021-06-01T08:16:16+08:00">2021-06-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="主库挂了怎么办"><a href="#主库挂了怎么办" class="headerlink" title="主库挂了怎么办"></a>主库挂了怎么办</h2><p>如果主库挂了，我们就需要运行一个新主库，比如说把一个从库切换为主库，把它当成主库。这就涉及到三个问题：</p>
+<ul>
+<li>主库真的挂了吗？</li>
+<li>该选择哪个从库作为主库？</li>
+<li>怎么把新主库的相关信息通知给从库和客户端呢？</li>
+</ul>
+<h2 id="哨兵机制的基本流程"><a href="#哨兵机制的基本流程" class="headerlink" title="哨兵机制的基本流程"></a>哨兵机制的基本流程</h2><p>哨兵其实就是一个运行在特殊模式下的 Redis 进程，主从库实例运行的同时，它也在运行。哨兵主要负责的就是三个任务：监控、选主（选择主库）和通知。</p>
+<ul>
+<li>我们先看监控。监控是指哨兵进程在运行时，周期性地给所有的主从库发送 PING 命令，检测它们是否仍然在线运行。如果从库没有在规定时间内响应哨兵的 PING 命令，哨兵就会把它标记为“下线状态”；同样，如果主库也没有在规定时间内响应哨兵的 PING 命令，哨兵就会判定主库下线，然后开始自动切换主库的流程。</li>
+<li>这个流程首先是执行哨兵的第二个任务，选主。主库挂了以后，哨兵就需要从很多个从库里，按照一定的规则选择一个从库实例，把它作为新的主库。这一步完成后，现在的集群里就有了新主库。</li>
+<li>然后，哨兵会执行最后一个任务：通知。在执行通知任务时，哨兵会把新主库的连接信息发给其他从库，让它们执行 replicaof 命令，和新主库建立连接，并进行数据复制。同时，哨兵会把新主库的连接信息通知给客户端，让它们把请求操作发到新主库上。</li>
+</ul>
+<img src="/2021/05/31/%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/%E5%93%A8%E5%85%B5%E8%81%8C%E8%B4%A3.jpg" class="">
+
+<p>判断主库是否下线时，不能由一个哨兵说了算，只有大多数的哨兵实例，都判断主库已经“主观下线”了，主库才会被标记为“客观下线”</p>
+<h3 id="如何选定新主库"><a href="#如何选定新主库" class="headerlink" title="如何选定新主库"></a>如何选定新主库</h3><p>一般来说，我把哨兵选择新主库的过程称为“筛选 + 打分”</p>
+<img src="/2021/05/31/%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/%E6%96%B0%E4%B8%BB%E5%BA%93%E9%80%89%E6%8B%A9.jpg" class="">
+
+<ul>
+<li>首先来看筛选的条件：<ul>
+<li>一般情况下，我们肯定要先保证所选的从库仍然在线运行。不过，在选主时从库正常在线，这只能表示从库的现状良好，并不代表它就是最适合做主库的。</li>
+<li>在选主时，除了要检查从库的当前在线状态，还要判断它之前的网络连接状态。如果从库总是和主库断连，而且断连次数超出了一定的阈值，我们就有理由相信，这个从库的网络状况并不是太好，就可以把这个从库筛掉了。</li>
+</ul>
+</li>
+<li>打分：<ul>
+<li>第一轮：优先级最高的从库得分高。用户可以通过 slave-priority 配置项，给不同的从库设置不同优先级。</li>
+<li>第二轮：和旧主库同步程度最接近的从库得分高。</li>
+<li>第三轮：ID 号小的从库得分高。在优先级和复制进度都相同的情况下，ID 号最小的从库得分最高，会被选为新主库。</li>
+</ul>
+</li>
+</ul>
+<p>我们再回顾下这个流程。首先，哨兵会按照在线状态、网络状态，筛选过滤掉一部分不符合要求的从库，然后，依次按照优先级、复制进度、ID 号大小再对剩余的从库进行打分，只要有得分最高的从库出现，就把它选为新主库。小结</p>
+<h2 id="哨兵集群"><a href="#哨兵集群" class="headerlink" title="哨兵集群"></a>哨兵集群</h2><h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/42ee966f96e5">https://www.jianshu.com/p/42ee966f96e5</a></p>
+<h3 id="基于-pub-sub-机制的哨兵集群组成"><a href="#基于-pub-sub-机制的哨兵集群组成" class="headerlink" title="基于 pub/sub 机制的哨兵集群组成"></a>基于 pub/sub 机制的哨兵集群组成</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sentinel monitor &lt;master-name&gt; &lt;ip&gt; &lt;redis-port&gt; &lt;quorum&gt; </span><br></pre></td></tr></table></figure>
+
+<img src="/2021/05/31/%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/%E5%93%A8%E5%85%B5%E8%BF%9E%E6%8E%A5.jpg" class="">
+
+<ul>
+<li>只有订阅了同一个频道的应用，才能通过发布的消息进行信息交换。</li>
+<li>哨兵是如何知道从库的 IP 地址和端口的呢</li>
+</ul>
+<h3 id="哨兵是如何知道从库的-IP-地址和端口的呢"><a href="#哨兵是如何知道从库的-IP-地址和端口的呢" class="headerlink" title="哨兵是如何知道从库的 IP 地址和端口的呢"></a>哨兵是如何知道从库的 IP 地址和端口的呢</h3><p>这是由哨兵向主库发送 INFO 命令来完成的。就像下图所示，哨兵 2 给主库发送 INFO 命令，主库接受到这个命令后，就会把从库列表返回给哨兵。接着，哨兵就可以根据从库列表中的连接信息，和每个从库建立连接，并在这个连接上持续地对从库进行监控。哨兵 1 和 3 可以通过相同的方法和从库建立连接。</p>
+<img src="/2021/05/31/%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/info.jpg" class="">
+
+<h3 id="基于-pub-sub-机制的客户端事件通知"><a href="#基于-pub-sub-机制的客户端事件通知" class="headerlink" title="基于 pub/sub 机制的客户端事件通知"></a>基于 pub/sub 机制的客户端事件通知</h3><p>每个哨兵实例也提供 pub/sub 机制，客户端可以从哨兵订阅消息。</p>
+<img src="/2021/05/31/%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/%E4%BA%8B%E4%BB%B6.jpg" class="">
+
+<h3 id="由哪个哨兵执行主从切换"><a href="#由哪个哨兵执行主从切换" class="headerlink" title="由哪个哨兵执行主从切换"></a>由哪个哨兵执行主从切换</h3><img src="/2021/05/31/%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/%E9%80%89%E4%B8%BE.jpg" class="">
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/31/%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/31/%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5/" class="post-title-link" itemprop="url">数据同步</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-31 13:30:00" itemprop="dateCreated datePublished" datetime="2021-05-31T13:30:00+08:00">2021-05-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-01 08:16:16" itemprop="dateModified" datetime="2021-06-01T08:16:16+08:00">2021-06-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="redis高可靠性"><a href="#redis高可靠性" class="headerlink" title="redis高可靠性"></a>redis高可靠性</h2><ul>
+<li>一是数据尽量少丢失（AOF &amp; RDB）</li>
+<li>二是服务尽量少中断 (多副本机制，增加副本冗余量，将一份数据同时保存在多个实例上)。<strong>问题：数据一致性</strong></li>
+</ul>
+<h2 id="数据一致性保证"><a href="#数据一致性保证" class="headerlink" title="数据一致性保证"></a>数据一致性保证</h2><p>Redis 提供了主从库模式，以保证数据副本的一致，主从库之间采用的是读写分离的方式。</p>
+<ul>
+<li>读操作：主库、从库都可以接收；</li>
+<li>写操作：首先到主库执行，然后，主库将写操作同步给从库</li>
+</ul>
+
+
+<h2 id="主从库间如何进行第一次同步"><a href="#主从库间如何进行第一次同步" class="headerlink" title="主从库间如何进行第一次同步"></a>主从库间如何进行第一次同步</h2><p>现在有实例 1（ip：172.16.19.3）和实例 2（ip：172.16.19.5），我们在实例 2 上执行以下这个命令后，实例 2 就变成了实例 1 的从库，并从实例 1 上复制数据：<br>replicaof  172.16.19.3  6379</p>
+<img src="/2021/05/31/%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5/%E7%AC%AC%E4%B8%80%E6%AC%A1%E5%90%8C%E6%AD%A5.jpg" class="">
+
+<ul>
+<li>第一阶段是主从库间建立连接、协商同步的过程，主要是为全量复制做准备。在这一步，从库和主库建立起连接，并告诉主库即将进行同步，主库确认回复后，主从库间就可以开始同步了。</li>
+<li>在第二阶段，主库将所有数据同步给从库。从库收到数据后，在本地完成数据加载。</li>
+<li>第三个阶段，主库会把第二阶段执行过程中新收到的写命令，再发送给从库。具体的操作是，当主库完成 RDB 文件发送后，就会把此时 replication buffer 中的修改操作发给从库，从库再重新执行这些操作。这样一来，主从库就实现同步了。</li>
+</ul>
+<h2 id="主从级联模式分担全量复制时的主库压力"><a href="#主从级联模式分担全量复制时的主库压力" class="headerlink" title="主从级联模式分担全量复制时的主库压力"></a>主从级联模式分担全量复制时的主库压力</h2><p>通过“主 - 从 - 从”模式将主库生成 RDB 和传输 RDB 的压力，以级联的方式分散到从库上。</p>
+<img src="/2021/05/31/%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5/%E7%BA%A7%E8%81%94%E5%90%8C%E6%AD%A5.jpg" class="">
+
+<h2 id="主从库间网络断了怎么办"><a href="#主从库间网络断了怎么办" class="headerlink" title="主从库间网络断了怎么办"></a>主从库间网络断了怎么办</h2><ul>
+<li>Redis 2.8 之前：全量复制，开销非常大</li>
+<li>Redis 2.8 以后：增量复制<ul>
+<li>当主从库断连后，主库会把断连期间收到的写操作命令，写入 replication buffer，同时也会把这些操作命令也写入 repl_backlog_buffer 这个缓冲区。</li>
+<li>repl_backlog_buffer 是一个环形缓冲区，主库会记录自己写到的位置，从库则会记录自己已经读到的位置。<img src="/2021/05/31/%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5/%E5%A2%9E%E9%87%8F%E5%A4%8D%E5%88%B6.jpg" class=""></li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/31/RDB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/31/RDB/" class="post-title-link" itemprop="url">RDB</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-05-31 08:02:45 / 修改时间：08:14:31" itemprop="dateCreated datePublished" datetime="2021-05-31T08:02:45+08:00">2021-05-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="内存快照RDB-Redis-DataBase-可以保证可靠性，还能在宕机时实现快速恢复的其他方法呢"><a href="#内存快照RDB-Redis-DataBase-可以保证可靠性，还能在宕机时实现快速恢复的其他方法呢" class="headerlink" title="内存快照RDB:Redis DataBase(可以保证可靠性，还能在宕机时实现快速恢复的其他方法呢)"></a>内存快照RDB:Redis DataBase(可以保证可靠性，还能在宕机时实现快速恢复的其他方法呢)</h2><p>我们还要考虑两个关键问题：</p>
+<ul>
+<li>对哪些数据做快照？这关系到快照的执行效率问题；</li>
+<li>做快照时，数据还能被增删改吗？这关系到 Redis 是否被阻塞，能否同时正常处理请求。</li>
+</ul>
+<h2 id="给哪些内存数据做快照？"><a href="#给哪些内存数据做快照？" class="headerlink" title="给哪些内存数据做快照？"></a>给哪些内存数据做快照？</h2><p>Redis 的数据都在内存中，为了提供所有数据的可靠性保证，它执行的是<strong>全量快照</strong>，也就是说，把内存中的所有数据都记录到磁盘中，这就类似于给 100 个人拍合影，把每一个人都拍进照片里。这样做的好处是，一次性记录了所有数据，一个都不少。</p>
+<p>Redis 提供了两个命令来生成 RDB 文件，分别是 save 和 bgsave。save：</p>
+<ul>
+<li>在主线程中执行，会导致阻塞；</li>
+<li>bgsave：创建一个子进程，专门用于写入 RDB 文件，避免了主线程的阻塞，这也是 Redis RDB 文件生成的默认配置。</li>
+</ul>
+<h2 id="快照时数据能修改吗"><a href="#快照时数据能修改吗" class="headerlink" title="快照时数据能修改吗?"></a>快照时数据能修改吗?</h2><p>写时复制技术（Copy-On-Write, COW）<br>    <img src="/2021/05/31/RDB/%E5%86%99%E6%97%B6%E5%A4%8D%E5%88%B6.jpg" class=""></p>
+<h2 id="增量快照"><a href="#增量快照" class="headerlink" title="增量快照"></a>增量快照</h2><p>Redis 4.0 中提出了一个混合使用 AOF 日志和内存快照的方法</p>
+<p>这样一来，快照不用很频繁地执行，这就避免了频繁 fork 对主线程的影响。而且，AOF 日志也只用记录两次快照间的操作，也就是说，不需要记录所有操作了，因此，就不会出现文件过大的情况了，也可以避免重写开销。</p>
+<h2 id="使用建议"><a href="#使用建议" class="headerlink" title="使用建议"></a>使用建议</h2><ul>
+<li>数据不能丢失时，内存快照和 AOF 的混合使用是一个很好的选择；</li>
+<li>如果允许分钟级别的数据丢失，可以只使用 RDB；</li>
+<li>如果只用 AOF，优先使用 everysec 的配置选项，因为它在可靠性和性能之间取了一个平衡。</li>
+</ul>
 
       
     </div>
@@ -1379,7 +1404,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1445,14 +1470,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-count">96</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>

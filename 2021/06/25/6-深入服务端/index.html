@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="本章涉及协议设计、时间轮、延迟操作、控制器及参数解密，尤其是协议设计和控制器的介绍，这些是深入了解Kafka的必备知识点。 协议设计Kafka自定义了一组基于TCP的二进制协议，只要遵守这组协议的格式，就可以向Kafka发送消息，也可以从Kafka中拉取消息，或者做一些其他的事情，比如提交消费位移等。 一共包含了 43 种协议类型  每种类型的Request都包含相同结构的协议请求头（Reques">
+<meta property="og:type" content="article">
+<meta property="og:title" content="6.深入服务端">
+<meta property="og:url" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="本章涉及协议设计、时间轮、延迟操作、控制器及参数解密，尤其是协议设计和控制器的介绍，这些是深入了解Kafka的必备知识点。 协议设计Kafka自定义了一组基于TCP的二进制协议，只要遵守这组协议的格式，就可以向Kafka发送消息，也可以从Kafka中拉取消息，或者做一些其他的事情，比如提交消费位移等。 一共包含了 43 种协议类型  每种类型的Request都包含相同结构的协议请求头（Reques">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E5%8D%8F%E8%AE%AE%E8%AF%B7%E6%B1%82%E5%A4%B4.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E8%AF%B7%E6%B1%82%E5%A4%B4%E8%A7%A3%E9%87%8A.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E5%93%8D%E5%BA%94%E8%AF%B7%E6%B1%82%E5%A4%B4.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/request%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%97%B6%E9%97%B4%E8%BD%AE.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E5%B1%82%E7%BA%A7%E6%97%B6%E9%97%B4%E8%BD%AE.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E5%BB%B6%E6%97%B6%E7%94%9F%E4%BA%A7%E7%BB%86%E8%8A%82.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%8E%A7%E5%88%B6%E5%99%A8.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E5%85%B3%E9%97%AD.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/bootstrap%E5%8E%9F%E7%90%86.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%8F%82%E6%95%B01.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%8F%82%E6%95%B02.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%8F%82%E6%95%B03.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%8F%82%E6%95%B04.png">
+<meta property="article:published_time" content="2021-06-25T05:57:01.000Z">
+<meta property="article:modified_time" content="2021-07-12T14:02:41.074Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E5%8D%8F%E8%AE%AE%E8%AF%B7%E6%B1%82%E5%A4%B4.png">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>6.深入服务端 | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">13</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">96</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          6.深入服务端
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-25 13:57:01" itemprop="dateCreated datePublished" datetime="2021-06-25T13:57:01+08:00">2021-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-12 22:02:41" itemprop="dateModified" datetime="2021-07-12T22:02:41+08:00">2021-07-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本章涉及协议设计、时间轮、延迟操作、控制器及参数解密，尤其是协议设计和控制器的介绍，这些是深入了解Kafka的必备知识点。</p>
+<h2 id="协议设计"><a href="#协议设计" class="headerlink" title="协议设计"></a>协议设计</h2><p>Kafka自定义了一组基于TCP的二进制协议，只要遵守这组协议的格式，就可以向Kafka发送消息，也可以从Kafka中拉取消息，或者做一些其他的事情，比如提交消费位移等。</p>
+<p>一共包含了 43 种协议类型</p>
+<ul>
+<li>每种类型的Request都包含相同结构的协议请求头（RequestHeader）和不同结构的协议请求体（RequestBody）<img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E5%8D%8F%E8%AE%AE%E8%AF%B7%E6%B1%82%E5%A4%B4.png" class=""><img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E8%AF%B7%E6%B1%82%E5%A4%B4%E8%A7%A3%E9%87%8A.png" class=""></li>
+<li>每种类型的Response也包含相同结构的协议响应头（ResponseHeader）和不同结构的响应体（ResponseBody）<img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E5%93%8D%E5%BA%94%E8%AF%B7%E6%B1%82%E5%A4%B4.png" class=""><img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B.png" class=""><img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/request%E7%BB%93%E6%9E%84.png" class=""></li>
+</ul>
+<p>消息累加器 RecordAccumulator 中的消息是以＜分区，Deque＜ProducerBatch＞＞的形式进行缓存的，之后由Sender线程转变成＜Node，List＜ProducerBatch＞＞的形式，针对每个Node，Sender线程在发送消息前会将对应的List＜ProducerBatch＞形式的内容转变成 ProduceRequest 的具体结构。List＜ProducerBatch＞中的内容首先会按照主题名称进行分类（对应ProduceRequest中的域topic），然后按照分区编号进行分类（对应ProduceRequest中的域partition），分类之后的ProducerBatch集合就对应ProduceRequest中的域record_set。</p>
+<h2 id="时间轮"><a href="#时间轮" class="headerlink" title="时间轮"></a>时间轮</h2><p>Kafka中存在大量的延时操作，比如延时生产、延时拉取和延时删除等。Kafka并没有使用JDK自带的Timer或DelayQueue（O(nlogn)）来实现延时的功能，而是基于时间轮的概念自定义实现了一个用于延时功能的定时器,而基于时间轮可以将插入和删除操作的时间复杂度都降为O（1）（SystemTimer）</p>
+<img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%97%B6%E9%97%B4%E8%BD%AE.png" class="">
+
+<ul>
+<li>Kafka中的时间轮（TimingWheel）是一个存储定时任务的环形队列，底层采用数组实现，数组中的每个元素可以存放一个定时任务列表（TimerTaskList）</li>
+<li>TimerTaskList是一个环形的双向链表，链表中的每一项表示的都是定时任务项（TimerTaskEntry），其中封装了真正的定时任务（TimerTask）。</li>
+<li>时间轮由多个时间格组成，每个时间格代表当前时间轮的基本时间跨度（tickMs）。时间轮的时间格个数是固定的，可用wheelSize来表示，</li>
+<li>那么整个时间轮的总体时间跨度（interval）可以通过公式 tickMs×wheelSize计算得出。</li>
+<li>时间轮还有一个表盘指针（currentTime），用来表示时间轮当前所处的时间，currentTime是tickMs的整数倍</li>
+<li>currentTime可以将整个时间轮划分为到期部分和未到期部分，currentTime当前指向的时间格也属于到期部分，表示刚好到期，需要处理此时间格所对应的TimerTaskList中的所有任务。</li>
+</ul>
+<p>工作流程：</p>
+<ul>
+<li>若时间轮的tickMs为1ms且wheelSize等于20，那么可以计算得出总体时间跨度interval为20ms。</li>
+<li>初始情况下表盘指针currentTime指向时间格0，此时有一个定时为2ms的任务插进来会存放到时间格为2的TimerTaskList中。</li>
+<li>随着时间的不断推移，指针currentTime不断向前推进，过了2ms之后，当到达时间格2时，就需要将时间格2对应的TimeTaskList中的任务进行相应的到期操作。</li>
+<li>此时若又有一个定时为 8ms 的任务插进来，则会存放到时间格 10 中，currentTime再过8ms后会指向时间格10。</li>
+<li>如果同时有一个定时为19ms的任务插进来怎么办？新来的TimerTaskEntry会复用原来的TimerTaskList，所以它会插入原本已经到期的时间格1。</li>
+<li>总之，整个时间轮的总体跨度是不变的，随着指针currentTime的不断推进，当前时间轮所能处理的时间段也在不断后移，总体时间范围在currentTime和currentTime+interval之间。</li>
+<li>Kafka中不乏几万甚至几十万毫秒的定时任务，这个wheelSize的扩充没有底线，就算将所有的定时任务的到期时间都设定一个上限，比如100万毫秒，那么这个wheelSize为100万毫秒的时间轮不仅占用很大的内存空间，而且也会拉低效率。</li>
+<li>Kafka 为此引入了<strong>层级时间轮的概念</strong>，当任务的到期时间超过了当前时间轮所表示的时间范围时，就会尝试添加到上层时间轮中。<img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E5%B1%82%E7%BA%A7%E6%97%B6%E9%97%B4%E8%BD%AE.png" class=""></li>
+<li>第一层的时间轮tickMs=1ms、wheelSize=20、interval=20ms。</li>
+<li>第二层的时间轮的tickMs为第一层时间轮的interval，即20ms。每一层时间轮的wheelSize是固定的，都是20，那么第二层的时间轮的总体时间跨度interval为400ms。</li>
+<li>以此类推，这个400ms也是第三层的tickMs的大小，第三层的时间轮的总体时间跨度为8000ms。</li>
+<li>同理，也会有降级操作</li>
+</ul>
+<p>TimingWheel时还有一些小细节</p>
+<ul>
+<li>TimingWheel中的每个双向环形链表TimerTaskList都会有一个哨兵节点（sentinel），引入哨兵节点可以简化边界条件。哨兵节点也称为哑元节点（dummy node），它是一个附加的链表节点，该节点作为第一个节点，</li>
+<li>Kafka 中的定时器只需持有 TimingWheel 的第一层时间轮的引用，并不会直接持有其他高层的时间轮，但每一层时间轮都会有一个引用（overflowWheel）指向更高一层的应用，以此层级调用可以实现定时器间接持有各个层级时间轮的引用。</li>
+<li>并且会配合DelayQueue 完成工作，其中用TimingWheel做最擅长的任务添加和删除操作，而用DelayQueue做最擅长的时间推进工作</li>
+<li>会有线程专门拿取DelayQueue中的到期的任务列表，推进时间轮，降级时间轮，处理操作</li>
+</ul>
+<h2 id="延时操作"><a href="#延时操作" class="headerlink" title="延时操作"></a>延时操作</h2><p>如果在使用生产者客户端发送消息的时候将 acks 参数设置为-1，那么就意味着需要等待ISR集合中的所有副本都确认收到消息之后才能正确地收到响应的结果，或者捕获超时异常。</p>
+<p>在Kafka中有多种延时操作，比如前面提及的延时生产，还有延时拉取（DelayedFetch）、延时数据删除（DelayedDeleteRecords）等。</p>
+<ul>
+<li>延时操作创建之后会被加入延时操作管理器（DelayedOperationPurgatory）来做专门的处理。延时操作有可能会超时，每个延时操作管理器都会配备一个定时器（SystemTimer）来做超时管理，定时器的底层就是采用时间轮（TimingWheel）实现的</li>
+<li>时间轮的轮转是靠“收割机”线程ExpiredOperationReaper来驱动的，这里的“收割机”线程就是由延时操作管理器启动的。</li>
+<li>定时器、“收割机”线程和延时操作管理器都是一一对应的。</li>
+<li>延时操作需要支持外部事件的触发，所以还要配备一个监听池来负责监听每个分区的外部事件—查看是否有分区的HW发生了增长。另外需要补充的是，ExpiredOperationReaper不仅可以推进时间轮，还会定期清理监听池中已完成的延时操作。<img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E5%BB%B6%E6%97%B6%E7%94%9F%E4%BA%A7%E7%BB%86%E8%8A%82.png" class=""></li>
+</ul>
+<p>延时拉取</p>
+<p>Kafka在处理拉取请求时，会先读取一次日志文件，如果收集不到足够多（fetchMinBytes，由参数fetch.min.bytes配置，默认值为1）的消息，那么就会创建一个延时拉取操作（DelayedFetch）以等待拉取到足够数量的消息。当延时拉取操作执行时，会再读取一次日志文件，然后将拉取结果返回给 follower 副本。延时拉取操作也会有一个专门的延时操作管理器负责管理，大体的脉络与延时生产操作相同，不再赘述。如果拉取进度一直没有追赶上leader副本，那么在拉取leader副本的消息时一般拉取的消息大小都会不小于fetchMinBytes，这样Kafka也就不会创建相应的延时拉取操作，而是立即返回拉取结果。如果是follower副本的延时拉取，它的外部事件就是消息追加到了leader副本的本地日志文件中；如果是消费者客户端的延时拉取，它的外部事件可以简单地理解为HW的增长。</p>
+<p>目前版本的Kafka还引入了事务的概念，对于消费者或follower副本而言，其默认的事务隔离级别为“read_uncommitted”。不过消费者可以通过客户端参数isolation.level将事务隔离级别设置为“read_committed”（注意：follower副本不可以将事务隔离级别修改为这个值），这样消费者拉取不到生产者已经写入却尚未提交的消息。对应的消费者的延时拉取，它的外部事件实际上会切换为由LSO<br>（LastStableOffset）的增长来触发。LSO是HW之前除去未提交的事务消息的最大偏移量，LSO≤HW，有关事务和LSO的内容可以分别参考7.4节和10.2节。</p>
+<h2 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h2><ul>
+<li>在 Kafka 集群中会有一个或多个 broker，其中有一个 broker 会被选举为控制器（Kafka Controller），它负责管理整个集群中所有分区和副本的状态。</li>
+<li>当某个分区的leader副本出现故障时，由控制器负责为该分区选举新的leader副本。</li>
+<li>当检测到某个分区的ISR集合发生变化时，由控制器负责通知所有broker更新其元数据信息。</li>
+<li>当使用kafka-topics.sh脚本为某个topic增加分区数量时，同样还是由控制器负责分区的重新分配。</li>
+</ul>
+<h3 id="控制器的选举及异常恢复"><a href="#控制器的选举及异常恢复" class="headerlink" title="控制器的选举及异常恢复"></a>控制器的选举及异常恢复</h3><p>Kafka中的控制器选举工作依赖于ZooKeeper，成功竞选为控制器的broker会在ZooKeeper中创建/controller这个临时（EPHEMERAL）节点，此临时节点的内容参考如下：</p>
+<ul>
+<li>在任意时刻，集群中有且仅有一个控制器。每个 broker 启动的时候会去尝试读取/controller节点的brokerid的值，如果读取到brokerid的值不为-1，则表示已经有其他 broker 节点成功竞选为控制器，所以当前 broker 就会放弃竞选</li>
+<li>如果 ZooKeeper 中不存在/controller节点，或者这个节点中的数据异常，那么就会尝试去创建/controller节点。</li>
+<li>当前broker去创建节点的时候，也有可能其他broker同时去尝试创建这个节点，只有创建成功的那个broker才会成为控制器，而创建失败的broker竞选失败</li>
+<li>每个broker都会在内存中保存当前控制器的brokerid值，这个值可以标识为activeControllerId。</li>
+<li>ZooKeeper 中还有一个与控制器有关的/controller_epoch 节点，这个节点是持久（PERSISTENT）节点，节点中存放的是一个整型的controller_epoch值。controller_epoch用于记录控制器发生变更的次数，即记录当前的控制器是第几代控制器，我们也可以称之为“控制器的纪元”。</li>
+<li>由此可见，Kafka 通过 controller_epoch 来保证控制器的唯一性，进而保证相关操作的一致性。</li>
+</ul>
+<p>具备控制器身份的broker需要比其他普通的broker多一份职责，具体细节如下</p>
+<ul>
+<li>监听分区相关的变化。为ZooKeeper中的/admin/reassign_partitions 节点注册 PartitionReassignmentHandler，用来处理分区重分配的动作。为 ZooKeeper 中的/isr_change_notification节点注册IsrChangeNotificetionHandler，用来处理ISR集合变更的动作。为ZooKeeper中的/admin/preferred-replica-election节点添加PreferredReplicaElectionHandler，用来处理优先副本的选举动作。</li>
+<li>监听主题相关的变化。为 ZooKeeper 中的/brokers/topics 节点添加TopicChangeHandler，用来处理主题增减的变化；为 ZooKeeper 中的/admin/delete_topics节点添加TopicDeletionHandler，用来处理删除主题的动作。</li>
+<li>监听broker相关的变化。为ZooKeeper中的/brokers/ids节点添加BrokerChangeHandler，用来处理broker增减的变化。</li>
+<li>从ZooKeeper中读取获取当前所有与主题、分区及broker有关的信息并进行相应的管理。对所有主题对应的 ZooKeeper 中的/brokers/topics/＜topic＞节点添加PartitionModificationsHandler，用来监听主题中的分区分配变化。</li>
+<li>启动并管理分区状态机和副本状态机。</li>
+<li>更新集群的元数据信息。</li>
+<li>如果参数 auto.leader.rebalance.enable 设置为 true，则还会开启一个名为“auto-leader-rebalance-task”的定时任务来负责维护分区的优先副本的均衡。<img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%8E%A7%E5%88%B6%E5%99%A8.png" class=""></li>
+<li>在目前的新版本的设计中，只有Kafka Controller在ZooKeeper上注册相应的监听器，其他的broker极少需要再监听ZooKeeper中的数据变化，这样省去了很多不必要的麻烦。不过每个broker还是会对/controller节点添加监听器，以此来监听此节点的数据变化（ControllerChangeHandler）。</li>
+<li>当/controller 节点的数据发生变化时，每个 broker 都会更新自身内存中保存的activeControllerId。如果broker 在数据变更前是控制器，在数据变更后自身的 brokerid 值与新的 activeControllerId 值不一致，那么就需要“退位”，关闭相应的资源，比如关闭状态机、注销相应的监听器等。</li>
+<li>当/controller节点被删除时，每个broker都会进行选举，如果broker在节点被删除前是控制器，那么在选举前还需要有一个“退位”的动作。如果有特殊需要，则可以手动删除/controller 节点来触发新一轮的选举。当然关闭控制器所对应的 broker，以及手动向/controller节点写入新的brokerid的所对应的数据，同样可以触发新一轮的选举。</li>
+</ul>
+<h3 id="优雅关闭"><a href="#优雅关闭" class="headerlink" title="优雅关闭"></a>优雅关闭</h3><ol>
+<li>获取Kafka的服务进程号PIDS。可以使用Java中的jps命令或使用Linux系统中的ps命令来查看。</li>
+<li>使用 kill-s TERM $PIDS 或 kill-15 $PIDS 的方式来关闭进程，注意千万不要使用kill-9的方式。<img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E5%85%B3%E9%97%AD.png" class=""></li>
+</ol>
+<h3 id="分区leader的选举"><a href="#分区leader的选举" class="headerlink" title="分区leader的选举"></a>分区leader的选举</h3><p>分区leader副本的选举由控制器负责具体实施。当创建分区（创建主题或增加分区都有创建分区的动作）或分区上线（比如分区中原先的leader副本下线，此时分区需要选举一个新的leader 上线来对外提供服务）的时候都需要执行 leader 的选举动作，对应的选举策略为OfflinePartitionLeaderElectionStrategy。</p>
+<ul>
+<li>这种策略的基本思路是按照 AR 集合中副本的顺序查找第一个存活的副本，并且这个副本在ISR集合中。</li>
+<li>一个分区的AR集合在分配的时候就被指定，并且只要不发生重分配的情况，集合内部副本的顺序是保持不变的，而分区的ISR集合中副本的顺序可能会改变。</li>
+<li>注意这里是根据AR的顺序而不是ISR的顺序进行选举的。</li>
+<li>如果ISR集合中没有可用的副本，那么此时还要再检查一下所配置的unclean.leader.election.enable参数（默认值为false）。如果这个参数配置为true，那么表示允许从非ISR列表中的选举leader，从AR列表中找到第一个存活的副本即为leader。</li>
+</ul>
+<p>当分区进行重分配（可以先回顾一下4.3.2节的内容）的时候也需要执行leader的选举动作，对应的选举策略为 ReassignPartitionLeaderElectionStrategy。</p>
+<ul>
+<li>从重分配的AR列表中找到第一个存活的副本，且这个副本在目前的ISR列表中。</li>
+<li>当发生优先副本（可以先回顾一下4.3.1节的内容）的选举时，直接将优先副本设置为leader即可，AR集合中的第一个副本即为优先副本（PreferredReplicaPartitionLeaderElectionStrategy）。</li>
+</ul>
+<p>还有一种情况会发生 leader 的选举，当某节点被优雅地关闭（也就是执行ControlledShutdown）时，位于这个节点上的leader副本都会下线，所以与此对应的分区需要执行leader的选举。</p>
+<ul>
+<li>从AR列表中找到第一个存活的副本，且这个副本在目前的ISR列表中，与此同时还要确保这个副本不处于正在被关闭的节点上。</li>
+</ul>
+<h2 id="参数解密"><a href="#参数解密" class="headerlink" title="参数解密"></a>参数解密</h2><h3 id="broker-id"><a href="#broker-id" class="headerlink" title="broker.id"></a>broker.id</h3><ul>
+<li>broker.id是broker在启动之前必须设定的参数之一，在Kafka集群中，每个broker都有唯一的 id（也可以记作 brokerId）值用来区分彼此。</li>
+<li>broker 在启动时会在 ZooKeeper 中的/brokers/ids路径下创建一个以当前brokerId为名称的虚节点，broker的健康状态检查就依赖于此虚节点。</li>
+<li>当 broker 下线时，该虚节点会自动删除，其他 broker 节点或客户端通过判断/brokers/ids路径下是否有此broker的brokerId节点来确定该broker的健康状态。</li>
+<li>config/server.properties 里的 broker.id 参数来配置brokerId，默认情况下broker.id值为-1。</li>
+<li>在Kafka中，brokerId值必须大于等于0才有可能正常启动，但这里并不是只能通过配置文件config/server.properties来设定这个值，还可以通过meta.properties文件或自动生成功能来实现。</li>
+</ul>
+<p>meta.properties文件与broker.id的关联如下</p>
+<ul>
+<li>如果 log.dir 或 log.dirs 中配置了多个日志根目录，这些日志根目录中的meta.properties文件所配置的broker.id不一致则会抛出InconsistentBrokerIdException的异常。</li>
+<li>如果config/server.properties配置文件里配置的broker.id的值和meta.properties文件里的broker.id值不一致，那么同样会抛出InconsistentBrokerIdException的异常。</li>
+<li>如果 config/server.properties 配置文件中并未配置 broker.id 的值，那么就以meta.properties文件中的broker.id值为准。</li>
+<li>如果没有meta.properties文件，那么在获取合适的broker.id值之后会创建一个新的meta.properties文件并将broker.id值存入其中。</li>
+<li>如果两个文件中都没有broker.id，Kafka 还提供了另外两个 broker 端参数：broker.id.generation.enable 和reserved.broker.max.id来配合生成新的brokerId。<ul>
+<li>broker.id.generation.enable参数用来配置是否开启自动生成 brokerId 的功能，默认情况下为 true，即开启此功能。</li>
+<li>自动生成的 brokerId 有一个基准值，即自动生成的 brokerId 必须超过这个基准值，这个基准值通过reserverd.broker.max.id参数配置，默认值为1000。也就是说，默认情况下自动生成的brokerId从1001开始。</li>
+<li>自动生成的brokerId的原理是先往ZooKeeper中的/brokers/seqid节点中写入一个空字符 串，然 后 获 取 返 回 的 Stat 信 息 中 的 version 值，进 而 将 version 的 值 和reserved.broker.max.id参数配置的值相加。先往节点中写入数据再获取Stat信息，这样可以确保返回的 version 值大于 0，进而就可以确保生成的 brokerId 值大于reserved.broker.max.id 参数配置的值，符合非自动生成的 broker.id 的值在[0，reserved.broker.max.id]区间设定。</li>
+</ul>
+</li>
+</ul>
+<h3 id="bootstrap-servers"><a href="#bootstrap-servers" class="headerlink" title="bootstrap.servers"></a>bootstrap.servers</h3><ul>
+<li>我们一般可以简单地认为 bootstrap.servers 这个参数所要指定的就是将要连接的Kafka集群的broker地址列表。</li>
+<li>不过从深层次的意义上来讲，这个参数配置的是用来发现Kafka集群元数据信息的服务地址。<img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/bootstrap%E5%8E%9F%E7%90%86.png" class=""></li>
+</ul>
+<p>客户端KafkaProducer1与Kafka Cluster直连，这是客户端给我们的既定印象，而事实上客户端连接Kafka集群要经历以下3个过程</p>
+<ul>
+<li>客户端KafkaProducer2与bootstrap.servers参数所指定的Server连接，并发送MetadataRequest请求来获取集群的元数据信息。</li>
+<li>Server在收到MetadataRequest请求之后，返回MetadataResponse给KafkaProducer2，在MetadataResponse中包含了集群的元数据信息。</li>
+<li>客户端KafkaProducer2收到的MetadataResponse之后解析出其中包含的集群元数据信息，然后与集群中的各个节点建立连接，之后就可以发送消息了。</li>
+</ul>
+<p>在绝大多数情况下，Kafka 本身就扮演着第一步和第二步中的 Server 角色，我们完全可以将这个Server的角色从Kafka中剥离出来。我们可以在这个Server的角色上大做文章，比如添加一些路由的功能、负载均衡的功能。</p>
+<p>bootstrap.servers、metadata.broker.list、zookeeper.connect 参数往往不是很清楚。这一现象还存在Kafka所提供的诸多脚本之中，在这些脚本中连接Kafka采用的选项参数有–bootstrap-server、–broker-list和–zookeeper</p>
+<ul>
+<li>bootstrap-server是broker-list 的替代品，但是kafka-console-producer.sh 还在使用</li>
+<li>zookeeper 命令是kafka-topics.sh脚本实际上操纵的就是ZooKeeper中的节点，而不是Kafka本身，它并没有被替代的必要。</li>
+</ul>
+<h3 id="服务端参数列表"><a href="#服务端参数列表" class="headerlink" title="服务端参数列表"></a>服务端参数列表</h3>  <img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%8F%82%E6%95%B01.png" class="">  <img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%8F%82%E6%95%B02.png" class="">  <img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%8F%82%E6%95%B03.png" class="">  <img src="/2021/06/25/6-%E6%B7%B1%E5%85%A5%E6%9C%8D%E5%8A%A1%E7%AB%AF/%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%8F%82%E6%95%B04.png" class="">
+
+<h2 id="元数据更新"><a href="#元数据更新" class="headerlink" title="元数据更新"></a>元数据更新</h2><p>broker是有状态的服务：每台broker在内存中都维护了集群上所有节点和topic分区的状态信息——Kafka称这部分状态信息为元数据缓存(metadata cache)。本文就将讨论一下这个metadata cache的设计与实现。</p>
+<h3 id="cache里面存了什么"><a href="#cache里面存了什么" class="headerlink" title="cache里面存了什么"></a>cache里面存了什么</h3><p>首先，我们来看下cache里面都存了什么，我们以Kafka 1.0.0版本作为分析对象。Metadata cache中保存的信息十分丰富，几乎囊括了Kafka集群的各个方面，它包含了：</p>
+<ul>
+<li>controller所在的broker ID，即保存了当前集群中controller是哪台broker</li>
+<li>集群中所有broker的信息：比如每台broker的ID、机架信息以及配置的若干组连接信息(比如配置了PLAINTEXT和SASL监听器就有两套连接信息，分别使用不同的安全协议和端口，甚至主机名都可能不同)</li>
+<li>集群中所有节点的信息：严格来说，它和上一个有些重复，不过此项是按照broker ID和监听器类型进行分组的。对于超大集群来说，使用这一项缓存可以快速地定位和查找给定节点信息，而无需遍历上一项中的内容，算是一个优化吧</li>
+<li>集群中所有分区的信息：所谓分区信息指的是分区的leader、ISR和AR信息以及当前处于offline状态的副本集合。这部分数据按照topic和分区ID进行分组，可以快速地查找到每个分区的当前状态。（注：AR表示assigned replicas，即创建topic时为该分区分配的副本集合）</li>
+</ul>
+<h3 id="每台broker都保存相同的cache吗？"><a href="#每台broker都保存相同的cache吗？" class="headerlink" title="每台broker都保存相同的cache吗？"></a>每台broker都保存相同的cache吗？</h3><p>　　是的，至少Kafka在设计时的确是这样的愿景：每台Kafka broker都要维护相同的缓存，这样客户端程序(clients)随意地给任何一个broker发送请求都能够获取相同的数据，这也是为什么任何一个broker都能处理clients发来的Metadata请求的原因：因为每个broker上都有这些数据！要知道目前Kafka共有38种请求类型，能做到这一点的可谓少之又少。每个broker都能处理的能力可以缩短请求被处理的延时从而提高整体clients端的吞吐，因此用空间去换一些时间的做法是值得的。</p>
+<h3 id="cache是怎么更新的？"><a href="#cache是怎么更新的？" class="headerlink" title="cache是怎么更新的？"></a>cache是怎么更新的？</h3><p>　　如前所述，用空间去换时间，好处是降低了延时，提升了吞吐，但劣势就在于你需要处理cache的更新并且维护一致性。目前Kafka是怎么更新cache的？简单来说，就是通过发送异步更新请求(UpdateMetadata request)来维护一致性的。既然是异步的，那么在某一个时间点集群上所有broker的cache信息就未必是严格相同的。只不过在实际使用场景中，这种弱一致性似乎并没有太大的问题。原因如下：</p>
+<ol>
+<li>clients并不是时刻都需要去请求元数据的，且会缓存到本地；</li>
+<li>即使获取的元数据无效或者过期了，clients通常都有重试机制，可以去其他broker上再次获取元数据;</li>
+<li>cache更新是很轻量级的，仅仅是更新一些内存中的数据结构，不会有太大的成本。因此我们还是可以安全地认为每台broker上都有相同的cache信息。</li>
+</ol>
+<p>　　具体的更新操作实际上是由controller来完成的。controller会在一定场景下向特定broker发送UpdateMetadata请求令这些broker去更新它们各自的cache，这些broker一旦接收到请求便开始全量更新——即清空当前所有cache信息，使用UpdateMetadata请求中的数据来重新填充cache。</p>
+<h3 id="cache什么时候更新？"><a href="#cache什么时候更新？" class="headerlink" title="cache什么时候更新？"></a>cache什么时候更新？</h3><p>　　实际上这个问题等同于：controller何时向特定broker发送UpdateMetadata请求？ 如果从源码开始分析，那么涉及到的场景太多了，比如controller启动时、新broker启动时、更新broker时、副本重分配时等等。我们只需要记住：<strong>只要集群中有broker或分区数据发生了变更就需要更新这些cache</strong></p>
+<p>　　举个经常有人问的例子：集群中新增加的broker是如何获取这些cache，并且其他broker是如何知晓它的？当有新broker启动时，它会在Zookeeper中进行注册，此时监听Zookeeper的controller就会立即感知这台新broker的加入，此时controller会更新它自己的缓存（注意：这是controller自己的缓存，不是本文讨论的metadata cache）把这台broker加入到当前broker列表中，之后它会发送UpdateMetadata请求给集群中所有的broker(也包括那台新加入的broker)让它们去更新metadata cache。一旦这些broker更新cache完成，它们就知道了这台新broker的存在，同时由于新broker也更新了cache，故现在它也有了集群所有的状态信息。</p>
+<h3 id="目前的问题？"><a href="#目前的问题？" class="headerlink" title="目前的问题？"></a>目前的问题？</h3><p>　　前面说过了，现在更新cache完全由controller来驱动，故controller所在broker的负载会极大地影响这部分操作（实际上，它会影响所有的controller操作）。根据目前的设计，controller所在broker依然作为一个普通broker执行其他的clients请求处理逻辑，所以如果controller broker一旦忙于各种clients请求(比如生产消息或消费消息)，那么这种更新操作的请求就会积压起来(backlog)，造成了更新操作的延缓甚至是被取消。究其根本原因在于当前controller对待数据类请求和控制类请求并无任何优先级化处理——controller一视同仁地对待这些请求，而实际上我们更希望controller能否赋予控制类请求更高的优先级。社区目前已经开始着手改造当前的设计，相信在未来的版本中此问题可以得到解决。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/25/5-%E6%97%A5%E5%BF%97%E5%AD%98%E5%82%A8/" rel="prev" title="5.日志存储">
+      <i class="fa fa-chevron-left"></i> 5.日志存储
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/06/26/7-%E6%B7%B1%E5%85%A5%E5%AE%A2%E6%88%B7%E7%AB%AF/" rel="next" title="7.深入客户端">
+      7.深入客户端 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%8F%E8%AE%AE%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.</span> <span class="nav-text">协议设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E8%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">时间轮</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%B6%E6%97%B6%E6%93%8D%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">延时操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%99%A8"><span class="nav-number">4.</span> <span class="nav-text">控制器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%99%A8%E7%9A%84%E9%80%89%E4%B8%BE%E5%8F%8A%E5%BC%82%E5%B8%B8%E6%81%A2%E5%A4%8D"><span class="nav-number">4.1.</span> <span class="nav-text">控制器的选举及异常恢复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E9%9B%85%E5%85%B3%E9%97%AD"><span class="nav-number">4.2.</span> <span class="nav-text">优雅关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E5%8C%BAleader%E7%9A%84%E9%80%89%E4%B8%BE"><span class="nav-number">4.3.</span> <span class="nav-text">分区leader的选举</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E8%A7%A3%E5%AF%86"><span class="nav-number">5.</span> <span class="nav-text">参数解密</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#broker-id"><span class="nav-number">5.1.</span> <span class="nav-text">broker.id</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bootstrap-servers"><span class="nav-number">5.2.</span> <span class="nav-text">bootstrap.servers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8"><span class="nav-number">5.3.</span> <span class="nav-text">服务端参数列表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%83%E6%95%B0%E6%8D%AE%E6%9B%B4%E6%96%B0"><span class="nav-number">6.</span> <span class="nav-text">元数据更新</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cache%E9%87%8C%E9%9D%A2%E5%AD%98%E4%BA%86%E4%BB%80%E4%B9%88"><span class="nav-number">6.1.</span> <span class="nav-text">cache里面存了什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%8F%E5%8F%B0broker%E9%83%BD%E4%BF%9D%E5%AD%98%E7%9B%B8%E5%90%8C%E7%9A%84cache%E5%90%97%EF%BC%9F"><span class="nav-number">6.2.</span> <span class="nav-text">每台broker都保存相同的cache吗？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cache%E6%98%AF%E6%80%8E%E4%B9%88%E6%9B%B4%E6%96%B0%E7%9A%84%EF%BC%9F"><span class="nav-number">6.3.</span> <span class="nav-text">cache是怎么更新的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cache%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E6%9B%B4%E6%96%B0%EF%BC%9F"><span class="nav-number">6.4.</span> <span class="nav-text">cache什么时候更新？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E5%89%8D%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-number">6.5.</span> <span class="nav-text">目前的问题？</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">96</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

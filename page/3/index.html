@@ -129,12 +129,12 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">13</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">45</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">96</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -191,7 +191,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/15/%E5%88%86%E6%B2%BB%E7%AE%97%E6%B3%95/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/16/%E9%9D%A2%E8%AF%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -205,7 +205,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/15/%E5%88%86%E6%B2%BB%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">分治算法</a>
+            <a href="/2021/06/16/%E9%9D%A2%E8%AF%95/" class="post-title-link" itemprop="url">面试</a>
         </h2>
 
         <div class="post-meta">
@@ -215,14 +215,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-05-15 16:44:15" itemprop="dateCreated datePublished" datetime="2021-05-15T16:44:15+08:00">2021-05-15</time>
+              <time title="创建时间：2021-06-16 18:59:08" itemprop="dateCreated datePublished" datetime="2021-06-16T18:59:08+08:00">2021-06-16</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-25 07:32:32" itemprop="dateModified" datetime="2021-05-25T07:32:32+08:00">2021-05-25</time>
+                <time title="修改时间：2021-06-17 21:06:33" itemprop="dateModified" datetime="2021-06-17T21:06:33+08:00">2021-06-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -230,7 +230,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
                 </span>
             </span>
 
@@ -245,284 +245,1142 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="如何理解分治算法？"><a href="#如何理解分治算法？" class="headerlink" title="如何理解分治算法？"></a>如何理解分治算法？</h2><p>分治算法是一种处理问题的思想，递归是一种编程技巧，一般用递归实现，分为三步：</p>
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><h3 id="什么是Redis"><a href="#什么是Redis" class="headerlink" title="什么是Redis"></a>什么是Redis</h3><p>Redis(Remote Dictionary Server) 是一个使用 C 语言编写的，开源的（BSD许可）高性能非关系型（NoSQL）的键值对数据库。</p>
+<p>Redis 可以存储键和五种不同类型的值之间的映射。键的类型只能为字符串，值支持五种数据类型：字符串、列表、集合、散列表、有序集合。</p>
+<p>与传统数据库不同的是 Redis 的数据是存在内存中的，所以读写速度非常快，因此 redis 被广泛应用于缓存方向，每秒可以处理超过 10万次读写操作，是已知性能最快的Key-Value DB。另外，Redis 也经常用来做分布式锁。除此之外，Redis 支持事务 、持久化、LUA脚本、LRU驱动事件、多种集群方案。</p>
+<h3 id="Redis有哪些优缺点"><a href="#Redis有哪些优缺点" class="headerlink" title="Redis有哪些优缺点"></a>Redis有哪些优缺点</h3><p>优点</p>
 <ul>
-<li>分解：将原问题分解成一系列子问题；</li>
-<li>解决：递归地求解各个子问题，若子问题足够小，则直接求解；</li>
-<li>合并：将子问题的结果合并成原问题。</li>
+<li>读写性能优异， Redis能读的速度是110000次/s，写的速度是81000次/s。</li>
+<li>支持数据持久化，支持AOF和RDB两种持久化方式。</li>
+<li>支持事务，Redis的所有操作都是原子性的，同时Redis还支持对几个操作合并后的原子性执行。</li>
+<li>数据结构丰富，除了支持string类型的value外还支持hash、set、zset、list等数据结构。</li>
+<li>支持主从复制，主机会自动将数据同步到从机，可以进行读写分离。</li>
 </ul>
-<p>分治算法能解决的问题，一般需要满足下面这几个条件：</p>
+<p>缺点</p>
 <ul>
-<li>原问题与分解成的小问题具有相同的模式；</li>
-<li>原问题分解成的子问题可以独立求解，子问题之间没有相关性，这一点是分治算法跟动态规划的明显区别，等我们讲到动态规划的时候，会详细对比这两种算法；</li>
-<li>具有分解终止条件，也就是说，当问题足够小时，可以直接求解；</li>
-<li>可以将子问题合并成原问题，而这个合并操作的复杂度不能太高，否则就起不到减小算法总体复杂度的效果了。</li>
+<li>数据库容量受到物理内存的限制，不能用作海量数据的高性能读写，因此Redis适合的场景主要局限在较小数据量的高性能操作和运算上。</li>
+<li>Redis 不具备自动容错和恢复功能，主机从机的宕机都会导致前端部分读写请求失败，需要等待机器重启或者手动切换前端的IP才能恢复。</li>
+<li>主机宕机，宕机前有部分数据未能及时同步到从机，切换IP后还会引入数据不一致的问题，降低了系统的可用性。</li>
+<li>Redis 较难支持在线扩容，在集群容量达到上限时在线扩容会变得很复杂。为避免这一问题，运维人员在系统上线时必须确保有足够的空间，这对资源造成了很大的浪费。</li>
 </ul>
-<h2 id="分治算法应用举例分析"><a href="#分治算法应用举例分析" class="headerlink" title="分治算法应用举例分析"></a>分治算法应用举例分析</h2><h3 id="归并求逆序度"><a href="#归并求逆序度" class="headerlink" title="归并求逆序度"></a>归并求逆序度</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> num = <span class="number">0</span>; <span class="comment">// 全局变量或者成员变量</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">count</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  num = <span class="number">0</span>;</span><br><span class="line">  mergeSortCounting(a, <span class="number">0</span>, n-<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">return</span> num;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">mergeSortCounting</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> p, <span class="keyword">int</span> r)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (p &gt;= r) <span class="keyword">return</span>;</span><br><span class="line">  <span class="keyword">int</span> q = (p+r)/<span class="number">2</span>;</span><br><span class="line">  mergeSortCounting(a, p, q);</span><br><span class="line">  mergeSortCounting(a, q+<span class="number">1</span>, r);</span><br><span class="line">  merge(a, p, q, r);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">merge</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> p, <span class="keyword">int</span> q, <span class="keyword">int</span> r)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> i = p, j = q+<span class="number">1</span>, k = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">int</span>[] tmp = <span class="keyword">new</span> <span class="keyword">int</span>[r-p+<span class="number">1</span>];</span><br><span class="line">  <span class="keyword">while</span> (i&lt;=q &amp;&amp; j&lt;=r) &#123;</span><br><span class="line">    <span class="keyword">if</span> (a[i] &lt;= a[j]) &#123;</span><br><span class="line">      tmp[k++] = a[i++];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      num += (q-i+<span class="number">1</span>); <span class="comment">// 统计p-q之间，比a[j]大的元素个数</span></span><br><span class="line">      tmp[k++] = a[j++];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">while</span> (i &lt;= q) &#123; <span class="comment">// 处理剩下的</span></span><br><span class="line">    tmp[k++] = a[i++];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">while</span> (j &lt;= r) &#123; <span class="comment">// 处理剩下的</span></span><br><span class="line">    tmp[k++] = a[j++];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt;= r-p; ++i) &#123; <span class="comment">// 从tmp拷贝回a</span></span><br><span class="line">    a[p+i] = tmp[i];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><p>关于分治算法，我这还有两道比较经典的问题，你可以自己练习一下。</p>
+<h3 id="为什么要用-Redis-为什么要用缓存"><a href="#为什么要用-Redis-为什么要用缓存" class="headerlink" title="为什么要用 Redis /为什么要用缓存"></a>为什么要用 Redis /为什么要用缓存</h3><p>主要从“高性能”和“高并发”这两点来看待这个问题</p>
+<p>高性能：</p>
+<p>假如用户第一次访问数据库中的某些数据。这个过程会比较慢，因为是从硬盘上读取的。将该用户访问的数据存在数缓存中，这样下一次再访问这些数据的时候就可以直接从缓存中获取了。操作缓存就是直接操作内存，所以速度相当快。如果数据库中的对应数据改变的之后，同步改变缓存中相应的数据即可！</p>
+<p>高并发：</p>
+<p>直接操作缓存能够承受的请求是远远大于直接访问数据库的，所以我们可以考虑把数据库中的部分数据转移到缓存中去，这样用户的一部分请求会直接到缓存这里而不用经过数据库。</p>
+<h3 id="为什么要用-Redis-而不用-map-guava-做缓存"><a href="#为什么要用-Redis-而不用-map-guava-做缓存" class="headerlink" title="为什么要用 Redis 而不用 map/guava 做缓存"></a>为什么要用 Redis 而不用 map/guava 做缓存</h3><p>缓存分为本地缓存和分布式缓存。以 Java 为例，使用自带的 map 或者 guava 实现的是本地缓存，最主要的特点是轻量以及快速，生命周期随着 jvm 的销毁而结束，并且在多实例的情况下，每个实例都需要各自保存一份缓存，缓存不具有一致性。</p>
+<p>使用 redis 或 memcached 之类的称为分布式缓存，在多实例的情况下，各实例共用一份缓存数据，缓存具有一致性。缺点是需要保持 redis 或 memcached服务的高可用，整个程序架构上较为复杂。</p>
+<h3 id="Redis为什么这么快"><a href="#Redis为什么这么快" class="headerlink" title="Redis为什么这么快"></a>Redis为什么这么快</h3><ol>
+<li>完全基于内存，绝大部分请求是纯粹的内存操作，非常快速。数据存在内存中，类似于 HashMap，HashMap 的优势就是查找和操作的时间复杂度都是O(1)；</li>
+<li>数据结构简单，对数据操作也简单，Redis 中的数据结构是专门进行设计的；</li>
+<li>采用单线程，避免了不必要的上下文切换和竞争条件，也不存在多进程或者多线程导致的切换而消耗 CPU，不用去考虑各种锁的问题，不存在加锁释放锁操作，没有因为可能出现死锁而导致的性能消耗；</li>
+<li>使用多路 I/O 复用模型，非阻塞 IO；</li>
+<li>使用底层模型不同，它们之间底层实现方式以及与客户端之间通信的应用协议不一样，Redis 直接自己构建了 VM 机制 ，因为一般的系统调用系统函数的话，会浪费一定的时间去移动和请求；</li>
+</ol>
+<h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><h3 id="Redis有哪些数据类型"><a href="#Redis有哪些数据类型" class="headerlink" title="Redis有哪些数据类型"></a>Redis有哪些数据类型</h3><p>Redis主要有5种数据类型，包括String，List，Set，Zset，Hash，满足大部分的使用要求</p>
+<table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>可以存储的值</th>
+<th>操作</th>
+<th>应用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>STRING</td>
+<td>字符串、整数或者浮点数</td>
+<td>对整个字符串或者字符串的其中一部分执行操作</td>
+<td>做简单的键值对缓存</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>对整数和浮点数执行自增或者自减操作</td>
+<td></td>
+</tr>
+<tr>
+<td>LIST</td>
+<td>列表</td>
+<td>从两端压入或者弹出元素</td>
+<td>存储一些列表型的数据结构，类似粉丝列表、文章的评论列表之类的数据</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>对单个或者多个元素进行修剪，</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>只保留一个范围内的元素</td>
+<td></td>
+</tr>
+<tr>
+<td>SET</td>
+<td>无序集合</td>
+<td>添加、获取、移除单个元素</td>
+<td>交集、并集、差集的操作，比如交集，可以把两个人的粉丝列表整一个交集</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>检查一个元素是否存在于集合中</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>计算交集、并集、差集</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>从集合里面随机获取元素</td>
+<td></td>
+</tr>
+<tr>
+<td>HASH</td>
+<td>包含键值对的无序散列表</td>
+<td>添加、获取、移除单个键值对</td>
+<td>结构化的数据，比如一个对象</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>获取所有键值对</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>检查某个键是否存在</td>
+<td></td>
+</tr>
+<tr>
+<td>ZSET</td>
+<td>有序集合</td>
+<td>添加、获取、删除元素</td>
+<td>去重但可以排序，如获取排名前几名的用户</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>根据分值范围或者成员来获取元素</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>计算一个键的排名</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="Redis的应用场景"><a href="#Redis的应用场景" class="headerlink" title="Redis的应用场景"></a>Redis的应用场景</h3><ul>
+<li><p>计数器</p>
 <ul>
-<li>二维平面上有 n 个点，如何快速计算出两个距离最近的点对？</li>
-<li>有两个 n<em>n 的矩阵 A，B，如何快速求解两个矩阵的乘积 C=A</em>B？</li>
+<li>可以对 String 进行自增自减运算，从而实现计数器功能。Redis 这种内存型数据库的读写性能非常高，很适合存储频繁读写的计数量。</li>
 </ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/15/%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/15/%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">贪心算法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-05-15 16:26:50 / 修改时间：22:21:02" itemprop="dateCreated datePublished" datetime="2021-05-15T16:26:50+08:00">2021-05-15</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="如何理解“贪心算法”？"><a href="#如何理解“贪心算法”？" class="headerlink" title="如何理解“贪心算法”？"></a>如何理解“贪心算法”？</h2><ul>
-<li>第一步，当我们看到这类问题的时候，首先要联想到贪心算法：针对一组数据，我们定义了限制值和期望值，希望从中选出几个数据，在满足限制值的情况下，期望值最大。</li>
-<li>第二步，我们尝试看下这个问题是否可以用贪心算法解决：每次选择当前情况下，在对限制值同等贡献量的情况下，对期望值贡献最大的数据。</li>
-<li>第三步，我们举几个例子看下贪心算法产生的结果是否是最优的。大部分情况下，举几个例子验证一下就可以了。</li>
-<li>第四步，当前面的选择会影响后面的选择时，就无法用贪心策略了，无后效性，即每一次选择都是同样的</li>
-</ul>
-<h2 id="贪心算法实战分析"><a href="#贪心算法实战分析" class="headerlink" title="贪心算法实战分析"></a>贪心算法实战分析</h2><h3 id="背包装豆子"><a href="#背包装豆子" class="headerlink" title="背包装豆子"></a>背包装豆子</h3><ul>
-<li>限制值：背包载重100kg 期望值：总价值最大</li>
-<li>在同等重量下，期望获取最大的价值的豆子即可</li>
-<li>无后效性</li>
-</ul>
-<h3 id="分糖果"><a href="#分糖果" class="headerlink" title="分糖果"></a>分糖果</h3><ul>
-<li>限制值：糖果数量M 期望值：孩子的数量N</li>
-<li>在相同的糖果下，孩子的个数最多，即在一个糖果的情况下，孩子需求越小，孩子越可能满足条件</li>
-<li>无后效性</li>
-</ul>
-<h3 id="钱币找零"><a href="#钱币找零" class="headerlink" title="钱币找零"></a>钱币找零</h3><ul>
-<li>限制值：钱总数 期望值：纸币数量最少</li>
-<li>在相同钱的情况下，面值越大，纸币数量越少</li>
-<li>无后效性</li>
-</ul>
-<h3 id="区间覆盖"><a href="#区间覆盖" class="headerlink" title="区间覆盖"></a>区间覆盖</h3><ul>
-<li>限制值：区间长度 期望值：子区间越多越好</li>
-<li>在同样长度的区间下，子区间越小，越能满足条件，即找一个满足条件的尾区间最小的</li>
-<li>无后效性</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/14/Trie%E6%A0%91/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/14/Trie%E6%A0%91/" class="post-title-link" itemprop="url">Trie树</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-05-14 07:51:27 / 修改时间：08:08:18" itemprop="dateCreated datePublished" datetime="2021-05-14T07:51:27+08:00">2021-05-14</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Trie树（字典树）"><a href="#Trie树（字典树）" class="headerlink" title="Trie树（字典树）"></a>Trie树（字典树）</h2><p>Trie 树的本质，就是利用字符串之间的公共前缀，将重复的前缀合并在一起。</p>
-<img src="/2021/05/14/Trie%E6%A0%91/%E5%AD%97%E5%85%B8%E6%A0%91.jpg" class="">
-
-<h2 id="如何实现一棵-Trie-树？"><a href="#如何实现一棵-Trie-树？" class="headerlink" title="如何实现一棵 Trie 树？"></a>如何实现一棵 Trie 树？</h2><p>借助散列表的思想，我们通过一个下标与字符一一映射的数组，来存储子节点的指针。</p>
-<img src="/2021/05/14/Trie%E6%A0%91/%E5%AD%98%E5%82%A8.jpg" class="">
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Trie</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> TrieNode root = <span class="keyword">new</span> TrieNode(<span class="string">&#x27;/&#x27;</span>); <span class="comment">// 存储无意义字符</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 往Trie树中插入一个字符串</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(<span class="keyword">char</span>[] text)</span> </span>&#123;</span><br><span class="line">    TrieNode p = root;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; text.length; ++i) &#123;</span><br><span class="line">      <span class="keyword">int</span> index = text[i] - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">      <span class="keyword">if</span> (p.children[index] == <span class="keyword">null</span>) &#123;</span><br><span class="line">        TrieNode newNode = <span class="keyword">new</span> TrieNode(text[i]);</span><br><span class="line">        p.children[index] = newNode;</span><br><span class="line">      &#125;</span><br><span class="line">      p = p.children[index];</span><br><span class="line">    &#125;</span><br><span class="line">    p.isEndingChar = <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 在Trie树中查找一个字符串</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">find</span><span class="params">(<span class="keyword">char</span>[] pattern)</span> </span>&#123;</span><br><span class="line">    TrieNode p = root;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; pattern.length; ++i) &#123;</span><br><span class="line">      <span class="keyword">int</span> index = pattern[i] - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">      <span class="keyword">if</span> (p.children[index] == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>; <span class="comment">// 不存在pattern</span></span><br><span class="line">      &#125;</span><br><span class="line">      p = p.children[index];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (p.isEndingChar == <span class="keyword">false</span>) <span class="keyword">return</span> <span class="keyword">false</span>; <span class="comment">// 不能完全匹配，只是前缀</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="keyword">true</span>; <span class="comment">// 找到pattern</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TrieNode</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">char</span> data;</span><br><span class="line">    <span class="keyword">public</span> TrieNode[] children = <span class="keyword">new</span> TrieNode[<span class="number">26</span>];</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">boolean</span> isEndingChar = <span class="keyword">false</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TrieNode</span><span class="params">(<span class="keyword">char</span> data)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.data = data;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>缓存</p>
 <ul>
-<li>在 Trie 树中，查找某个字符串的时间复杂度是多少？(构建是O(n),查找是O(k))</li>
+<li>将热点数据放到内存中，设置内存的最大使用量以及淘汰策略来保证缓存的命中率。</li>
 </ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/" class="post-title-link" itemprop="url">字符串匹配</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-05-14 07:26:57 / 修改时间：08:08:18" itemprop="dateCreated datePublished" datetime="2021-05-14T07:26:57+08:00">2021-05-14</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="BF-算法-Brute-Force-强制匹配算法-O-n-m"><a href="#BF-算法-Brute-Force-强制匹配算法-O-n-m" class="headerlink" title="BF 算法(Brute Force 强制匹配算法 O(n*m))"></a>BF 算法(Brute Force 强制匹配算法 O(n*m))</h2><p>我们在主串中，检查起始位置分别是 0、1、2….n-m 且长度为 m 的 n-m+1 个子串，看有没有跟模式串匹配的</p>
-<img src="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/BF.jpg" class="">
-<p>尽管理论上，BF 算法的时间复杂度很高，是 O(n*m)，但在实际的开发中，它却是一个比较常用的字符串匹配算法。为什么这么说呢？原因有两点。</p>
+</li>
+<li><p>会话缓存</p>
 <ul>
-<li>第一，实际的软件开发中，大部分情况下，模式串和主串的长度都不会太长。而且每次模式串与主串中的子串匹配的时候，当中途遇到不能匹配的字符的时候，就可以就停止了，不需要把 m 个字符都比对一下。所以，尽管理论上的最坏情况时间复杂度是 O(n*m)，但是，统计意义上，大部分情况下，算法执行效率要比这个高很多。</li>
-<li>第二，朴素字符串匹配算法思想简单，代码实现也非常简单。简单意味着不容易出错，如果有 bug 也容易暴露和修复。在工程中，在满足性能要求的前提下，简单是首选。这也是我们常说的KISS（Keep it Simple and Stupid）设计原则。</li>
+<li>可以使用 Redis 来统一存储多台应用服务器的会话信息。当应用服务器不再存储用户的会话信息，也就不再具有状态，一个用户可以请求任意一个应用服务器，从而更容易实现高可用性以及可伸缩性。</li>
 </ul>
-<h2 id="RK-算法（Rabin-Karp-人名-O-n-）"><a href="#RK-算法（Rabin-Karp-人名-O-n-）" class="headerlink" title="RK 算法（Rabin-Karp 人名 O(n)）"></a>RK 算法（Rabin-Karp 人名 O(n)）</h2><p>RK 算法的思路是这样的：我们通过哈希算法对主串中的 n-m+1 个子串分别求哈希值，然后逐个与模式串的哈希值比较大小。如果某个子串的哈希值与模式串相等，那就说明对应的子串和模式串匹配了（这里先不考虑哈希冲突的问题，后面我们会讲到）。因为哈希值是一个数字，数字之间比较是否相等是非常快速的，所以模式串和子串比较的效率就提高了<br>当我们发现一个子串的哈希值跟模式串的哈希值相等的时候，我们只需要再对比一下子串和模式串本身就好了。当然，如果子串的哈希值与模式串的哈希值不相等，那对应的子串和模式串肯定也是不匹配的，就不需要比对子串和模式串本身了。</p>
-<h2 id="BM（Boyer-Moore）算法"><a href="#BM（Boyer-Moore）算法" class="headerlink" title="BM（Boyer-Moore）算法"></a>BM（Boyer-Moore）算法</h2><p>BM 算法包含两部分，分别是坏字符规则（bad character rule）和好后缀规则（good suffix shift）。</p>
+</li>
+<li><p>全页缓存（FPC）</p>
+<ul>
+<li>除基本的会话token之外，Redis还提供很简便的FPC平台。以Magento为例，Magento提供一个插件来使用Redis作为全页缓存后端。此外，对WordPress的用户来说，Pantheon有一个非常好的插件 wp-redis，这个插件能帮助你以最快速度加载你曾浏览过的页面。</li>
+</ul>
+</li>
+<li><p>查找表</p>
+<ul>
+<li>例如 DNS 记录就很适合使用 Redis 进行存储。查找表和缓存类似，也是利用了 Redis 快速的查找特性。但是查找表的内容不能失效，而缓存的内容可以失效，因为缓存不作为可靠的数据来源。</li>
+</ul>
+</li>
+<li><p>消息队列(发布/订阅功能)</p>
+<ul>
+<li>List 是一个双向链表，可以通过 lpush 和 rpop 写入和读取消息。不过最好使用 Kafka、RabbitMQ 等消息中间件。</li>
+</ul>
+</li>
+<li><p>分布式锁实现</p>
+<ul>
+<li>在分布式场景下，无法使用单机环境下的锁来对多个节点上的进程进行同步。可以使用 Redis 自带的 SETNX 命令实现分布式锁，除此之外，还可以使用官方提供的 RedLock 分布式锁实现。</li>
+</ul>
+</li>
+<li><p>Set 可以实现交集、并集等操作，从而实现共同好友等功能。ZSet 可以实现有序性操作，从而实现排行榜等功能。</p>
+</li>
+<li><p>string——适合最简单的k-v存储，类似于memcached的存储结构，短信验证码，配置信息等，就用这种类型来存储。</p>
+</li>
+<li><p>hash——一般key为ID或者唯一标示，value对应的就是详情了。如商品详情，个人信息详情，新闻详情等。</p>
+</li>
+<li><p>list——因为list是有序的，比较适合存储一些有序且数据相对固定的数据。如省市区表、字典表等。因为list是有序的，适合根据写入的时间来排序，如：最新的***，消息队列等。</p>
+</li>
+<li><p>set——可以简单的理解为ID-List的模式，如微博中一个人有哪些好友，set最牛的地方在于，可以对两个set提供交集、并集、差集操作。例如：查找两个人共同的好友等。</p>
+</li>
+<li><p>Sorted Set——是set的增强版本，增加了一个score参数，自动会根据score的值进行排序。比较适合类似于top 10等不根据插入的时间来排序的数据。</p>
+</li>
+</ul>
+<h2 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h2><h3 id="什么是Redis持久化"><a href="#什么是Redis持久化" class="headerlink" title="什么是Redis持久化"></a>什么是Redis持久化</h3><p>持久化就是把内存的数据写到磁盘中去，防止服务宕机了内存数据丢失。</p>
+<h3 id="Redis-的持久化机制是什么？各自的优缺点"><a href="#Redis-的持久化机制是什么？各自的优缺点" class="headerlink" title="Redis 的持久化机制是什么？各自的优缺点"></a>Redis 的持久化机制是什么？各自的优缺点</h3><h4 id="RDB"><a href="#RDB" class="headerlink" title="RDB"></a>RDB</h4><p>Redis 提供两种持久化机制 RDB（默认） 和 AOF 机制:</p>
+<p>RDB：是Redis DataBase缩写快照</p>
+<p>RDB是Redis默认的持久化方式。按照一定的时间将内存的数据以快照的形式保存到硬盘中，对应产生的数据文件为dump.rdb。通过配置文件中的save参数来定义快照的周期。</p>
+<p>优点：</p>
 <ol>
-<li><p>坏字符规则:当发生不匹配的时候，我们把坏字符对应的模式串中的字符下标记作 si。如果坏字符在模式串中存在，我们把这个坏字符在模式串中的下标记作 xi。如果不存在，我们把 xi 记作 -1。那模式串往后移动的位数就等于 si-xi。（注意，我这里说的下标，都是字符在模式串的下标）。</p>
-<img src="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/%E5%9D%8F%E5%AD%97%E7%AC%A6.jpg" class=""> 
-<img src="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/%E5%9D%8F%E5%AD%97%E7%AC%A6%E6%BB%91%E5%8A%A8%E4%BD%8D%E6%95%B0.jpg" class=""></li>
-<li><p>好后缀规则：</p>
-<img src="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/%E5%A5%BD%E5%90%8E%E7%BC%80.jpg" class=""> 
-<img src="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/%E6%9C%89%E9%87%8D%E5%90%88.jpg" class="">
-<img src="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/%E6%B2%A1%E9%87%8D%E5%90%88%E5%89%8D%E7%BC%80.jpg" class="">
-<p>我们可以分别计算好后缀和坏字符往后滑动的位数，然后取两个数中最大的，作为模式串往后滑动的位数。这种处理方法还可以避免我们前面提到的，根据坏字符规则，计算得到的往后滑动的位数，有可能是负数的情况。</p>
+<li>只有一个文件 dump.rdb，方便持久化。</li>
+<li>容灾性好，一个文件可以保存到安全的磁盘。</li>
+<li>性能最大化，fork 子进程来完成写操作，让主进程继续处理命令，所以是 IO 最大化。使用单独子进程来进行持久化，主进程不会进行任何 IO 操作，保证了 redis 的高性能</li>
+<li>相对于数据集大时，比 AOF 的启动效率更高。</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>数据安全性低。RDB 是间隔一段时间进行持久化，如果持久化之间 redis 发生故障，会发生数据丢失。所以这种方式更适合数据要求不严谨的时候)</li>
+<li>AOF（Append-only file)持久化方式： 是指所有的命令行记录以 redis 命令请 求协议的格式完全持久化存储)保存为 aof 文件。</li>
+</ol>
+<h4 id="AOF：持久化"><a href="#AOF：持久化" class="headerlink" title="AOF：持久化"></a>AOF：持久化</h4><p>AOF持久化(即Append Only File持久化)，则是将Redis执行的每次写命令记录到单独的日志文件中，当重启Redis会重新将持久化的日志中文件恢复数据。</p>
+<p>当两种方式同时开启时，数据恢复Redis会优先选择AOF恢复。</p>
+<p>优点：</p>
+<ol>
+<li>数据安全，aof 持久化可以配置 appendfsync 属性，有 always，每进行一次 命令操作就记录到 aof 文件中一次。</li>
+<li>通过 append 模式写文件，即使中途服务器宕机，可以通过 redis-check-aof 工具解决数据一致性问题。</li>
+<li>AOF 机制的 rewrite 模式。AOF 文件没被 rewrite 之前（文件过大时会对命令 进行合并重写），可以删除其中的某些命令（比如误操作的 flushall）)</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>AOF 文件比 RDB 文件大，且恢复速度慢。</li>
+<li>数据集大的时候，比 rdb 启动效率低。</li>
+</ol>
+<p>优缺点是什么？</p>
+<ul>
+<li>AOF文件比RDB更新频率高，优先使用AOF还原数据。</li>
+<li>AOF比RDB更安全也更大</li>
+<li>RDB性能比AOF好</li>
+<li>如果两个都配了优先加载AOF</li>
+</ul>
+<h3 id="如何选择合适的持久化方式"><a href="#如何选择合适的持久化方式" class="headerlink" title="如何选择合适的持久化方式"></a>如何选择合适的持久化方式</h3><ul>
+<li>一般来说， 如果想达到足以媲美PostgreSQL的数据安全性，你应该同时使用两种持久化功能。在这种情况下，当 Redis 重启的时候会优先载入AOF文件来恢复原始的数据，因为在通常情况下AOF文件保存的数据集要比RDB文件保存的数据集要完整。</li>
+<li>如果你非常关心你的数据， 但仍然可以承受数分钟以内的数据丢失，那么你可以只使用RDB持久化。</li>
+<li>有很多用户都只使用AOF持久化，但并不推荐这种方式，因为定时生成RDB快照（snapshot）非常便于进行数据库备份， 并且 RDB 恢复数据集的速度也要比AOF恢复的速度要快，除此之外，使用RDB还可以避免AOF程序的bug。</li>
+<li>如果你只希望你的数据在服务器运行的时候存在，你也可以不使用任何持久化方式。</li>
+</ul>
+<h3 id="Redis持久化数据和缓存怎么做扩容"><a href="#Redis持久化数据和缓存怎么做扩容" class="headerlink" title="Redis持久化数据和缓存怎么做扩容"></a>Redis持久化数据和缓存怎么做扩容</h3><ul>
+<li>如果Redis被当做缓存使用，使用一致性哈希实现动态扩容缩容。</li>
+<li>如果Redis被当做一个持久化存储使用，必须使用固定的keys-to-nodes映射关系，节点的数量一旦确定不能变化。否则的话(即Redis节点需要动态变化的情况），必须使用可以在运行时进行数据再平衡的一套系统，而当前只有Redis集群可以做到这样。</li>
+</ul>
+<h2 id="过期键的删除策略"><a href="#过期键的删除策略" class="headerlink" title="过期键的删除策略"></a>过期键的删除策略</h2><h3 id="Redis的过期键的删除策略"><a href="#Redis的过期键的删除策略" class="headerlink" title="Redis的过期键的删除策略"></a>Redis的过期键的删除策略</h3><p>我们都知道，Redis是key-value数据库，我们可以设置Redis中缓存的key的过期时间。Redis的过期策略就是指当Redis中缓存的key过期了，Redis如何处理。</p>
+<p>过期策略通常有以下三种：</p>
+<ul>
+<li>定时过期：每个设置过期时间的key都需要创建一个定时器，到过期时间就会立即清除。该策略可以立即清除过期的数据，对内存很友好；但是会占用大量的CPU资源去处理过期的数据，从而影响缓存的响应时间和吞吐量。</li>
+<li>惰性过期：只有当访问一个key时，才会判断该key是否已过期，过期则清除。该策略可以最大化地节省CPU资源，却对内存非常不友好。极端情况可能出现大量的过期key没有再次被访问，从而不会被清除，占用大量内存。</li>
+<li>定期过期：每隔一定的时间，会扫描一定数量的数据库的expires字典中一定数量的key，并清除其中已过期的key。该策略是前两者的一个折中方案。通过调整定时扫描的时间间隔和每次扫描的限定耗时，可以在不同情况下使得CPU和内存资源达到最优的平衡效果。<br>(expires字典会保存所有设置了过期时间的key的过期时间数据，其中，key是指向键空间中的某个键的指针，value是该键的毫秒精度的UNIX时间戳表示的过期时间。键空间是指该Redis集群中保存的所有键。)</li>
+</ul>
+<p><strong>Redis中同时使用了惰性过期和定期过期两种过期策略。</strong></p>
+<h3 id="Redis-key的过期时间和永久有效分别怎么设置"><a href="#Redis-key的过期时间和永久有效分别怎么设置" class="headerlink" title="Redis key的过期时间和永久有效分别怎么设置"></a>Redis key的过期时间和永久有效分别怎么设置</h3><p>EXPIRE和PERSIST命令。</p>
+<h3 id="我们知道通过expire来设置key-的过期时间，那么对过期的数据怎么处理呢"><a href="#我们知道通过expire来设置key-的过期时间，那么对过期的数据怎么处理呢" class="headerlink" title="我们知道通过expire来设置key 的过期时间，那么对过期的数据怎么处理呢"></a>我们知道通过expire来设置key 的过期时间，那么对过期的数据怎么处理呢</h3><p>除了缓存服务器自带的缓存失效策略之外（Redis默认的有6中策略可供选择），我们还可以根据具体的业务需求进行自定义的缓存淘汰，常见的策略有两种：</p>
+<ul>
+<li>定时去清理过期的缓存(定期过期)；</li>
+<li>当有用户请求过来时，再判断这个请求所用到的缓存是否过期，过期的话就去底层系统得到新数据并更新缓存（惰性过期）。</li>
+<li>不进行数据淘汰的策略，只有 <strong>noeviction（默认）</strong> 这一种。</li>
+<li>在设置了过期时间的数据中进行淘汰，包括 volatile-random、volatile-ttl、volatile-lru、volatile-lfu（Redis 4.0 后新增）四种。</li>
+<li>在所有数据范围内进行淘汰，包括 allkeys-lru、allkeys-random、allkeys-lfu（Redis 4.0 后新增）三种。</li>
+</ul>
+<h2 id="内存相关"><a href="#内存相关" class="headerlink" title="内存相关"></a>内存相关</h2><h3 id="Redis的内存用完了会发生什么"><a href="#Redis的内存用完了会发生什么" class="headerlink" title="Redis的内存用完了会发生什么"></a>Redis的内存用完了会发生什么</h3><p>如果达到设置的上限，Redis的写命令会返回错误信息（但是读命令还可以正常返回。）或者你可以配置内存淘汰机制，当Redis达到内存上限时会冲刷掉旧的内容。</p>
+<h3 id="Redis如何做内存优化"><a href="#Redis如何做内存优化" class="headerlink" title="Redis如何做内存优化"></a>Redis如何做内存优化</h3><p>可以好好利用Hash,list,sorted set,set等集合类型数据，因为通常情况下很多小的Key-Value可以用更紧凑的方式存放到一起。尽可能使用散列表（hashes），散列表（是说散列表里面存储的数少）使用的内存非常小，所以你应该尽可能的将你的数据模型抽象到一个散列表里面。比如你的web系统中有一个用户对象，不要为这个用户的名称，姓氏，邮箱，密码设置单独的key，而是应该把这个用户的所有信息存储到一张散列表里面</p>
+<h2 id="线程模型"><a href="#线程模型" class="headerlink" title="线程模型"></a>线程模型</h2><p>Redis基于Reactor模式开发了网络事件处理器，这个处理器被称为文件事件处理器（file event handler）。它的组成结构为4部分：多个套接字、IO多路复用程序、文件事件分派器、事件处理器。因为文件事件分派器队列的消费是单线程的，所以Redis才叫单线程模型。</p>
+<ul>
+<li>文件事件处理器使用 I/O 多路复用（multiplexing）程序来同时监听多个套接字， 并根据套接字目前执行的任务来为套接字关联不同的事件处理器。</li>
+<li>当被监听的套接字准备好执行连接应答（accept）、读取（read）、写入（write）、关闭（close）等操作时， 与操作相对应的文件事件就会产生， 这时文件事件处理器就会调用套接字之前关联好的事件处理器来处理这些事件。</li>
+<li>虽然文件事件处理器以单线程方式运行， 但通过使用 I/O 多路复用程序来监听多个套接字， 文件事件处理器既实现了高性能的网络通信模型， 又可以很好地与 redis 服务器中其他同样以单线程方式运行的模块进行对接， 这保持了 Redis 内部单线程设计的简单性。</li>
+</ul>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><h3 id="Redis事务的概念"><a href="#Redis事务的概念" class="headerlink" title="Redis事务的概念"></a>Redis事务的概念</h3><p>Redis 事务的本质是通过MULTI、EXEC、WATCH等一组命令的集合。事务支持一次执行多个命令，一个事务中所有命令都会被序列化。在事务执行过程，会按照顺序串行化执行队列中的命令，其他客户端提交的命令请求不会插入到事务执行命令序列中。</p>
+<p>总结说：redis事务就是一次性、顺序性、排他性的执行一个队列中的一系列命令。</p>
+<h3 id="redis事务的三个阶段"><a href="#redis事务的三个阶段" class="headerlink" title="redis事务的三个阶段"></a>redis事务的三个阶段</h3><ul>
+<li>事务开始 MULTI</li>
+<li>命令入队</li>
+<li>事务执行 EXEC</li>
+<li>事务执行过程中，如果服务端收到有EXEC、DISCARD、WATCH、MULTI之外的请求，将会把请求放入队列中排队</li>
+</ul>
+<h3 id="Redis事务相关命令"><a href="#Redis事务相关命令" class="headerlink" title="Redis事务相关命令"></a>Redis事务相关命令</h3><p>Redis事务功能是通过MULTI、EXEC、DISCARD和WATCH 四个原语实现的</p>
+<p>Redis会将一个事务中的所有命令序列化，然后按顺序执行。</p>
+<ul>
+<li>redis 不支持回滚，“Redis 在事务失败时不进行回滚，而是继续执行余下的命令”， 所以 Redis 的内部可以保持简单且快速。</li>
+<li>如果在一个事务中的命令出现错误，那么所有的命令都不会执行；</li>
+<li>如果在一个事务中出现运行错误，那么正确的命令会被执行。</li>
+<li>WATCH 命令是一个乐观锁，可以为 Redis 事务提供 check-and-set （CAS）行为。 可以监控一个或多个键，一旦其中有一个键被修改（或删除），之后的事务就不会执行，监控一直持续到EXEC命令。</li>
+<li>MULTI命令用于开启一个事务，它总是返回OK。 MULTI执行之后，客户端可以继续向服务器发送任意多条命令，这些命令不会立即被执行，而是被放到一个队列中，当EXEC命令被调用时，所有队列中的命令才会被执行。</li>
+<li>EXEC：执行所有事务块内的命令。返回事务块内所有命令的返回值，按命令执行的先后顺序排列。 当操作被打断时，返回空值 nil 。</li>
+<li>通过调用DISCARD，客户端可以清空事务队列，并放弃执行事务， 并且客户端会从事务状态中退出。</li>
+<li>UNWATCH命令可以取消watch对所有key的监控。</li>
+</ul>
+<h3 id="事务管理（ACID）概述"><a href="#事务管理（ACID）概述" class="headerlink" title="事务管理（ACID）概述"></a>事务管理（ACID）概述</h3><p>Redis的事务总是具有ACID中的一致性和隔离性，其他特性是不支持的。当服务器运行在AOF持久化模式下，并且appendfsync选项的值为always时，事务也具有耐久性。</p>
+<h3 id="Redis事务支持隔离性吗"><a href="#Redis事务支持隔离性吗" class="headerlink" title="Redis事务支持隔离性吗"></a>Redis事务支持隔离性吗</h3><p>Redis 是单进程程序，并且它保证在执行事务时，不会对事务进行中断，事务可以运行直到执行完所有事务队列中的命令为止。因此，Redis 的事务是总是带有隔离性的。</p>
+<h3 id="Redis事务保证原子性吗，支持回滚吗"><a href="#Redis事务保证原子性吗，支持回滚吗" class="headerlink" title="Redis事务保证原子性吗，支持回滚吗"></a>Redis事务保证原子性吗，支持回滚吗</h3><p>Redis中，单条命令是原子性执行的，但事务不保证原子性，且没有回滚。事务中任意命令执行失败，其余的命令仍会被执行。</p>
+<h3 id="Redis事务其他实现"><a href="#Redis事务其他实现" class="headerlink" title="Redis事务其他实现"></a>Redis事务其他实现</h3><ul>
+<li>基于Lua脚本，Redis可以保证脚本内的命令一次性、按顺序地执行，其同时也不提供事务运行错误的回滚，执行过程中如果部分命令运行错误，剩下的命令还是会继续运行完</li>
+<li>基于中间标记变量，通过另外的标记变量来标识事务是否执行完成，读取数据时先读取该标记变量判断是否事务执行完成。但这样会需要额外写代码实现，比较繁琐</li>
+</ul>
+<h2 id="集群方案"><a href="#集群方案" class="headerlink" title="集群方案"></a>集群方案</h2><h3 id="哨兵模式"><a href="#哨兵模式" class="headerlink" title="哨兵模式"></a>哨兵模式</h3><img src="/2021/06/16/%E9%9D%A2%E8%AF%95/%E5%93%A8%E5%85%B5%E9%9B%86%E7%BE%A4.png" class="">
+
+<h4 id="哨兵的介绍"><a href="#哨兵的介绍" class="headerlink" title="哨兵的介绍"></a>哨兵的介绍</h4><p>sentinel，中文名是哨兵。哨兵是 redis 集群机构中非常重要的一个组件，主要有以下功能：</p>
+<ul>
+<li>集群监控：负责监控 redis master 和 slave 进程是否正常工作。</li>
+<li>消息通知：如果某个 redis 实例有故障，那么哨兵负责发送消息作为报警通知给管理员。</li>
+<li>故障转移：如果 master node 挂掉了，会自动转移到 slave node 上。</li>
+<li>配置中心：如果故障转移发生了，通知 client 客户端新的 master 地址。</li>
+</ul>
+<h4 id="哨兵用于实现-redis-集群的高可用，本身也是分布式的，作为一个哨兵集群去运行，互相协同工作"><a href="#哨兵用于实现-redis-集群的高可用，本身也是分布式的，作为一个哨兵集群去运行，互相协同工作" class="headerlink" title="哨兵用于实现 redis 集群的高可用，本身也是分布式的，作为一个哨兵集群去运行，互相协同工作"></a>哨兵用于实现 redis 集群的高可用，本身也是分布式的，作为一个哨兵集群去运行，互相协同工作</h4><ul>
+<li>故障转移时，判断一个 master node 是否宕机了，需要大部分的哨兵都同意才行，涉及到了分布式选举的问题。</li>
+<li>即使部分哨兵节点挂掉了，哨兵集群还是能正常工作的，因为如果一个作为高可用机制重要组成部分的故障转移系统本身是单点的，那就很坑爹了。</li>
+</ul>
+<h4 id="哨兵的核心知识"><a href="#哨兵的核心知识" class="headerlink" title="哨兵的核心知识"></a>哨兵的核心知识</h4><ul>
+<li>哨兵至少需要 3 个实例，来保证自己的健壮性。</li>
+<li>哨兵 + redis 主从的部署架构，是不保证数据零丢失的，只能保证 redis 集群的高可用性。</li>
+<li>对于哨兵 + redis 主从这种复杂的部署架构，尽量在测试环境和生产环境，都进行充足的测试和演练。</li>
+</ul>
+<h3 id="官方Redis-Cluster-方案-服务端路由查询"><a href="#官方Redis-Cluster-方案-服务端路由查询" class="headerlink" title="官方Redis Cluster 方案(服务端路由查询)"></a>官方Redis Cluster 方案(服务端路由查询)</h3><img src="/2021/06/16/%E9%9D%A2%E8%AF%95/redis_cluster.png" class="">
+
+<p>redis 集群模式的工作原理能说一下么？在集群模式下，redis 的 key 是如何寻址的？分布式寻址都有哪些算法？了解一致性 hash 算法吗？</p>
+<h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>Redis Cluster是一种服务端Sharding技术，3.0版本开始正式提供。Redis Cluster并没有使用一致性hash，而是采用slot(槽)的概念，一共分成16384个槽。将请求发送到任意节点，接收到请求的节点会将查询请求发送到正确的节点上执行</p>
+<h4 id="方案说明"><a href="#方案说明" class="headerlink" title="方案说明"></a>方案说明</h4><ul>
+<li>通过哈希的方式，将数据分片，每个节点均分存储一定哈希槽(哈希值)区间的数据，默认分配了16384 个槽位</li>
+<li>每份数据分片会存储在多个互为主从的多节点上</li>
+<li>数据写入先写主节点，再同步到从节点(支持配置为阻塞同步)</li>
+<li>同一分片多个节点间的数据不保持一致性</li>
+<li>读取数据时，当客户端操作的key没有分配在该节点上时，redis会返回转向指令，指向正确的节点</li>
+<li>扩容时时需要需要把旧节点的数据迁移一部分到新节点</li>
+</ul>
+<p>在 redis cluster 架构下，每个 redis 要放开两个端口号，比如一个是 6379，另外一个就是 加1w 的端口号，比如 16379。</p>
+<p>16379 端口号是用来进行节点间通信的，也就是 cluster bus 的东西，cluster bus 的通信，用来进行故障检测、配置更新、故障转移授权。cluster bus 用了另外一种二进制的协议，gossip 协议，用于节点间进行高效的数据交换，占用更少的网络带宽和处理时间。</p>
+<h4 id="节点间的内部通信机制"><a href="#节点间的内部通信机制" class="headerlink" title="节点间的内部通信机制"></a>节点间的内部通信机制</h4><p>基本通信原理</p>
+<p>集群元数据的维护有两种方式：集中式、Gossip 协议。redis cluster 节点间采用 gossip 协议进行通信。</p>
+<h4 id="分布式寻址算法"><a href="#分布式寻址算法" class="headerlink" title="分布式寻址算法"></a>分布式寻址算法</h4><ul>
+<li>hash 算法（大量缓存重建）<ul>
+<li>直接用hash 函数进行映射</li>
+<li>当系统需要对服务器进行扩容时，那么整个已经保存到服务器中的数据都得重新进行hash碰撞，当系统具有海量数据时将会是场灾难。</li>
+</ul>
+</li>
+<li>一致性 hash 算法（自动缓存迁移）+ 虚拟节点（自动负载均衡）<ul>
+<li>一致性哈希将整个哈希值空间组织成一个虚拟的圆环，在集群服务器确定以后，将各个服务器使用Hash函数进行一个哈希计算，哈希计算可以选择服务器的ip地址或者主机名等关键字进行哈希，这样就完成了节点在hash环上的位置分配，</li>
+<li>每台服务器在hash环上的位置分配完成后，在客户端对缓存key进行同样函数的hash运算，得出hash值，同样得到环上的一个位置，从这个位置顺时针找到最近的一个服务器节点，比如遍历所有节点位置和key位置差值取最小值，这样就完成了路由。</li>
+<li>为了避免节点分布不均匀情况，添加虚拟节点。具体操作就是将一台服务器加上编号尾缀进行哈希，每台服务器就会有多个结果，简单来说就是将一台服务器映射成不同的多个hash值。</li>
+</ul>
+</li>
+<li>redis cluster 的 hash slot 算法<ul>
+<li>记录和物理机之间引入了虚拟桶层，记录通过hash函数映射到虚拟桶，记录和虚拟桶是多对一的关系</li>
+<li>第二层是虚拟桶和物理机之间的映射，同样也是多对一的关系，即一个物理机对应多个虚拟桶，这个层关系是通过内存表实现的</li>
+<li>如果用户要从集群中移除节点 A ， 那么集群只需要将节点 A 中的所有哈希槽移动到节点 B 和节点 C ， 然后再移除空白（不包含任何哈希槽）的节点 A 就可以了。</li>
+<li>因为将一个哈希槽从一个节点移动到另一个节点不会造成节点阻塞， 所以无论是添加新节点还是移除已存在节点， 又或者改变某个节点包含的哈希槽数量， 都不会造成集群下线。</li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/6b9ce31c0351">https://www.jianshu.com/p/6b9ce31c0351</a> 一致性哈希算法</li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/baidu_36161424/article/details/104945388">https://blog.csdn.net/baidu_36161424/article/details/104945388</a></li>
+</ul>
+</li>
+</ul>
+<p>优点</p>
+<ul>
+<li>无中心架构，支持动态扩容，对业务透明</li>
+<li>具备Sentinel的监控和自动Failover(故障转移)能力</li>
+<li>客户端不需要连接集群所有节点，连接集群中任何一个可用节点即可</li>
+<li>高性能，客户端直连redis服务，免去了proxy代理的损耗</li>
+</ul>
+<p>缺点</p>
+<ul>
+<li>运维也很复杂，数据迁移需要人工干预</li>
+<li>只能使用0号数据库</li>
+<li>不支持批量操作(pipeline管道操作)</li>
+<li>分布式逻辑和存储模块耦合等</li>
+</ul>
+<h3 id="基于客户端分配"><a href="#基于客户端分配" class="headerlink" title="基于客户端分配"></a>基于客户端分配</h3><img src="/2021/06/16/%E9%9D%A2%E8%AF%95/%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%88%86%E9%85%8D.jpg" class="">
+
+<p>Redis Sharding是Redis Cluster出来之前，业界普遍使用的多Redis实例集群方法。其主要思想是采用哈希算法将Redis数据的key进行散列，通过hash函数，特定的key会映射到特定的Redis节点上。Java redis客户端驱动jedis，支持Redis Sharding功能，即ShardedJedis以及结合缓存池的ShardedJedisPool</p>
+<p>优点</p>
+<ul>
+<li>优势在于非常简单，服务端的Redis实例彼此独立，相互无关联，每个Redis实例像单服务器一样运行，非常容易线性扩展，系统的灵活性很强</li>
+</ul>
+<p>缺点</p>
+<ul>
+<li>由于sharding处理放到客户端，规模进一步扩大时给运维带来挑战。</li>
+<li>客户端sharding不支持动态增删节点。服务端Redis实例群拓扑结构有变化时，每个客户端都需要更新调整。连接不能共享，当应用规模增大时，资源浪费制约优化</li>
+</ul>
+<h3 id="基于代理服务器分片"><a href="#基于代理服务器分片" class="headerlink" title="基于代理服务器分片"></a>基于代理服务器分片</h3><img src="/2021/06/16/%E9%9D%A2%E8%AF%95/%E4%BB%A3%E7%90%86%E5%88%86%E9%85%8D.jpg" class="">
+
+<p>客户端发送请求到一个代理组件，代理解析客户端的数据，并将请求转发至正确的节点，最后将结果回复给客户端</p>
+<p>特征</p>
+<ul>
+<li>透明接入，业务程序不用关心后端Redis实例，切换成本低</li>
+<li>Proxy 的逻辑和存储的逻辑是隔离的</li>
+<li>代理层多了一次转发，性能有所损耗</li>
+</ul>
+<p>业界开源方案</p>
+<ul>
+<li>Twtter开源的Twemproxy</li>
+<li>豌豆荚开源的Codis</li>
+</ul>
+<h3 id="Redis-主从架构"><a href="#Redis-主从架构" class="headerlink" title="Redis 主从架构"></a>Redis 主从架构</h3><p>见数据同步</p>
+<h3 id="生产环境中的-redis-是怎么部署的"><a href="#生产环境中的-redis-是怎么部署的" class="headerlink" title="生产环境中的 redis 是怎么部署的"></a>生产环境中的 redis 是怎么部署的</h3><p>edis cluster，10 台机器，5 台机器部署了 redis 主实例，另外 5 台机器部署了 redis 的从实例，每个主实例挂了一个从实例，5 个节点对外提供读写服务，每个节点的读写高峰qps可能可以达到每秒 5 万，5 台机器最多是 25 万读写请求/s。</p>
+<p>机器是什么配置？32G 内存+ 8 核 CPU + 1T 磁盘，但是分配给 redis 进程的是10g内存，一般线上生产环境，redis 的内存尽量不要超过 10g，超过 10g 可能会有问题。</p>
+<p>5 台机器对外提供读写，一共有 50g 内存。</p>
+<p>因为每个主实例都挂了一个从实例，所以是高可用的，任何一个主实例宕机，都会自动故障迁移，redis 从实例会自动变成主实例继续提供读写服务。</p>
+<p>你往内存里写的是什么数据？每条数据的大小是多少？商品数据，每条数据是 10kb。100 条数据是 1mb，10 万条数据是 1g。常驻内存的是 200 万条商品数据，占用内存是 20g，仅仅不到总内存的 50%。目前高峰期每秒就是 3500 左右的请求量。</p>
+<p>其实大型的公司，会有基础架构的 team 负责缓存集群的运维。</p>
+<h3 id="说说Redis哈希槽的概念"><a href="#说说Redis哈希槽的概念" class="headerlink" title="说说Redis哈希槽的概念"></a>说说Redis哈希槽的概念</h3><p>Redis集群没有使用一致性hash,而是引入了哈希槽的概念，Redis集群有16384个哈希槽，每个key通过CRC16校验后对16384取模来决定放置哪个槽，集群的每个节点负责一部分hash槽。</p>
+<h3 id="Redis集群会有写操作丢失吗？为什么"><a href="#Redis集群会有写操作丢失吗？为什么" class="headerlink" title="Redis集群会有写操作丢失吗？为什么"></a>Redis集群会有写操作丢失吗？为什么</h3><p>Redis并不能保证数据的强一致性，这意味这在实际中集群在特定的条件下可能会丢失写操作。</p>
+<h3 id="Redis集群之间是如何复制的"><a href="#Redis集群之间是如何复制的" class="headerlink" title="Redis集群之间是如何复制的"></a>Redis集群之间是如何复制的</h3><p>异步复制</p>
+<h3 id="Redis集群最大节点个数是多少"><a href="#Redis集群最大节点个数是多少" class="headerlink" title="Redis集群最大节点个数是多少"></a>Redis集群最大节点个数是多少</h3><p>16384个</p>
+<h3 id="Redis集群如何选择数据库"><a href="#Redis集群如何选择数据库" class="headerlink" title="Redis集群如何选择数据库"></a>Redis集群如何选择数据库</h3><p>Redis集群目前无法做数据库选择，默认在0数据库。</p>
+<h2 id="分布式问题"><a href="#分布式问题" class="headerlink" title="分布式问题"></a>分布式问题</h2><p>见分布式锁</p>
+<h2 id="缓存异常"><a href="#缓存异常" class="headerlink" title="缓存异常"></a>缓存异常</h2><p>见缓存</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/15/%E9%9D%A2%E8%AF%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/15/%E9%9D%A2%E8%AF%95/" class="post-title-link" itemprop="url">面试</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-15 21:41:30" itemprop="dateCreated datePublished" datetime="2021-06-15T21:41:30+08:00">2021-06-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-16 21:14:06" itemprop="dateModified" datetime="2021-06-16T21:14:06+08:00">2021-06-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6868270408534720525">https://juejin.cn/post/6868270408534720525</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/ThinkWon/article/details/104778621">https://blog.csdn.net/ThinkWon/article/details/104778621</a></p>
+<h2 id="能说下myisam-和-innodb的区别吗"><a href="#能说下myisam-和-innodb的区别吗" class="headerlink" title="能说下myisam 和 innodb的区别吗"></a>能说下myisam 和 innodb的区别吗</h2><p>myisam引擎是5.1版本之前的默认引擎，支持全文检索、压缩、空间函数等，但是<strong>不支持事务和行级锁</strong>，所以一般用于有大量查询少量插入的场景来使用，而且myisam不支持外键，并且索引和数据是分开存储的。<br>innodb是基于聚簇索引建立的，和myisam相反它支持事务、外键，并且通过MVCC来支持高并发，索引和数据存储在一起。</p>
+<h2 id="说下mysql的索引有哪些吧，索引的数据结构，聚簇和非聚簇索引又是什么"><a href="#说下mysql的索引有哪些吧，索引的数据结构，聚簇和非聚簇索引又是什么" class="headerlink" title="说下mysql的索引有哪些吧，索引的数据结构，聚簇和非聚簇索引又是什么"></a>说下mysql的索引有哪些吧，索引的数据结构，聚簇和非聚簇索引又是什么</h2><h3 id="索引类别"><a href="#索引类别" class="headerlink" title="索引类别"></a>索引类别</h3><ul>
+<li>主键索引: 数据列不允许重复，不允许为NULL，一个表只能有一个主键。</li>
+<li>唯一索引: 数据列不允许重复，允许为NULL值，一个表允许多个列创建唯一索引。<ul>
+<li>可以通过 ALTER TABLE table_name ADD UNIQUE (column); 创建唯一索引</li>
+<li>可以通过 ALTER TABLE table_name ADD UNIQUE (column1,column2); 创建唯一组合索引</li>
+</ul>
+</li>
+<li>普通索引: 基本的索引类型，没有唯一性的限制，允许为NULL值。<ul>
+<li>可以通过ALTER TABLE table_name ADD INDEX index_name (column);创建普通索引</li>
+<li>可以通过ALTER TABLE table_name ADD INDEX index_name(column1, column2, column3);创建组合索引</li>
+</ul>
+</li>
+<li>全文索引： 是目前搜索引擎使用的一种关键技术。<ul>
+<li>可以通过ALTER TABLE table_name ADD FULLTEXT (column);创建全文索引</li>
+</ul>
+</li>
+</ul>
+<h3 id="索引数据结构"><a href="#索引数据结构" class="headerlink" title="索引数据结构"></a>索引数据结构</h3><p>索引按照数据结构来说主要包含B+树和Hash索引。</p>
+<ul>
+<li>B+树是左小右大的顺序存储结构，节点只包含id索引列，而叶子节点包含索引列和数据，这种数据和索引在一起存储的索引方式叫做聚簇索引，一张表只能有一个聚簇索引。假设没有定义主键，InnoDB会选择一个唯一的非空索引代替，如果没有的话则会隐式定义一个主键作为聚簇索引。将数据存储与索引放到了一块，找到索引也就找到了数据</li>
+<li>非聚簇索引：将数据存储于索引分开结构，索引结构的叶子节点指向了数据的对应行，myisam通过key_buffer把索引先缓存到内存中，当需要访问数据时（通过索引访问数据），在内存中直接搜索索引，然后通过索引找到磁盘相应数据，这也就是为什么索引不在key buffer命中时，速度慢的原因</li>
+</ul>
+<h2 id="索引覆盖，回表"><a href="#索引覆盖，回表" class="headerlink" title="索引覆盖，回表"></a>索引覆盖，回表</h2><p>覆盖索引指的是在一次查询中，如果一个索引包含或者说覆盖所有需要查询的字段的值，我们就称之为覆盖索引，而不再需要回表查询。</p>
+<p>而要确定一个查询是否是覆盖索引，我们只需要explain sql语句看Extra的结果是否是“Using index”即可。</p>
+<h2 id="锁的类型有哪些呢"><a href="#锁的类型有哪些呢" class="headerlink" title="锁的类型有哪些呢"></a>锁的类型有哪些呢</h2><h3 id="从数据库角度，线程是否能共享同一把锁（共享，排他）"><a href="#从数据库角度，线程是否能共享同一把锁（共享，排他）" class="headerlink" title="从数据库角度，线程是否能共享同一把锁（共享，排他）"></a>从数据库角度，线程是否能共享同一把锁（共享，排他）</h3><p>mysql锁分为共享锁和排他锁，也叫做读锁和写锁。</p>
+<p>读锁是共享的，可以通过lock in share mode实现，这时候只能读不能写。</p>
+<p>写锁是排他的，它会阻塞其他的写锁和读锁。从颗粒度来区分，可以分为表锁和行锁两种。</p>
+<p>行锁又可以分为乐观锁和悲观锁，悲观锁可以通过for update实现，乐观锁则通过版本号实现。</p>
+<h2 id="你能说下事务的基本特性和隔离级别"><a href="#你能说下事务的基本特性和隔离级别" class="headerlink" title="你能说下事务的基本特性和隔离级别"></a>你能说下事务的基本特性和隔离级别</h2><p>事务基本特性ACID 读未提交 读提交 可重复读 串行化</p>
+<h2 id="那ACID靠什么保证的"><a href="#那ACID靠什么保证的" class="headerlink" title="那ACID靠什么保证的"></a>那ACID靠什么保证的</h2><ul>
+<li>A原子性由undo log日志保证，它记录了需要回滚的日志信息，事务回滚时撤销已经执行成功的sql</li>
+<li>C一致性一般由代码层面来保证</li>
+<li>I隔离性由MVCC来保证</li>
+<li>D持久性由内存+redo log来保证，mysql修改数据同时在内存和redo log记录这次操作，事务提交的时候通过redo log刷盘，宕机的时候可以从redo log恢复</li>
+</ul>
+<h2 id="那你说说什么是幻读，什么是MVCC"><a href="#那你说说什么是幻读，什么是MVCC" class="headerlink" title="那你说说什么是幻读，什么是MVCC"></a>那你说说什么是幻读，什么是MVCC</h2><ul>
+<li><p><strong>幻读</strong></p>
+<p>在一个事务的两次查询中数据笔数不一致，例如有一个事务查询了几列(Row)数据，而另一个事务却在此时插入了新的几列数据，先前的事务在接下来的查询中，就会发现有几列数据是它先前所没有的。</p>
+</li>
+<li><p>MVCC</p>
+<ul>
+<li>在可重复读隔离级别下，事务在启动的时候就“拍了个快照”。注意，这个快照是基于整库的。</li>
+<li>在事务开始的时候向 InnoDB 的事务系统申请的，是按申请顺序严格递增的。</li>
+<li>而每行数据也都是有多个版本的。数据表中的一行记录，其实可能有多个版本 (row)，每个版本有自己的 row trx_id。</li>
+</ul>
+</li>
+</ul>
+<h2 id="说说mysql主从同步怎么做的"><a href="#说说mysql主从同步怎么做的" class="headerlink" title="说说mysql主从同步怎么做的"></a>说说mysql主从同步怎么做的</h2><p>首先先了解mysql主从同步的原理</p>
+<ul>
+<li>master提交完事务后，写入binlog</li>
+<li>slave连接到master，获取binlog</li>
+<li>master创建dump线程，推送binglog到slave</li>
+<li>slave启动一个IO线程读取同步过来的master的binlog，记录到relay log中继日志中</li>
+<li>slave再开启一个sql线程读取relay log事件并在slave执行，完成同步</li>
+<li>slave记录自己的binglog</li>
+</ul>
+<img src="/2021/06/15/%E9%9D%A2%E8%AF%95/%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5.image" class="">
+
+<p>全同步复制</p>
+<ul>
+<li><p>主库写入binlog后强制同步日志到从库，所有的从库都执行完成后才返回给客户端，但是很显然这个方式的话性能会受到严重影响。<br>半同步复制</p>
+</li>
+<li><p>和全同步不同的是，半同步复制的逻辑是这样，从库写入日志成功后返回ACK确认给主库，主库收到至少一个从库的确认就认为写操作完成。</p>
+</li>
+</ul>
+<h2 id="数据库基础知识"><a href="#数据库基础知识" class="headerlink" title="数据库基础知识"></a>数据库基础知识</h2><h3 id="为什么要使用数据库"><a href="#为什么要使用数据库" class="headerlink" title="为什么要使用数据库"></a>为什么要使用数据库</h3><p>数据保存在数据库</p>
+<ul>
+<li>数据永久保存</li>
+<li>使用SQL语句，查询方便效率高。</li>
+<li>管理数据方便</li>
+</ul>
+<h3 id="什么是SQL"><a href="#什么是SQL" class="headerlink" title="什么是SQL"></a>什么是SQL</h3><p>结构化查询语言(Structured Query Language)简称SQL，是一种数据库查询语言。</p>
+<p>作用：用于存取数据、查询、更新和管理关系数据库系统。</p>
+<h3 id="数据库三大范式是什么"><a href="#数据库三大范式是什么" class="headerlink" title="数据库三大范式是什么"></a>数据库三大范式是什么</h3><ul>
+<li>第一范式：每个列都不可以再拆分。</li>
+<li>第二范式：在第一范式的基础上，非主键列完全依赖于主键，而不能是依赖于主键的一部- 分。</li>
+<li>第三范式：在第二范式的基础上，非主键列只依赖于主键，不依赖于其他非主键。</li>
+<li>在设计数据库结构的时候，要尽量遵守三范式，如果不遵守，必须有足够的理由。比如性能。事实上我们经常会为了性能而妥协数据库的设计。</li>
+</ul>
+<h3 id="MySQL的binlog有有几种录入格式？分别有什么区别"><a href="#MySQL的binlog有有几种录入格式？分别有什么区别" class="headerlink" title="MySQL的binlog有有几种录入格式？分别有什么区别"></a>MySQL的binlog有有几种录入格式？分别有什么区别</h3><p>有三种格式，statement，row和mixed。</p>
+<ul>
+<li>statement模式下，每一条会修改数据的sql都会记录在binlog中。不需要记录每一行的变化，减少了binlog日志量，节约了IO，提高性能。由于sql的执行是有上下文的，因此在保存的时候需要保存相关的信息，同时还有一些使用了函数之类的语句无法被记录复制。</li>
+<li>row级别下，不记录sql语句上下文相关信息，仅保存哪条记录被修改。记录单元为每一行的改动，基本是可以全部记下来但是由于很多操作，会导致大量行的改动(比如alter table)，因此这种模式的文件保存的信息太多，日志量太大。</li>
+<li>mixed，一种折中的方案，普通操作使用statement记录，当无法使用statement的时候使用row。</li>
+<li>此外，新版的MySQL中对row级别也做了一些优化，当表结构发生变化的时候，会记录语句而不是逐行记录。</li>
+</ul>
+<h2 id="引擎"><a href="#引擎" class="headerlink" title="引擎"></a>引擎</h2><h3 id="MySQL存储引擎MyISAM与InnoDB区别"><a href="#MySQL存储引擎MyISAM与InnoDB区别" class="headerlink" title="MySQL存储引擎MyISAM与InnoDB区别"></a>MySQL存储引擎MyISAM与InnoDB区别</h3><ul>
+<li>Innodb引擎：Innodb引擎提供了对数据库ACID事务的支持。并且还提供了行级锁和外键的约束。它的设计的目标就是处理大数据容量的数据库系统。</li>
+<li>MyIASM引擎(原本Mysql的默认引擎)：不提供事务的支持，也不支持行级锁和外键。</li>
+<li>MEMORY引擎：所有的数据都在内存中，数据的处理速度快，但是安全性不高。</li>
+</ul>
+<h3 id="存储引擎选择"><a href="#存储引擎选择" class="headerlink" title="存储引擎选择"></a>存储引擎选择</h3><p>如果没有特别的需求，使用默认的Innodb即可。</p>
+<ul>
+<li>MyISAM：以读写插入为主的应用程序，比如博客系统、新闻门户网站。</li>
+<li>Innodb：更新（删除）操作频率也高，或者要保证数据的完整性；并发量高，支持事务和外键。比如OA自动化办公系统。</li>
+</ul>
+<h2 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h2><h3 id="什么是索引"><a href="#什么是索引" class="headerlink" title="什么是索引"></a>什么是索引</h3><ul>
+<li>索引是一种特殊的文件(InnoDB数据表上的索引是表空间的一个组成部分)，它们包含着对数据表里所有记录的引用指针。</li>
+<li>索引是一种数据结构。数据库索引，是数据库管理系统中一个排序的数据结构，以协助快速查询、更新数据库表中数据。索引的实现通常使用B树及其变种B+树。</li>
+<li>更通俗的说，索引就相当于目录。为了方便查找书中的内容，通过对内容建立索引形成目录。索引是一个文件，它是要占据物理空间的。</li>
+</ul>
+<h3 id="索引有哪些优缺点"><a href="#索引有哪些优缺点" class="headerlink" title="索引有哪些优缺点"></a>索引有哪些优缺点</h3><p>索引的优点</p>
+<ul>
+<li>可以大大加快数据的检索速度，这也是创建索引的最主要的原因。</li>
+<li>通过使用索引，可以在查询的过程中，使用优化隐藏器，提高系统的性能。</li>
+</ul>
+<p>索引的缺点</p>
+<ul>
+<li>时间方面：创建索引和维护索引要耗费时间，具体地，当对表中的数据进行增加、删除和修改的时候，索引也要动态的维护，会降低增/改/删的执行效率；</li>
+<li>空间方面：索引需要占物理空间。</li>
+</ul>
+<h3 id="索引使用场景"><a href="#索引使用场景" class="headerlink" title="索引使用场景"></a>索引使用场景</h3><ul>
+<li>where 查询时，加速查询</li>
+<li>order by 省去了排序的苦恼</li>
+<li>join 对join语句匹配关系（on）涉及的字段建立索引能够提高效率</li>
+</ul>
+<h3 id="索引有哪几种类型"><a href="#索引有哪几种类型" class="headerlink" title="索引有哪几种类型"></a>索引有哪几种类型</h3><ul>
+<li>主键索引: 数据列不允许重复，不允许为NULL，一个表只能有一个主键。</li>
+<li>唯一索引: 数据列不允许重复，允许为NULL值，一个表允许多个列创建唯一索引。<ul>
+<li>可以通过 ALTER TABLE table_name ADD UNIQUE (column); 创建唯一索引</li>
+<li>可以通过 ALTER TABLE table_name ADD UNIQUE (column1,column2); 创建唯一组合索引</li>
+</ul>
+</li>
+<li>普通索引: 基本的索引类型，没有唯一性的限制，允许为NULL值。<ul>
+<li>可以通过ALTER TABLE table_name ADD INDEX index_name (column);创建普通索引</li>
+<li>可以通过ALTER TABLE table_name ADD INDEX index_name(column1, column2, column3);创建组合索引</li>
+</ul>
+</li>
+<li>全文索引： 是目前搜索引擎使用的一种关键技术。<ul>
+<li>可以通过ALTER TABLE table_name ADD FULLTEXT (column);创建全文索引</li>
+</ul>
+</li>
+</ul>
+<h3 id="索引数据结构1"><a href="#索引数据结构1" class="headerlink" title="索引数据结构1"></a>索引数据结构1</h3><p>索引按照数据结构来说主要包含B+树和Hash索引。</p>
+<ul>
+<li>B+树是左小右大的顺序存储结构，节点只包含id索引列，而叶子节点包含索引列和数据，这种数据和索引在一起存储的索引方式叫做聚簇索引，一张表只能有一个聚簇索引。假设没有定义主键，InnoDB会选择一个唯一的非空索引代替，如果没有的话则会隐式定义一个主键作为聚簇索引。将数据存储与索引放到了一块，找到索引也就找到了数据</li>
+<li>非聚簇索引：将数据存储于索引分开结构，索引结构的叶子节点指向了数据的对应行，myisam通过key_buffer把索引先缓存到内存中，当需要访问数据时（通过索引访问数据），在内存中直接搜索索引，然后通过索引找到磁盘相应数据，这也就是为什么索引不在key buffer命中时，速度慢的原因</li>
+</ul>
+<h3 id="索引的基本原理"><a href="#索引的基本原理" class="headerlink" title="索引的基本原理"></a>索引的基本原理</h3><p>索引用来快速地寻找那些具有特定值的记录。如果没有索引，一般来说执行查询时遍历整张表。</p>
+<p>索引的原理很简单，就是把无序的数据变成有序的查询</p>
+<ul>
+<li>把创建了索引的列的内容进行排序</li>
+<li>对排序结果生成倒排表</li>
+<li>在倒排表内容上拼上数据地址链</li>
+<li>在查询的时候，先拿到倒排表内容，再取出数据地址链，从而拿到具体数据</li>
+</ul>
+<h3 id="索引设计的原则"><a href="#索引设计的原则" class="headerlink" title="索引设计的原则"></a>索引设计的原则</h3><ul>
+<li>适合索引的列是出现在where子句中的列，或者连接子句中指定的列</li>
+<li>基数较小的类，索引效果较差，没有必要在此列建立索引</li>
+<li>使用短索引，如果对长字符串列进行索引，应该指定一个前缀长度，这样能够节省大量索引空间</li>
+<li>不要过度索引。索引需要额外的磁盘空间，并降低写操作的性能。在修改表内容的时候，索引会进行更新甚至重构，索引列越多，这个时间就会越长。所以只保持需要的索引有利于查询即可。</li>
+</ul>
+<h3 id="创建索引的原则（重中之重）"><a href="#创建索引的原则（重中之重）" class="headerlink" title="创建索引的原则（重中之重）"></a>创建索引的原则（重中之重）</h3><p>索引虽好，但也不是无限制的使用，最好符合一下几个原则</p>
+<ol>
+<li>最左前缀匹配原则，组合索引非常重要的原则，mysql会一直向右匹配直到遇到范围查询(&gt;、&lt;、between、like)就停止匹配，比如a = 1 and b = 2 and c &gt; 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整。</li>
+<li>较频繁作为查询条件的字段才去创建索引</li>
+<li>更新频繁字段不适合创建索引</li>
+<li>若是不能有效区分数据的列不适合做索引列(如性别，男女未知，最多也就三种，区分度实在太低)</li>
+<li>尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可。</li>
+<li>定义有外键的数据列一定要建立索引。</li>
+<li>对于那些查询中很少涉及的列，重复值比较多的列不要建立索引。</li>
+<li>对于定义为text、image和bit的数据类型的列不要建立索引。</li>
+</ol>
+<h3 id="创建索引的三种方式，删除索引"><a href="#创建索引的三种方式，删除索引" class="headerlink" title="创建索引的三种方式，删除索引"></a>创建索引的三种方式，删除索引</h3><h4 id="第一种方式：在执行CREATE-TABLE时创建索引"><a href="#第一种方式：在执行CREATE-TABLE时创建索引" class="headerlink" title="第一种方式：在执行CREATE TABLE时创建索引"></a>第一种方式：在执行CREATE TABLE时创建索引</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE user_index2 (</span><br><span class="line">    id INT auto_increment PRIMARY KEY,</span><br><span class="line">    first_name VARCHAR (16),</span><br><span class="line">    last_name VARCHAR (16),</span><br><span class="line">    id_card VARCHAR (18),</span><br><span class="line">    information text,</span><br><span class="line">    KEY name (first_name, last_name),</span><br><span class="line">    FULLTEXT KEY (information),</span><br><span class="line">    UNIQUE KEY (id_card)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二种方式：使用ALTER-TABLE命令去增加索引"><a href="#第二种方式：使用ALTER-TABLE命令去增加索引" class="headerlink" title="第二种方式：使用ALTER TABLE命令去增加索引"></a>第二种方式：使用ALTER TABLE命令去增加索引</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ALTER TABLE table_name ADD INDEX index_name (column_list);</span><br></pre></td></tr></table></figure>
+
+<h4 id="第三种方式：使用CREATE-INDEX命令创建"><a href="#第三种方式：使用CREATE-INDEX命令创建" class="headerlink" title="第三种方式：使用CREATE INDEX命令创建"></a>第三种方式：使用CREATE INDEX命令创建</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE INDEX index_name ON table_name (column_list);</span><br></pre></td></tr></table></figure>
+
+<h4 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">alter table user_index drop KEY name;</span><br><span class="line">alter table user_index drop KEY id_card;</span><br><span class="line">alter table user_index drop KEY information;</span><br></pre></td></tr></table></figure>
+
+<h3 id="百万级别或以上的数据如何删除"><a href="#百万级别或以上的数据如何删除" class="headerlink" title="百万级别或以上的数据如何删除"></a>百万级别或以上的数据如何删除</h3><p>关于索引：由于索引需要额外的维护成本，因为索引文件是单独存在的文件,所以当我们对数据的增加,修改,删除,都会产生额外的对索引文件的操作,这些操作需要消耗额外的IO,会降低增/改/删的执行效率。所以，在我们删除数据库百万级别数据的时候，查询MySQL官方手册得知删除数据的速度和创建的索引数量是成正比的。</p>
+<ul>
+<li>所以我们想要删除百万数据的时候可以先删除索引（此时大概耗时三分多钟）</li>
+<li>然后删除其中无用数据（此过程需要不到两分钟）</li>
+<li>删除完成后重新创建索引(此时数据较少了)创建索引也非常快，约十分钟左右。</li>
+<li>与之前的直接删除绝对是要快速很多，更别说万一删除中断,一切删除会回滚。那更是坑了。</li>
+</ul>
+<h3 id="前缀索引"><a href="#前缀索引" class="headerlink" title="前缀索引"></a>前缀索引</h3><ul>
+<li>语法：index(field(10))，使用字段值的前10个字符建立索引，默认是使用字段的全部内容建立索引。</li>
+<li>前提：前缀的标识度高。比如密码就适合建立前缀索引，因为密码几乎各不相同。</li>
+<li>实操的难度：在于前缀截取的长度。</li>
+<li>我们可以利用select count(*)/count(distinct left(password,prefixLen));，通过从调整prefixLen的值（从1自增）查看不同前缀长度的一个平均匹配度，接近1时就可以了（表示一个密码的前prefixLen个字符几乎能确定唯一一条记录）</li>
+</ul>
+<h3 id="什么是最左前缀原则？什么是最左匹配原则"><a href="#什么是最左前缀原则？什么是最左匹配原则" class="headerlink" title="什么是最左前缀原则？什么是最左匹配原则"></a>什么是最左前缀原则？什么是最左匹配原则</h3><ul>
+<li>顾名思义，就是最左优先，在创建多列索引时，要根据业务需求，where子句中使用最频繁的一列放在最左边。</li>
+<li>最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(&gt;、&lt;、between、like)就停止匹配，比如a = 1 and b = 2 and c &gt; 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整。</li>
+<li>=和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式</li>
+</ul>
+<h3 id="B树和B-树的区别"><a href="#B树和B-树的区别" class="headerlink" title="B树和B+树的区别"></a>B树和B+树的区别</h3><h4 id="使用B树的好处"><a href="#使用B树的好处" class="headerlink" title="使用B树的好处"></a>使用B树的好处</h4><p>B树可以在内部节点同时存储键和值，因此，把频繁访问的数据放在靠近根节点的地方将会大大提高热点数据的查询效率。这种特性使得B树在特定数据重复多次查询的场景中更加高效。</p>
+<h4 id="使用B-树的好处"><a href="#使用B-树的好处" class="headerlink" title="使用B+树的好处"></a>使用B+树的好处</h4><p>由于B+树的内部节点只存放键，不存放值，因此，一次读取，可以在内存页中获取更多的键，有利于更快地缩小查找范围。 B+树的叶节点由一条链相连，因此，当需要进行一次全数据遍历的时候，B+树只需要使用O(logN)时间找到最小的一个节点，然后通过链进行O(N)的顺序遍历即可。而B树则需要对树的每一层进行遍历，这会需要更多的内存置换次数，因此也就需要花费更多的时间</p>
+<h4 id="数据库为什么使用B-树而不是B树"><a href="#数据库为什么使用B-树而不是B树" class="headerlink" title="数据库为什么使用B+树而不是B树"></a>数据库为什么使用B+树而不是B树</h4><ul>
+<li>B树只适合随机检索，而B+树同时支持随机检索和顺序检索；</li>
+<li>B+树空间利用率更高，可减少I/O次数，磁盘读写代价更低。一般来说，索引本身也很大，不可能全部存储在内存中，因此索引往往以索引文件的形式存储的磁盘上。这样的话，索引查找过程中就要产生磁盘I/O消耗。B+树的内部结点并没有指向关键字具体信息的指针，只是作为索引使用，其内部结点比B树小，盘块能容纳的结点中关键字数量更多，一次性读入内存中可以查找的关键字也就越多，相对的，IO读写次数也就降低了。而IO读写次数是影响索引检索效率的最大因素；</li>
+<li>B+树的查询效率更加稳定。B树搜索有可能会在非叶子结点结束，越靠近根节点的记录查找时间越短，只要找到关键字即可确定记录的存在，其性能等价于在关键字全集内做一次二分查找。而在B+树中，顺序检索比较明显，随机检索时，任何关键字的查找都必须走一条从根节点到叶节点的路，所有关键字的查找路径长度相同，导致每一个关键字的查询效率相当。</li>
+<li>B-树在提高了磁盘IO性能的同时并没有解决元素遍历的效率低下的问题。B+树的叶子节点使用指针顺序连接在一起，只要遍历叶子节点就可以实现整棵树的遍历。而且在数据库中基于范围的查询是非常频繁的，而B树不支持这样的操作。</li>
+<li>增删文件（节点）时，效率更高。因为B+树的叶子节点包含所有关键字，并以有序的链表结构存储，这样可很好提高增删效率。</li>
+</ul>
+<h3 id="什么是聚簇索引？何时使用聚簇索引与非聚簇索引"><a href="#什么是聚簇索引？何时使用聚簇索引与非聚簇索引" class="headerlink" title="什么是聚簇索引？何时使用聚簇索引与非聚簇索引"></a>什么是聚簇索引？何时使用聚簇索引与非聚簇索引</h3><ul>
+<li>聚簇索引：将数据存储与索引放到了一块，找到索引也就找到了数据</li>
+<li>非聚簇索引：将数据存储于索引分开结构，索引结构的叶子节点指向了数据的对应行，myisam通过key_buffer把索引先缓存到内存中，当需要访问数据时（通过索引访问数据），在内存中直接搜索索引，然后通过索引找到磁盘相应数据，这也就是为什么索引不在key buffer命中时，速度慢的原因</li>
+</ul>
+<h3 id="非聚簇索引一定会回表查询吗"><a href="#非聚簇索引一定会回表查询吗" class="headerlink" title="非聚簇索引一定会回表查询吗"></a>非聚簇索引一定会回表查询吗</h3><p>不一定，这涉及到查询语句所要求的字段是否全部命中了索引，如果全部命中了索引，那么就不必再进行回表查询。</p>
+<h3 id="联合索引是什么？为什么需要注意联合索引中的顺序"><a href="#联合索引是什么？为什么需要注意联合索引中的顺序" class="headerlink" title="联合索引是什么？为什么需要注意联合索引中的顺序"></a>联合索引是什么？为什么需要注意联合索引中的顺序</h3><p>MySQL可以使用多个字段同时建立一个索引，叫做联合索引。在联合索引中，如果想要命中索引，需要按照建立索引时的字段顺序挨个使用，否则无法命中索引。</p>
+<p>具体原因为:</p>
+<ul>
+<li>MySQL使用索引时需要索引有序，假设现在建立了”name，age，school”的联合索引，那么索引的排序为: 先按照name排序，如果name相同，则按照age排序，如果age的值也相等，则按照school进行排序。</li>
+<li>当进行查询时，此时索引仅仅按照name严格有序，因此必须首先使用name字段进行等值查询，之后对于匹配到的列而言，其按照age字段严格有序，此时可以使用age字段用做索引查找，以此类推。因此在建立联合索引的时候应该注意索引列的顺序，一般情况下，将查询需求频繁或者字段选择性高的列放在前面。此外可以根据特例的查询或者表结构进行单独的调整。</li>
+</ul>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><h3 id="什么是数据库事务"><a href="#什么是数据库事务" class="headerlink" title="什么是数据库事务"></a>什么是数据库事务</h3><p>事务是一个不可分割的数据库操作序列，也是数据库并发控制的基本单位，其执行的结果必须使数据库从一种一致性状态变到另一种一致性状态。事务是逻辑上的一组操作，要么都执行，要么都不执行。</p>
+<p>事务最经典也经常被拿出来说例子就是转账了。</p>
+<h3 id="事物的四大特性-ACID-介绍一下"><a href="#事物的四大特性-ACID-介绍一下" class="headerlink" title="事物的四大特性(ACID)介绍一下"></a>事物的四大特性(ACID)介绍一下</h3><ul>
+<li>原子性： 事务是最小的执行单位，不允许分割。事务的原子性确保动作要么全部完成，要么完全不起作用；</li>
+<li>一致性： 执行事务前后，数据保持一致，多个事务对同一个数据读取的结果是相同的；</li>
+<li>隔离性： 并发访问数据库时，一个用户的事务不被其他事务所干扰，各并发事务之间数据库是独立的；</li>
+<li>持久性： 一个事务被提交之后。它对数据库中数据的改变是持久的，即使数据库发生故障也不应该对其有任何影响。</li>
+</ul>
+<h3 id="什么是脏读？幻读？不可重复读"><a href="#什么是脏读？幻读？不可重复读" class="headerlink" title="什么是脏读？幻读？不可重复读"></a>什么是脏读？幻读？不可重复读</h3><ul>
+<li>脏读(Drity Read)：某个事务已更新一份数据，另一个事务在此时读取了同一份数据，由于某些原因，前一个RollBack了操作，则后一个事务所读取的数据就会是不正确的。</li>
+<li>不可重复读(Non-repeatable read):在一个事务的两次查询之中数据不一致，这可能是两次查询过程中间插入了一个事务更新的原有的数据。</li>
+<li>幻读(Phantom Read):在一个事务的两次查询中数据笔数不一致，例如有一个事务查询了几列(Row)数据，而另一个事务却在此时插入了新的几列数据，先前的事务在接下来的查询中，就会发现有几列数据是它先前所没有的。</li>
+</ul>
+<h3 id="什么是事务的隔离级别？MySQL的默认隔离级别是什么"><a href="#什么是事务的隔离级别？MySQL的默认隔离级别是什么" class="headerlink" title="什么是事务的隔离级别？MySQL的默认隔离级别是什么"></a>什么是事务的隔离级别？MySQL的默认隔离级别是什么</h3><p>为了达到事务的四大特性，数据库定义了4种不同的事务隔离级别，由低到高依次为Read uncommitted、Read committed、Repeatable read、Serializable，这四个级别可以逐个解决脏读、不可重复读、幻读这几类问题。</p>
+<ul>
+<li>READ-UNCOMMITTED(读取未提交)： 最低的隔离级别，允许读取尚未提交的数据变更，可能会导致脏读、幻读或不可重复读。</li>
+<li>READ-COMMITTED(读取已提交)： 允许读取并发事务已经提交的数据，可以阻止脏读，但是幻读或不可重复读仍有可能发生。</li>
+<li>REPEATABLE-READ(可重复读)： 对同一字段的多次读取结果都是一致的，除非数据是被本身事务自己所修改，可以阻止脏读和不可重复读，但幻读仍有可能发生。</li>
+<li>SERIALIZABLE(可串行化)： 最高的隔离级别，完全服从ACID的隔离级别。所有的事务依次逐个执行，这样事务之间就完全不可能产生干扰，也就是说，该级别可以防止脏读、不可重复读以及幻读。</li>
+</ul>
+<h2 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h2><h3 id="隔离级别与锁的关系"><a href="#隔离级别与锁的关系" class="headerlink" title="隔离级别与锁的关系"></a>隔离级别与锁的关系</h3><ul>
+<li>在Read Uncommitted级别下，读取数据不需要加共享锁，这样就不会跟被修改的数据上的排他锁冲突</li>
+<li>在Read Committed级别下，读操作需要加共享锁，但是在语句执行完以后释放共享锁；</li>
+<li>在Repeatable Read级别下，读操作需要加共享锁，但是在事务提交之前并不释放共享锁，也就是必须等待事务执行完毕以后才释放共享锁。</li>
+<li>SERIALIZABLE 是限制性最强的隔离级别，因为该级别锁定整个范围的键，并一直持有锁，直到事务完成。</li>
+</ul>
+<h3 id="按照锁的粒度分数据库锁有哪些？锁机制与InnoDB锁算法"><a href="#按照锁的粒度分数据库锁有哪些？锁机制与InnoDB锁算法" class="headerlink" title="按照锁的粒度分数据库锁有哪些？锁机制与InnoDB锁算法"></a>按照锁的粒度分数据库锁有哪些？锁机制与InnoDB锁算法</h3><p>在关系型数据库中，可以按照锁的粒度把数据库锁分为行级锁(INNODB引擎)、表级锁(MYISAM引擎)和页级锁(BDB引擎 )。</p>
+<p>MyISAM和InnoDB存储引擎使用的锁：</p>
+<ul>
+<li>MyISAM采用表级锁(table-level locking)。</li>
+<li>InnoDB支持行级锁(row-level locking)和表级锁，默认为行级锁</li>
+</ul>
+<p>行级锁，表级锁和页级锁对比</p>
+<ul>
+<li>行级锁 行级锁是Mysql中锁定粒度最细的一种锁，表示只针对当前操作的行进行加锁。行级锁能大大减少数据库操作的冲突。其加锁粒度最小，但加锁的开销也最大。行级锁分为共享锁 和 排他锁。<ul>
+<li>特点：开销大，加锁慢；会出现死锁；锁定粒度最小，发生锁冲突的概率最低，并发度也最高。</li>
+</ul>
+</li>
+<li>表级锁 表级锁是MySQL中锁定粒度最大的一种锁，表示对当前操作的整张表加锁，它实现简单，资源消耗较少，被大部分MySQL引擎支持。最常使用的MYISAM与INNODB都支持表级锁定。表级锁定分为表共享读锁（共享锁）与表独占写锁（排他锁）。<ul>
+<li>特点：开销小，加锁快；不会出现死锁；锁定粒度大，发出锁冲突的概率最高，并发度最低。</li>
+</ul>
+</li>
+<li>页级锁 页级锁是MySQL中锁定粒度介于行级锁和表级锁中间的一种锁。表级锁速度快，但冲突多，行级冲突少，但速度慢。所以取了折衷的页级，一次锁定相邻的一组记录。<ul>
+<li>特点：开销和加锁时间界于表锁和行锁之间；会出现死锁；锁定粒度界于表锁和行锁之间，并发度一般</li>
+</ul>
+</li>
+</ul>
+<h3 id="从锁的类别上分MySQL都有哪些锁呢？像上面那样子进行锁定岂不是有点阻碍并发效率了"><a href="#从锁的类别上分MySQL都有哪些锁呢？像上面那样子进行锁定岂不是有点阻碍并发效率了" class="headerlink" title="从锁的类别上分MySQL都有哪些锁呢？像上面那样子进行锁定岂不是有点阻碍并发效率了"></a>从锁的类别上分MySQL都有哪些锁呢？像上面那样子进行锁定岂不是有点阻碍并发效率了</h3><p>从锁的类别上来讲，有共享锁和排他锁。</p>
+<ul>
+<li>共享锁: 又叫做读锁。 当用户要进行数据的读取时，对数据加上共享锁。共享锁可以同时加上多个。</li>
+<li>排他锁: 又叫做写锁。 当用户要进行数据的写入时，对数据加上排他锁。排他锁只可以加一个，他和其他的排他锁，共享锁都相斥。</li>
+</ul>
+<h3 id="MySQL中InnoDB引擎的行锁是怎么实现的"><a href="#MySQL中InnoDB引擎的行锁是怎么实现的" class="headerlink" title="MySQL中InnoDB引擎的行锁是怎么实现的"></a>MySQL中InnoDB引擎的行锁是怎么实现的</h3><ul>
+<li>答：InnoDB是基于索引来完成行锁</li>
+<li>例: select * from tab_with_index where id = 1 for update;</li>
+<li>for update 可以根据条件来完成行锁锁定，并且 id 是有索引键的列，如果 id 不是索引键那么InnoDB将完成表锁，并发将无从谈起</li>
+</ul>
+<h3 id="InnoDB存储引擎的锁的算法有三种"><a href="#InnoDB存储引擎的锁的算法有三种" class="headerlink" title="InnoDB存储引擎的锁的算法有三种"></a>InnoDB存储引擎的锁的算法有三种</h3><p>Record lock：单个行记录上的锁<br>Gap lock：间隙锁，锁定一个范围，不包括记录本身<br>Next-key lock：record+gap 锁定一个范围，包含记录本身</p>
+<p>相关知识点：</p>
+<ul>
+<li>innodb对于行的查询使用next-key lock</li>
+<li>Next-locking keying为了解决Phantom Problem幻读问题</li>
+<li>当查询的索引含有唯一属性时，将next-key lock降级为record key</li>
+<li>Gap锁设计的目的是为了阻止多个事务将记录插入到同一范围内，而这会导致幻读问题的产生</li>
+<li>有两种方式显式关闭gap锁：（除了外键约束和唯一性检查外，其余情况仅使用record lock） A. 将事务隔离级别设置为RC B. 将参数innodb_locks_unsafe_for_binlog设置为1</li>
+</ul>
+<h3 id="什么是死锁？怎么解决"><a href="#什么是死锁？怎么解决" class="headerlink" title="什么是死锁？怎么解决"></a>什么是死锁？怎么解决</h3><p>死锁是指两个或多个事务在同一资源上相互占用，并请求锁定对方的资源，从而导致恶性循环的现象。</p>
+<p>常见的解决死锁的方法</p>
+<ol>
+<li>如果不同程序会并发存取多个表，尽量约定以相同的顺序访问表，可以大大降低死锁机会。</li>
+<li>在同一个事务中，尽可能做到一次锁定所需要的所有资源，减少死锁产生概率；</li>
+<li>对于非常容易产生死锁的业务部分，可以尝试使用升级锁定颗粒度，通过表级锁定来减少死锁产生的概率；</li>
+<li>如果业务处理不好可以用分布式事务锁或者使用乐观锁</li>
+</ol>
+<h3 id="数据库的乐观锁和悲观锁是什么？怎么实现的"><a href="#数据库的乐观锁和悲观锁是什么？怎么实现的" class="headerlink" title="数据库的乐观锁和悲观锁是什么？怎么实现的"></a>数据库的乐观锁和悲观锁是什么？怎么实现的</h3><p>数据库管理系统（DBMS）中的并发控制的任务是确保在多个事务同时存取数据库中同一数据时不破坏事务的隔离性和统一性以及数据库的统一性。乐观并发控制（乐观锁）和悲观并发控制（悲观锁）是并发控制主要采用的技术手段。</p>
+<ul>
+<li>悲观锁：假定会发生并发冲突，屏蔽一切可能违反数据完整性的操作。在查询完数据的时候就把事务锁起来，直到提交事务。实现方式：使用数据库中的锁机制</li>
+<li>乐观锁：假设不会发生并发冲突，只在提交操作时检查是否违反数据完整性。在修改数据的时候把事务锁起来，通过version的方式来进行锁定。实现方式：乐一般会使用版本号机制或CAS算法实现。</li>
+</ul>
+<p>两种锁的使用场景</p>
+<ul>
+<li>从上面对两种锁的介绍，我们知道两种锁各有优缺点，不可认为一种好于另一种，像乐观锁适用于写比较少的情况下（多读场景），即冲突真的很少发生的时候，这样可以省去了锁的开销，加大了系统的整个吞吐量。</li>
+<li>但如果是多写的情况，一般会经常产生冲突，这就会导致上层应用会不断的进行retry，这样反倒是降低了性能，所以一般多写的场景下用悲观锁就比较合适。</li>
+</ul>
+<h2 id="常用SQL语句"><a href="#常用SQL语句" class="headerlink" title="常用SQL语句"></a>常用SQL语句</h2><h3 id="超键、候选键、主键、外键分别是什么"><a href="#超键、候选键、主键、外键分别是什么" class="headerlink" title="超键、候选键、主键、外键分别是什么"></a>超键、候选键、主键、外键分别是什么</h3><ul>
+<li>超键：在关系中能唯一标识元组的属性集称为关系模式的超键。一个属性可以为作为一个超键，多个属性组合在一起也可以作为一个超键。超键包含候选键和主键。</li>
+<li>候选键：是最小超键，即没有冗余元素的超键。</li>
+<li>主键：数据库表中对储存数据对象予以唯一和完整标识的数据列或属性的组合。一个数据列只能有一个主键，且主键的取值不能缺失，即不能为空值（Null）。</li>
+<li>外键：在一个表中存在的另一个表的主键称此表的外键。</li>
+</ul>
+<h3 id="SQL-约束有哪几种"><a href="#SQL-约束有哪几种" class="headerlink" title="SQL 约束有哪几种"></a>SQL 约束有哪几种</h3><ul>
+<li>NOT NULL: 用于控制字段的内容一定不能为空（NULL）。</li>
+<li>UNIQUE: 控件字段内容不能重复，一个表允许有多个 Unique 约束。</li>
+<li>PRIMARY KEY: 也是用于控件字段内容不能重复，但它在一个表只允许出现一个。</li>
+<li>FOREIGN KEY: 用于预防破坏表之间连接的动作，也能防止非法数据插入外键列，因为它必须是它指向的那个表中的值之一。</li>
+<li>CHECK: 用于控制字段的值范围。</li>
+</ul>
+<h3 id="六种关联查询"><a href="#六种关联查询" class="headerlink" title="六种关联查询"></a>六种关联查询</h3><ul>
+<li>交叉连接（CROSS JOIN）<ul>
+<li>select r.<em>,s.</em> from r,s 笛卡尔积</li>
+</ul>
+</li>
+<li>内连接（INNER JOIN）<ul>
+<li>等值连接：ON A.id=B.id</li>
+<li>不等值连接：ON A.id &gt; B.id</li>
+<li>自连接：SELECT * FROM A T1 INNER JOIN A T2 ON T1.id=T2.pid</li>
+<li>select r.<em>,s.</em> from r inner join s on r.c=s.c</li>
+</ul>
+</li>
+<li>外连接（LEFT JOIN/RIGHT JOIN）<ul>
+<li>左外连接：LEFT OUTER JOIN, 以左表为主，先查询出左表，按照ON后的关联条件匹配右表，没有匹配到的用NULL填充，可以简写成LEFT JOIN</li>
+<li>右外连接：RIGHT OUTER JOIN, 以右表为主，先查询出右表，按照ON后的关联条件匹配左表，没有匹配到的用NULL填充，可以简写成RIGHT JOIN</li>
+</ul>
+</li>
+<li>联合查询（UNION与UNION ALL）<ul>
+<li>就是把多个结果集集中在一起，UNION前的结果为基准，需要注意的是联合查询的列数要相等，相同的记录行会合并</li>
+<li>如果使用UNION ALL，不会合并重复的记录行</li>
+<li>效率 UNION 高于 UNION ALL</li>
+</ul>
+</li>
+<li>全连接（FULL JOIN）</li>
+<li>交叉连接（CROSS JOIN）</li>
+</ul>
+<h3 id="mysql中-in-和-exists-区别"><a href="#mysql中-in-和-exists-区别" class="headerlink" title="mysql中 in 和 exists 区别"></a>mysql中 in 和 exists 区别</h3><p>mysql中的in语句是把外表和内表作hash 连接，而exists语句是对外表作loop循环，每次loop循环再对内表进行查询。一直大家都认为exists比in语句的效率要高，这种说法其实是不准确的。这个是要区分环境的。</p>
+<ul>
+<li>如果查询的两个表大小相当，那么用in和exists差别不大。</li>
+<li>如果两个表中一个较小，一个是大表，则子查询表大的用exists，子查询表小的用in。</li>
+<li>not in 和not exists：如果查询语句使用了not in，那么内外表都进行全表扫描，没有用到索引；而not extsts的子查询依然能用到表上的索引。所以无论那个表大，用not exists都比not in要快</li>
+</ul>
+<h3 id="varchar与char的区别"><a href="#varchar与char的区别" class="headerlink" title="varchar与char的区别"></a>varchar与char的区别</h3><p>char的特点</p>
+<ul>
+<li>char表示定长字符串，长度是固定的；</li>
+<li>如果插入数据的长度小于char的固定长度时，则用空格填充；</li>
+<li>因为长度固定，所以存取速度要比varchar快很多，甚至能快50%，但正因为其长度固定，所以会占据多余的空间，是空间换时间的做法；</li>
+<li>对于char来说，最多能存放的字符个数为255，和编码无关</li>
+</ul>
+<p>varchar的特点</p>
+<ul>
+<li>varchar表示可变长字符串，长度是可变的；</li>
+<li>插入的数据是多长，就按照多长来存储；</li>
+<li>varchar在存取方面与char相反，它存取慢，因为长度不固定，但正因如此，不占据多余的空间，是时间换空间的做法；</li>
+<li>对于varchar来说，最多能存放的字符个数为65532</li>
+</ul>
+<p>总之，结合性能角度（char更快）和节省磁盘空间角度（varchar更小），具体情况还需具体来设计数据库才是妥当的做法</p>
+<h3 id="mysql中int-10-和char-10-以及varchar-10-的区别"><a href="#mysql中int-10-和char-10-以及varchar-10-的区别" class="headerlink" title="mysql中int(10)和char(10)以及varchar(10)的区别"></a>mysql中int(10)和char(10)以及varchar(10)的区别</h3><ul>
+<li>int(10)的10表示显示的数据的长度，不是存储数据的大小；chart(10)和varchar(10)的10表示存储数据的大小，即表示存储多少个字符。<ul>
+<li>int(10) 10位的数据长度 9999999999，占32个字节，int型4位</li>
+<li>char(10) 10位固定字符串，不足补空格 最多10个字符</li>
+<li>varchar(10) 10位可变字符串，不足补空格 最多10个字符</li>
+</ul>
+</li>
+<li>char(10)表示存储定长的10个字符，不足10个就用空格补齐，占用更多的存储空间</li>
+<li>varchar(10)表示存储10个变长的字符，存储多少个就是多少个，空格也按一个字符存储，这一点是和char(10)的空格不同的，char(10)的空格表示占位不算一个字符</li>
+</ul>
+<h3 id="FLOAT和DOUBLE的区别是什么"><a href="#FLOAT和DOUBLE的区别是什么" class="headerlink" title="FLOAT和DOUBLE的区别是什么"></a>FLOAT和DOUBLE的区别是什么</h3><ul>
+<li>FLOAT类型数据可以存储至多8位十进制数，并在内存中占4字节。</li>
+<li>DOUBLE类型数据可以存储至多18位十进制数，并在内存中占8字节。</li>
+</ul>
+<h3 id="drop、delete与truncate的区别"><a href="#drop、delete与truncate的区别" class="headerlink" title="drop、delete与truncate的区别"></a>drop、delete与truncate的区别</h3><table>
+<thead>
+<tr>
+<th></th>
+<th>Delete</th>
+<th>Truncate</th>
+<th>Drop</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>类型</td>
+<td>属于DML</td>
+<td>属于DDL</td>
+<td>属于DDL</td>
+</tr>
+<tr>
+<td>回滚</td>
+<td>可回滚</td>
+<td>不可回滚</td>
+<td>不可回滚</td>
+</tr>
+<tr>
+<td>删除内容</td>
+<td>表结构还在，删除表的全部或者一部分数据行</td>
+<td>表结构还在，删除表中的所有数据</td>
+<td>从数据库中删除表，所有的数据行，索引和权限也会被删除</td>
+</tr>
+<tr>
+<td>删除速度</td>
+<td>删除速度慢，需要逐行删除</td>
+<td>删除速度快</td>
+<td>删除速度最快</td>
+</tr>
+</tbody></table>
+<p>因此，在不再需要一张表的时候，用drop；在想删除部分数据行时候，用delete；在保留表而删除所有数据的时候用truncate。</p>
+<h2 id="SQL优化"><a href="#SQL优化" class="headerlink" title="SQL优化"></a>SQL优化</h2><h3 id="如何定位及优化SQL语句的性能问题？创建的索引有没有被使用到-或者说怎么才可以知道这条语句运行很慢的原因"><a href="#如何定位及优化SQL语句的性能问题？创建的索引有没有被使用到-或者说怎么才可以知道这条语句运行很慢的原因" class="headerlink" title="如何定位及优化SQL语句的性能问题？创建的索引有没有被使用到?或者说怎么才可以知道这条语句运行很慢的原因"></a>如何定位及优化SQL语句的性能问题？创建的索引有没有被使用到?或者说怎么才可以知道这条语句运行很慢的原因</h3><p>MySQL提供了explain命令来查看语句的执行计划。</p>
+<p>执行计划包含的信息 id 有一组数字组成。表示一个查询中各个子查询的执行顺序;</p>
+<ul>
+<li>id相同执行顺序由上至下。</li>
+<li>id不同，id值越大优先级越高，越先被执行。</li>
+<li>id为null时表示一个结果集，不需要使用它查询，常出现在包含union等查询语句中。</li>
+</ul>
+<p>select_type 每个子查询的查询类型，一些常见的查询类型。</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>select_type</th>
+<th>description</th>
+<th>Drop</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>SIMPLE</td>
+<td>不包含任何子查询或union等查询</td>
+<td>属于DDL</td>
+</tr>
+<tr>
+<td>2</td>
+<td>PRIMARY</td>
+<td>包含子查询最外层查询就显示为 PRIMARY</td>
+<td>不可回滚</td>
+</tr>
+<tr>
+<td>3</td>
+<td>SUBQUERY</td>
+<td>在select或 where字句中包含的查询</td>
+<td>从数据库中删除表，所有的数据行，索引和权限也会被删除</td>
+</tr>
+<tr>
+<td>4</td>
+<td>DERIVED</td>
+<td>from字句中包含的查询</td>
+<td>删除速度最快</td>
+</tr>
+<tr>
+<td>5</td>
+<td>UNION</td>
+<td>出现在union后的查询语句中</td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td>UNION RESULT</td>
+<td>从UNION中获取结果集，例如上文的第三个例子</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>type(非常重要，可以看到有没有走索引) 访问类型</p>
+<ul>
+<li>ALL 扫描全表数据</li>
+<li>index 遍历索引</li>
+<li>range 索引范围查找</li>
+<li>index_subquery 在子查询中使用 ref</li>
+<li>unique_subquery 在子查询中使用 eq_ref</li>
+<li>ref_or_null 对Null进行索引的优化的 ref</li>
+<li>fulltext 使用全文索引</li>
+<li>ref 使用非唯一索引查找数据</li>
+<li>eq_ref 在join查询中使用PRIMARY KEYorUNIQUE NOT NULL索引关联。</li>
+</ul>
+<p>possible_keys 可能使用的索引，注意不一定会使用。查询涉及到的字段上若存在索引，则该索引将被列出来。当该列为 NULL时就要考虑当前的SQL是否需要优化了。</p>
+<p>key 显示MySQL在查询中实际使用的索引，若没有使用索引，显示为NULL。</p>
+<p>TIPS:查询中若使用了覆盖索引(覆盖索引：索引的数据覆盖了需要查询的所有数据)，则该索引仅出现在key列表中</p>
+<p>key_length 索引长度</p>
+<p>ref 表示上述表的连接匹配条件，即哪些列或常量被用于查找索引列上的值</p>
+<p>rows 返回估算的结果集数目，并不是一个准确的值。</p>
+<p>extra 的信息非常丰富，常见的有：</p>
+<ul>
+<li>Using index 使用覆盖索引</li>
+<li>Using where 使用了用where子句来过滤结果集</li>
+<li>Using filesort 使用文件排序，使用非索引列进行排序时出现，非常消耗性能，尽量优化。</li>
+<li>Using temporary 使用了临时表 sql优化的目标可以参考阿里开发手册</li>
+</ul>
+<h3 id="大表数据查询，怎么优化"><a href="#大表数据查询，怎么优化" class="headerlink" title="大表数据查询，怎么优化"></a>大表数据查询，怎么优化</h3><ul>
+<li>优化shema、sql语句+索引；</li>
+<li>第二加缓存，memcached, redis；</li>
+<li>主从复制，读写分离；</li>
+<li>垂直拆分，根据你模块的耦合度，将一个大的系统分为多个小的系统，也就是分布式系统；</li>
+<li>水平切分，针对数据量大的表，这一步最麻烦，最能考验技术水平，要选择一个合理的sharding key, 为了有好的查询效率，表结构也要改动，做一定的冗余，应用也要改，sql中尽量带sharding key，将数据定位到限定的表上去查，而不是扫描全部的表；</li>
+</ul>
+<h3 id="慢查询日志"><a href="#慢查询日志" class="headerlink" title="慢查询日志"></a>慢查询日志</h3><p>于记录执行时间超过某个临界值的SQL日志，用于快速定位慢查询，为我们的优化做参考。</p>
+<p>开启慢查询日志</p>
+<p>配置项：slow_query_log</p>
+<p>可以使用show variables like ‘slov_query_log’查看是否开启，如果状态值为OFF，可以使用set GLOBAL slow_query_log = on来开启，它会在datadir下产生一个xxx-slow.log的文件。</p>
+<p>设置临界时间</p>
+<p>配置项：long_query_time</p>
+<p>查看：show VARIABLES like ‘long_query_time’，单位秒</p>
+<p>设置：set long_query_time=0.5</p>
+<p>实操时应该从长时间设置到短的时间，即将最慢的SQL优化掉</p>
+<p>查看日志，一旦SQL超过了我们设置的临界时间就会被记录到xxx-slow.log中</p>
+<h3 id="为什么要尽量设定一个主键"><a href="#为什么要尽量设定一个主键" class="headerlink" title="为什么要尽量设定一个主键"></a>为什么要尽量设定一个主键</h3><p>主键是数据库确保数据行在整张表唯一性的保障，即使业务上本张表没有主键，也建议添加一个自增长的ID列作为主键。设定了主键之后，在后续的删改查的时候可能更加快速以及确保操作数据范围安全。</p>
+<h3 id="主键使用自增ID还是UUID"><a href="#主键使用自增ID还是UUID" class="headerlink" title="主键使用自增ID还是UUID"></a>主键使用自增ID还是UUID</h3><p>推荐使用自增ID，不要使用UUID。</p>
+<p>因为在InnoDB存储引擎中，主键索引是作为聚簇索引存在的，也就是说，主键索引的B+树叶子节点上存储了主键索引以及全部的数据(按照顺序)，如果主键索引是自增ID，那么只需要不断向后排列即可，如果是UUID，由于到来的ID与原来的大小不确定，会造成非常多的数据插入，数据移动，然后导致产生很多的内存碎片，进而造成插入性能的下降。</p>
+<p>总之，在数据量大一些的情况下，用自增主键性能会好一些。</p>
+<p>关于主键是聚簇索引，如果没有主键，InnoDB会选择一个唯一键来作为聚簇索引，如果没有唯一键，会生成一个隐式的主键。</p>
+<h3 id="字段为什么要求定义为not-null"><a href="#字段为什么要求定义为not-null" class="headerlink" title="字段为什么要求定义为not null"></a>字段为什么要求定义为not null</h3><p>null值会占用更多的字节，且会在程序中造成很多与预期不符的情况。</p>
+<h3 id="如果要存储用户的密码散列，应该使用什么字段进行存储"><a href="#如果要存储用户的密码散列，应该使用什么字段进行存储" class="headerlink" title="如果要存储用户的密码散列，应该使用什么字段进行存储"></a>如果要存储用户的密码散列，应该使用什么字段进行存储</h3><p>密码散列，盐，用户身份证号等固定长度的字符串应该使用char而不是varchar来存储，这样可以节省空间且提高检索效率。</p>
+<h3 id="优化查询过程中的数据访问"><a href="#优化查询过程中的数据访问" class="headerlink" title="优化查询过程中的数据访问"></a>优化查询过程中的数据访问</h3><ul>
+<li>访问数据太多导致查询性能下降</li>
+<li>确定应用程序是否在检索大量超过需要的数据，可能是太多行或列</li>
+<li>确认MySQL服务器是否在分析大量不必要的数据行</li>
+<li>避免犯如下SQL语句错误</li>
+<li>查询不需要的数据。解决办法：使用limit解决</li>
+<li>多表关联返回全部列。解决办法：指定列名</li>
+<li>总是返回全部列。解决办法：避免使用SELECT *</li>
+<li>重复查询相同的数据。解决办法：可以缓存数据，下次直接读取缓存</li>
+<li>是否在扫描额外的记录。解决办法：</li>
+<li>使用explain进行分析，如果发现查询需要扫描大量的数据，但只返回少数的行，可以通过如下技巧去优化：</li>
+<li>使用索引覆盖扫描，把所有的列都放到索引中，这样存储引擎不需要回表获取对应行就可以返回结果。</li>
+<li>改变数据库和表的结构，修改数据表范式</li>
+<li>重写SQL语句，让优化器可以以更优的方式执行查询。</li>
+</ul>
+<h3 id="优化长难的查询语句"><a href="#优化长难的查询语句" class="headerlink" title="优化长难的查询语句"></a>优化长难的查询语句</h3><ul>
+<li>一个复杂查询还是多个简单查询<ul>
+<li>MySQL内部每秒能扫描内存中上百万行数据，相比之下，响应数据给客户端就要慢得多</li>
+<li>使用尽可能小的查询是好的，但是有时将一个大的查询分解为多个小的查询是很有必要的。</li>
+</ul>
+</li>
+<li>切分查询<ul>
+<li>将一个大的查询分为多个小的相同的查询</li>
+<li>一次性删除1000万的数据要比一次删除1万，暂停一会的方案更加损耗服务器开销。</li>
+</ul>
+</li>
+<li>分解关联查询，让缓存的效率更高。</li>
+<li>执行单个查询可以减少锁的竞争。</li>
+<li>在应用层做关联更容易对数据库进行拆分。查询效率会有大幅提升。</li>
+<li>较少冗余记录的查询。</li>
+</ul>
+<h3 id="优化特定类型的查询语句"><a href="#优化特定类型的查询语句" class="headerlink" title="优化特定类型的查询语句"></a>优化特定类型的查询语句</h3><ul>
+<li>count(*)会忽略所有的列，直接统计所有列数，不要使用count(列名)</li>
+<li>MyISAM中，没有任何where条件的count(*)非常快。</li>
+<li>当有where条件时，MyISAM的count统计不一定比其它引擎快。</li>
+<li>可以使用explain查询近似值，用近似值替代count(*)</li>
+<li>增加汇总表</li>
+<li>使用缓存</li>
+</ul>
+<h3 id="优化关联查询"><a href="#优化关联查询" class="headerlink" title="优化关联查询"></a>优化关联查询</h3><ul>
+<li>确定ON或者USING子句中是否有索引。</li>
+<li>确保GROUP BY和ORDER BY只有一个表中的列，这样MySQL才有可能使用索引</li>
+</ul>
+<h3 id="优化子查询"><a href="#优化子查询" class="headerlink" title="优化子查询"></a>优化子查询</h3><ul>
+<li>用关联查询替代</li>
+<li>优化GROUP BY和DISTINCT</li>
+<li>这两种查询据可以使用索引来优化，是最有效的优化方法</li>
+<li>关联查询中，使用标识列分组的效率更高</li>
+<li>如果不需要ORDER BY，进行GROUP BY时加ORDER BY NULL，MySQL不会再进行文件排序。</li>
+<li>WITH ROLLUP超级聚合，可以挪到应用程序处理</li>
+</ul>
+<h3 id="优化LIMIT分页"><a href="#优化LIMIT分页" class="headerlink" title="优化LIMIT分页"></a>优化LIMIT分页</h3><ul>
+<li>LIMIT偏移量大的时候，查询效率较低</li>
+<li>可以记录上次查询的最大ID，下次查询时直接根据该ID来查询</li>
+</ul>
+<h3 id="优化UNION查询"><a href="#优化UNION查询" class="headerlink" title="优化UNION查询"></a>优化UNION查询</h3><p>UNION ALL的效率高于UNION</p>
+<h3 id="优化WHERE子句"><a href="#优化WHERE子句" class="headerlink" title="优化WHERE子句"></a>优化WHERE子句</h3><p>解题方法</p>
+<p>对于此类考题，先说明如何定位低效SQL语句，然后根据SQL语句可能低效的原因做排查，先从索引着手，如果索引没有问题，考虑以上几个方面，数据访问的问题，长难查询句的问题还是一些特定类型优化的问题，逐一回答。</p>
+<p>SQL语句优化的一些方法</p>
+<ol>
+<li><p>对查询进行优化，应尽量避免全表扫描，首先应考虑在 where 及 order by 涉及的列上建立索引。</p>
+</li>
+<li><p>应尽量避免在 where 子句中对字段进行 null 值判断，否则将导致引擎放弃使用索引而进行全表扫描</p>
+</li>
+<li><p>应尽量避免在 where 子句中使用!=或&lt;&gt;操作符，否则引擎将放弃使用索引而进行全表扫描。</p>
+</li>
+<li><p>应尽量避免在 where 子句中使用or 来连接条件，否则将导致引擎放弃使用索引而进行全表扫描</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select id from t where num=10 or num=20</span><br><span class="line">    -- 可以这样查询：</span><br><span class="line">select id from t where num=10 union all select id from t where num=20</span><br></pre></td></tr></table></figure></li>
+<li><p>in 和 not in 也要慎用，否则会导致全表扫描</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select id from t where num in(1,2,3)</span><br><span class="line">-- 对于连续的数值，能用 between 就不要用 in 了：</span><br><span class="line">select id from t where num between 1 and 3</span><br></pre></td></tr></table></figure></li>
+<li><p>下面的查询也将导致全表扫描：select id from t where name like ‘%李%’若要提高效率，可以考虑全文检索</p>
+</li>
+<li><p>如果在 where 子句中使用参数，也会导致全表扫描。因为SQL只有在运行时才会解析局部变量，但优化程序不能将访问计划的选择推迟到运行时；它必须在编译时进行选择。然 而，如果在编译时建立访问计划，变量的值还是未知的，因而无法作为索引选择的输入项。如下面语句将进行全表扫描：</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select id from t where num=@num</span><br><span class="line">-- 可以改为强制查询使用索引：</span><br><span class="line">select id from t with(index(索引名)) where num=@num</span><br></pre></td></tr></table></figure></li>
+<li><p>应尽量避免在 where 子句中对字段进行表达式操作，这将导致引擎放弃使用索引而进行全表扫描</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select id from t where num/2=100</span><br><span class="line">-- 应改为:</span><br><span class="line">select id from t where num=100*2</span><br></pre></td></tr></table></figure></li>
+<li><p>应尽量避免在where子句中对字段进行函数操作，这将导致引擎放弃使用索引而进行全表扫描</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">select id from t where substring(name,1,3)=’abc’</span><br><span class="line">-- name以abc开头的id应改为:</span><br><span class="line">select id from t where name like ‘abc%’</span><br></pre></td></tr></table></figure></li>
+<li><p>不要在 where 子句中的“=”左边进行函数、算术运算或其他表达式运算，否则系统将可能无法正确使用索引</p>
 </li>
 </ol>
-<h2 id="KMP-算法基本原理"><a href="#KMP-算法基本原理" class="headerlink" title="KMP 算法基本原理"></a>KMP 算法基本原理</h2>
+<h2 id="数据库优化"><a href="#数据库优化" class="headerlink" title="数据库优化"></a>数据库优化</h2><h3 id="为什么要优化"><a href="#为什么要优化" class="headerlink" title="为什么要优化"></a>为什么要优化</h3><ul>
+<li>系统的吞吐量瓶颈往往出现在数据库的访问速度上</li>
+<li>随着应用程序的运行，数据库中的数据会越来越多，处理时间会相应变慢</li>
+<li>数据是存放在磁盘上的，读写速度无法和内存相比</li>
+<li>优化原则：减少系统瓶颈，减少资源占用，增加系统的反应速度。</li>
+</ul>
+<h3 id="数据库结构优化"><a href="#数据库结构优化" class="headerlink" title="数据库结构优化"></a>数据库结构优化</h3><p>一个好的数据库设计方案对于数据库的性能往往会起到事半功倍的效果。</p>
+<p>需要考虑数据冗余、查询和更新的速度、字段的数据类型是否合理等多方面的内容。</p>
+<h4 id="将字段很多的表分解成多个表"><a href="#将字段很多的表分解成多个表" class="headerlink" title="将字段很多的表分解成多个表"></a>将字段很多的表分解成多个表</h4><ul>
+<li>对于字段较多的表，如果有些字段的使用频率很低，可以将这些字段分离出来形成新表。</li>
+<li>因为当一个表的数据量很大时，会由于使用频率低的字段的存在而变慢。</li>
+</ul>
+<h4 id="增加中间表"><a href="#增加中间表" class="headerlink" title="增加中间表"></a>增加中间表</h4><ul>
+<li>对于需要经常联合查询的表，可以建立中间表以提高查询效率。</li>
+<li>通过建立中间表，将需要通过联合查询的数据插入到中间表中，然后将原来的联合查询改为对中间表的查询。</li>
+</ul>
+<h4 id="增加冗余字段"><a href="#增加冗余字段" class="headerlink" title="增加冗余字段"></a>增加冗余字段</h4><ul>
+<li>设计数据表时应尽量遵循范式理论的规约，尽可能的减少冗余字段，让数据库设计看起来精致、优雅。但是，合理的加入冗余字段可以提高查询速度。</li>
+<li>表的规范化程度越高，表和表之间的关系越多，需要连接查询的情况也就越多，性能也就越差。</li>
+<li>冗余字段的值在一个表中修改了，就要想办法在其他表中更新，否则就会导致数据不一致的问题。</li>
+</ul>
+<h3 id="MySQL数据库cpu飙升到500-的话他怎么处理"><a href="#MySQL数据库cpu飙升到500-的话他怎么处理" class="headerlink" title="MySQL数据库cpu飙升到500%的话他怎么处理"></a>MySQL数据库cpu飙升到500%的话他怎么处理</h3><ul>
+<li>当 cpu 飙升到 500%时，先用操作系统命令 top 命令观察是不是 mysqld 占用导致的，如果不是，找出占用高的进程，并进行相关处理。</li>
+<li>如果是 mysqld 造成的， show processlist，看看里面跑的 session 情况，是不是有消耗资源的 sql 在运行。找出消耗高的 sql，看看执行计划是否准确， index 是否缺失，或者实在是数据量太大造成。</li>
+<li>一般来说，肯定要 kill 掉这些线程(同时观察 cpu 使用率是否下降)，等进行相应的调整(比如说加索引、改 sql、改内存参数)之后，再重新跑这些 SQL。</li>
+<li>也有可能是每个 sql 消耗资源并不多，但是突然之间，有大量的 session 连进来导致 cpu 飙升，这种情况就需要跟应用一起来分析为何连接数会激增，再做出相应的调整，比如说限制连接数等</li>
+</ul>
+<h3 id="当MySQL单表记录数过大时，数据库的CRUD性能会明显下降，一些常见的优化措施如下"><a href="#当MySQL单表记录数过大时，数据库的CRUD性能会明显下降，一些常见的优化措施如下" class="headerlink" title="当MySQL单表记录数过大时，数据库的CRUD性能会明显下降，一些常见的优化措施如下"></a>当MySQL单表记录数过大时，数据库的CRUD性能会明显下降，一些常见的优化措施如下</h3><ul>
+<li>限定数据的范围： 务必禁止不带任何限制数据范围条件的查询语句。比如：我们当用户在查询订单历史的时候，我们可以控制在一个月的范围内。；</li>
+<li>读/写分离： 经典的数据库拆分方案，主库负责写，从库负责读；</li>
+<li>缓存： 使用MySQL的缓存，另外对重量级、更新少的数据可以考虑使用应用级别的缓存</li>
+</ul>
+<h3 id="通过分库分表的方式进行优化，主要有垂直分表和水平分表"><a href="#通过分库分表的方式进行优化，主要有垂直分表和水平分表" class="headerlink" title="通过分库分表的方式进行优化，主要有垂直分表和水平分表"></a>通过分库分表的方式进行优化，主要有垂直分表和水平分表</h3><h4 id="垂直拆分"><a href="#垂直拆分" class="headerlink" title="垂直拆分"></a>垂直拆分</h4><p>根据数据库里面数据表的相关性进行拆分。 例如，用户表中既有用户的登录信息又有用户的基本信息，可以将用户表拆分成两个单独的表，甚至放到单独的库做分库。</p>
+<p>简单来说垂直拆分是指数据表列的拆分，把一张列比较多的表拆分为多张表。 如下图所示，这样来说大家应该就更容易理解了。</p>
+<p>垂直拆分的优点： 可以使得行数据变小，在查询时减少读取的Block数，减少I/O次数。此外，垂直分区可以简化表的结构，易于维护。</p>
+<p>垂直拆分的缺点： 主键会出现冗余，需要管理冗余列，并会引起Join操作，可以通过在应用层进行Join来解决。此外，垂直分区会让事务变得更加复杂；</p>
+<h4 id="水平拆分"><a href="#水平拆分" class="headerlink" title="水平拆分"></a>水平拆分</h4><p>保持数据表结构不变，通过某种策略存储数据分片。这样每一片数据分散到不同的表或者库中，达到了分布式的目的。 水平拆分可以支撑非常大的数据量。</p>
+<h3 id="分库分表后面临的问题"><a href="#分库分表后面临的问题" class="headerlink" title="分库分表后面临的问题"></a>分库分表后面临的问题</h3><ul>
+<li>事务支持 分库分表后，就成了分布式事务了。如果依赖数据库本身的分布式事务管理功能去执行事务，将付出高昂的性能代价； 如果由应用程序去协助控制，形成程序逻辑上的事务，又会造成编程方面的负担。</li>
+<li>跨库join</li>
+<li>只要是进行切分，跨节点Join的问题是不可避免的。但是良好的设计和切分却可以减少此类情况的发生。解决这一问题的普遍做法是分两次查询实现。在第一次查询的结果集中找出关联数据的id,根据这些id发起第二次请求得到关联数据。 分库分表方案产品</li>
+<li>跨节点的count,order by,group by以及聚合函数问题 这些是一类问题，因为它们都需要基于全部数据集合进行计算。多数的代理都不会自动处理合并工作。解决方案：与解决跨节点join问题的类似，分别在各个节点上得到结果后在应用程序端进行合并。和join不同的是每个结点的查询可以并行执行，因此很多时候它的速度要比单一大表快很多。但如果结果集很大，对应用程序内存的消耗是一个问题。</li>
+<li>数据迁移，容量规划，扩容等问题 来自淘宝综合业务平台团队，它利用对2的倍数取余具有向前兼容的特性（如对4取余得1的数对2取余也是1）来分配数据，避免了行级别的数据迁移，但是依然需要进行表级别的迁移，同时对扩容规模和分表数量都有限制。总得来说，这些方案都不是十分的理想，多多少少都存在一些缺点，这也从一个侧面反映出了Sharding扩容的难度。</li>
+<li>ID问题</li>
+<li>一旦数据库被切分到多个物理结点上，我们将不能再依赖数据库自身的主键生成机制。一方面，某个分区数据库自生成的ID无法保证在全局上是唯一的；另一方面，应用程序在插入数据之前需要先获得ID,以便进行SQL路由. 一些常见的主键生成策略</li>
+</ul>
+<h3 id="MySQL的复制原理以及流程"><a href="#MySQL的复制原理以及流程" class="headerlink" title="MySQL的复制原理以及流程"></a>MySQL的复制原理以及流程</h3><p>主从复制：将主数据库中的DDL和DML操作通过二进制日志（BINLOG）传输到从数据库上，然后将这些日志重新执行（重做）；从而使得从数据库的数据与主数据库保持一致。</p>
+<h4 id="主从复制的作用"><a href="#主从复制的作用" class="headerlink" title="主从复制的作用"></a>主从复制的作用</h4><ul>
+<li>主数据库出现问题，可以切换到从数据库。</li>
+<li>可以进行数据库层面的读写分离。</li>
+<li>可以在从数据库上进行日常备份</li>
+</ul>
+<h4 id="MySQL主从复制解决的问题"><a href="#MySQL主从复制解决的问题" class="headerlink" title="MySQL主从复制解决的问题"></a>MySQL主从复制解决的问题</h4><ul>
+<li>数据分布：随意开始或停止复制，并在不同地理位置分布数据备份</li>
+<li>负载均衡：降低单个服务器的压力</li>
+<li>高可用和故障切换：帮助应用程序避免单点失败</li>
+<li>升级测试：可以用更高版本的MySQL作为从库</li>
+</ul>
+<h4 id="基本原理流程，3个线程以及之间的关联"><a href="#基本原理流程，3个线程以及之间的关联" class="headerlink" title="基本原理流程，3个线程以及之间的关联"></a>基本原理流程，3个线程以及之间的关联</h4><p>主：binlog线程——记录下所有改变了数据库数据的语句，放进master上的binlog中；</p>
+<p>从：io线程——在使用start slave 之后，负责从master上拉取 binlog 内容，放进自己的relay log中；</p>
+<p>从：sql执行线程——执行relay log中的语句；</p>
+<p>第一步：master在每个事务更新数据完成之前，将该操作记录串行地写入到binlog文件中。</p>
+<p>第二步：salve开启一个I/O Thread，该线程在master打开一个普通连接，主要工作是binlog dump process。如果读取的进度已经跟上了master，就进入睡眠状态并等待master产生新的事件。I/O线程最终的目的是将这些事件写入到中继日志中。</p>
+<p>第三步：SQL Thread会读取中继日志，并顺序执行该日志中的SQL事件，从而与主数据库中的数据保持一致。</p>
+<h3 id="数据表损坏的修复方式有哪些"><a href="#数据表损坏的修复方式有哪些" class="headerlink" title="数据表损坏的修复方式有哪些"></a>数据表损坏的修复方式有哪些</h3><p>使用 myisamchk 来修复，具体步骤：</p>
+<p>1）修复前将mysql服务停止。<br>2）打开命令行方式，然后进入到mysql的/bin目录。<br>3）执行myisamchk –recover 数据库所在路径/*.MYI</p>
+
       
     </div>
 
@@ -541,7 +1399,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/13/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/15/7%E6%95%B0%E6%8D%AE%E4%B8%8D%E4%B8%A2%E5%A4%B1%E4%BF%9D%E8%AF%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -555,7 +1413,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/13/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88/" class="post-title-link" itemprop="url">深度优先广度优先</a>
+            <a href="/2021/06/15/7%E6%95%B0%E6%8D%AE%E4%B8%8D%E4%B8%A2%E5%A4%B1%E4%BF%9D%E8%AF%81/" class="post-title-link" itemprop="url">7数据不丢失保证</a>
         </h2>
 
         <div class="post-meta">
@@ -564,16 +1422,19 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-05-13 07:44:34" itemprop="dateCreated datePublished" datetime="2021-05-13T07:44:34+08:00">2021-05-13</time>
+              <time title="创建时间：2021-06-15 10:40:14 / 修改时间：21:39:48" itemprop="dateCreated datePublished" datetime="2021-06-15T10:40:14+08:00">2021-06-15</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-17 08:12:23" itemprop="dateModified" datetime="2021-05-17T08:12:23+08:00">2021-05-17</time>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
               </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
 
           
 
@@ -586,9 +1447,31 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="BFS"><a href="#BFS" class="headerlink" title="BFS"></a>BFS</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">bfs</span>(<span class="params">root,n</span>):</span></span><br><span class="line">    visited = <span class="built_in">set</span>()</span><br><span class="line">    queue = []</span><br><span class="line">    result = []</span><br><span class="line">    pre = &#123;&#125;</span><br><span class="line">    queue.append(root)</span><br><span class="line">    <span class="keyword">while</span>(queue):</span><br><span class="line">        tmp = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(queue)):</span><br><span class="line">            nod = queue.pop(<span class="number">0</span>)</span><br><span class="line">            visited.add(nod)</span><br><span class="line">            tmp.append(nod)</span><br><span class="line">            nodes = nod.children</span><br><span class="line">            rel_nodes = <span class="built_in">set</span>(nodes).difference(visited)</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> rel_nodes:</span><br><span class="line">                pre[i] = nod</span><br><span class="line">            queue.extend(rel_nodes)</span><br><span class="line">        result.append(tmp)</span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
-
-<h2 id="DFS"><a href="#DFS" class="headerlink" title="DFS"></a>DFS</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">visited = <span class="built_in">set</span>()</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dfs</span>(<span class="params">root, visited</span>):</span></span><br><span class="line">    <span class="keyword">if</span> root <span class="keyword">in</span> visited:</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    visited.add(root)</span><br><span class="line">    <span class="keyword">for</span> node <span class="keyword">in</span> root.children:</span><br><span class="line">        <span class="keyword">if</span> node <span class="keyword">not</span> <span class="keyword">in</span> visited:</span><br><span class="line">            dfs(node,visited)</span><br></pre></td></tr></table></figure>
+          <h2 id="WAL机制"><a href="#WAL机制" class="headerlink" title="WAL机制"></a>WAL机制</h2><p>只要 redo log 和 binlog 保证持久化到磁盘，就能确保 MySQL 异常重启后，数据可以恢复。</p>
+<h3 id="binlog-的写入机制"><a href="#binlog-的写入机制" class="headerlink" title="binlog 的写入机制"></a>binlog 的写入机制</h3><p>事务执行过程中，先把日志写到 binlog cache，事务提交的时候，再把 binlog cache 写到 binlog 文件中。<br>    <img src="/2021/06/15/7%E6%95%B0%E6%8D%AE%E4%B8%8D%E4%B8%A2%E5%A4%B1%E4%BF%9D%E8%AF%81/binlog%E5%86%99%E5%85%A5.webp" class=""><br>可以看到，每个线程有自己 binlog cache，但是共用同一份 binlog 文件。</p>
+<ul>
+<li>图中的 write，指的就是指把日志写入到文件系统的 page cache，并没有把数据持久化到磁盘，所以速度比较快。</li>
+<li>图中的 fsync，才是将数据持久化到磁盘的操作。一般情况下，我们认为 fsync 才占磁盘的 IOPS。</li>
+</ul>
+<p>write 和 fsync 的时机，是由参数 sync_binlog 控制的：</p>
+<ul>
+<li>sync_binlog=0 的时候，表示每次提交事务都只 write，不 fsync；</li>
+<li>sync_binlog=1 的时候，表示每次提交事务都会执行 fsync；</li>
+<li>sync_binlog=N(N&gt;1) 的时候，表示每次提交事务都 write，但累积 N 个事务后才 fsync。</li>
+</ul>
+<p>因此，在出现 IO 瓶颈的场景里，将 sync_binlog 设置成一个比较大的值，可以提升性能。在实际的业务场景中，考虑到丢失日志量的可控性，一般不建议将这个参数设成 0，比较常见的是将其设置为 100~1000 中的某个数值。但是，将 sync_binlog 设置为 N，对应的风险是：如果主机发生异常重启，会丢失最近 N 个事务的 binlog 日志。</p>
+<h3 id="redo-log-的写入机制"><a href="#redo-log-的写入机制" class="headerlink" title="redo log 的写入机制"></a>redo log 的写入机制</h3><p>事务在执行过程中，生成的 redo log 是要先写到 redo log buffer 的。<br>    <img src="/2021/06/15/7%E6%95%B0%E6%8D%AE%E4%B8%8D%E4%B8%A2%E5%A4%B1%E4%BF%9D%E8%AF%81/redolog%E5%86%99%E5%85%A5.webp" class=""><br>这三种状态分别是：</p>
+<ul>
+<li>存在 redo log buffer 中，物理上是在 MySQL 进程内存中，就是图中的红色部分；</li>
+<li>写到磁盘 (write)，但是没有持久化（fsync)，物理上是在文件系统的 page cache 里面，也就是图中的黄色部分；</li>
+<li>持久化到磁盘，对应的是 hard disk，也就是图中的绿色部分.</li>
+</ul>
+<p>为了控制 redo log 的写入策略，InnoDB 提供了 innodb_flush_log_at_trx_commit 参数，它有三种可能取值：</p>
+<ul>
+<li>设置为 0 的时候，表示每次事务提交时都只是把 redo log 留在 redo log buffer 中 ;</li>
+<li>设置为 1 的时候，表示每次事务提交时都将 redo log 直接持久化到磁盘；</li>
+<li>设置为 2 的时候，表示每次事务提交时都只是把 redo log 写到 page cache。</li>
+</ul>
 
       
     </div>
@@ -608,7 +1491,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/13/%E9%80%92%E5%BD%92%E6%A0%91/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/15/6%E6%95%B0%E6%8D%AE%E5%88%A0%E9%99%A4%E4%BA%86%E4%BD%86%E6%98%AF%E8%A1%A8%E5%A4%A7%E5%B0%8F%E4%B8%8D%E5%8F%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -622,7 +1505,171 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/13/%E9%80%92%E5%BD%92%E6%A0%91/" class="post-title-link" itemprop="url">递归树</a>
+            <a href="/2021/06/15/6%E6%95%B0%E6%8D%AE%E5%88%A0%E9%99%A4%E4%BA%86%E4%BD%86%E6%98%AF%E8%A1%A8%E5%A4%A7%E5%B0%8F%E4%B8%8D%E5%8F%98/" class="post-title-link" itemprop="url">6数据删除了但是表大小不变</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-06-15 10:24:37 / 修改时间：21:39:48" itemprop="dateCreated datePublished" datetime="2021-06-15T10:24:37+08:00">2021-06-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="数据删除表大小不变"><a href="#数据删除表大小不变" class="headerlink" title="数据删除表大小不变"></a>数据删除表大小不变</h2><p>如果要收缩一个表，只是 delete 掉表里面不用的数据的话，表文件的大小是不会变的，你还要通过 alter table 命令重建表，才能达到表文件变小的目的。<br>两种实现方式</p>
+<ul>
+<li>Online DDL 的方式是可以考虑在业务低峰期使用的，而 MySQL 5.5 及之前的版本，这个命令是会阻塞 DML 的，这个你需要特别小心。<br>alter table t engine=innodb,ALGORITHM=inplace;</li>
+<li>inplace</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/15/5sql%E5%8F%98%E6%85%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/15/5sql%E5%8F%98%E6%85%A2/" class="post-title-link" itemprop="url">5sql变慢</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-06-15 10:08:37 / 修改时间：21:39:48" itemprop="dateCreated datePublished" datetime="2021-06-15T10:08:37+08:00">2021-06-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="你的-SQL-语句为什么变“慢”了"><a href="#你的-SQL-语句为什么变“慢”了" class="headerlink" title="你的 SQL 语句为什么变“慢”了"></a>你的 SQL 语句为什么变“慢”了</h2><ul>
+<li>当内存数据页跟磁盘数据页内容不一致的时候，我们称这个内存页为“脏页”。</li>
+<li>内存数据写入到磁盘后，内存和磁盘上的数据页的内容就一致了，称为“干净页”。</li>
+<li>利用 WAL 技术，数据库将随机写转换成了顺序写，大大提升了数据库的性能。</li>
+<li>但是，由此也带来了内存脏页的问题。脏页会被后台线程自动 flush，也会由于数据页淘汰而触发 flush，而刷脏页的过程由于会占用资源，可能会让你的更新和查询语句的响应时间长一些。</li>
+</ul>
+<h3 id="InnoDB-刷脏页的控制策略"><a href="#InnoDB-刷脏页的控制策略" class="headerlink" title="InnoDB 刷脏页的控制策略"></a>InnoDB 刷脏页的控制策略</h3><ul>
+<li>innodb_io_capacity 告诉innoDB 磁盘能力，建议设置成IOPS (通过fio测试<br>fio -filename=$filename -direct=1 -iodepth 1 -thread -rw=randrw -ioengine=psync -bs=16k -size=500M -numjobs=10 -runtime=10 -group_reporting -name=mytest )</li>
+<li>innodb_max_dirty_pages_pct 脏页比例上限，默认为75%。</li>
+<li>innodb_flush_neighbors 值为 1 的时候会有上述的“连坐”机制，值为 0 时表示不找邻居，自己刷自己的。在 MySQL 8.0 中，innodb_flush_neighbors 参数的默认值已经是 0 了。</li>
+</ul>
+<h2 id="短连接风暴"><a href="#短连接风暴" class="headerlink" title="短连接风暴"></a>短连接风暴</h2><p>max_connections 最大连接参数，当超过这个参数，就会报Too many connections，连接拒绝。</p>
+<ul>
+<li>第一种方法：先处理掉那些占着连接但是不工作的线程。</li>
+<li>第二种方法：减少连接过程的消耗。<ul>
+<li>跳过权限验证的方法是：重启数据库，并使用–skip-grant-tables 参数启动。这样，整个 MySQL 会跳过所有的权限验证阶段，包括连接过程和语句执行过程在内。</li>
+<li>MySQL 8.0 版本里，如果你启用–skip-grant-tables 参数，MySQL 会默认把 –skip-networking 参数打开，表示这时候数据库只能被本地的客户端连接。</li>
+</ul>
+</li>
+</ul>
+<h2 id="慢查询性能问题"><a href="#慢查询性能问题" class="headerlink" title="慢查询性能问题"></a>慢查询性能问题</h2><ul>
+<li>索引没有设计好；</li>
+<li>SQL 语句没写好；</li>
+<li>MySQL 选错了索引。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/11/tcp-ip/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/11/tcp-ip/" class="post-title-link" itemprop="url">tcp/ip</a>
         </h2>
 
         <div class="post-meta">
@@ -632,14 +1679,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-05-13 07:28:55" itemprop="dateCreated datePublished" datetime="2021-05-13T07:28:55+08:00">2021-05-13</time>
+              <time title="创建时间：2021-06-11 08:05:46" itemprop="dateCreated datePublished" datetime="2021-06-11T08:05:46+08:00">2021-06-11</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-18 08:13:57" itemprop="dateModified" datetime="2021-05-18T08:13:57+08:00">2021-05-18</time>
+                <time title="修改时间：2021-06-15 07:39:01" itemprop="dateModified" datetime="2021-06-15T07:39:01+08:00">2021-06-15</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -647,7 +1694,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
                 </span>
             </span>
 
@@ -662,8 +1709,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="实战一：分析快速排序的时间复杂度"><a href="#实战一：分析快速排序的时间复杂度" class="headerlink" title="实战一：分析快速排序的时间复杂度"></a>实战一：分析快速排序的时间复杂度</h2><img src="/2021/05/13/%E9%80%92%E5%BD%92%E6%A0%91/1.jpg" class="">
-<p>快速排序的过程中，每次分区都要遍历待分区区间的所有数据，所以，每一层分区操作所遍历的数据的个数之和就是 n。我们现在只要求出递归树的高度 h，这个快排过程遍历的数据个数就是 h∗n ，也就是说，时间复杂度就是 O(h∗n)。h 为数据的高度logn</p>
+          <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>分层：解耦 和 扩展<br>nc: 连接<br>抓包：tcpdump -nn -i eth0 port 80<br>路由：route -n<br>mark: arp -n</p>
 
       
     </div>
@@ -683,7 +1729,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/13/%E7%BA%A2%E9%BB%91%E6%A0%91/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/08/1%E4%B8%80%E6%9D%A1sql%E7%9A%84%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -697,7 +1743,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/13/%E7%BA%A2%E9%BB%91%E6%A0%91/" class="post-title-link" itemprop="url">红黑树</a>
+            <a href="/2021/06/08/1%E4%B8%80%E6%9D%A1sql%E7%9A%84%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B/" class="post-title-link" itemprop="url">一条sql的执行过程</a>
         </h2>
 
         <div class="post-meta">
@@ -707,14 +1753,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-05-13 07:11:55" itemprop="dateCreated datePublished" datetime="2021-05-13T07:11:55+08:00">2021-05-13</time>
+              <time title="创建时间：2021-06-08 07:37:56" itemprop="dateCreated datePublished" datetime="2021-06-08T07:37:56+08:00">2021-06-08</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-25 07:32:32" itemprop="dateModified" datetime="2021-05-25T07:32:32+08:00">2021-05-25</time>
+                <time title="修改时间：2021-06-15 07:39:01" itemprop="dateModified" datetime="2021-06-15T07:39:01+08:00">2021-06-15</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -722,7 +1768,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
                 </span>
             </span>
 
@@ -737,29 +1783,42 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="二叉查找树问题"><a href="#二叉查找树问题" class="headerlink" title="二叉查找树问题"></a>二叉查找树问题</h2><p>由于在插入过程中可能退化为链表，使其性能由O(logn)–&gt;O(n)</p>
-<h2 id="平衡二叉查找树"><a href="#平衡二叉查找树" class="headerlink" title="平衡二叉查找树"></a>平衡二叉查找树</h2><ul>
-<li>平衡二叉树的严格定义是这样的：二叉树中任意一个节点的左右子树的高度相差不能大于 1。</li>
-<li>平衡二叉查找树中“平衡”的意思，其实就是让整棵树左右看起来比较“对称”、比较“平衡”，不要出现左子树很高、右子树很矮的情况。这样就能让整棵树的高度相对来说低一些，相应的插入、删除、查找等操作的效率高一些。</li>
+          <h2 id="逻辑架构图"><a href="#逻辑架构图" class="headerlink" title="逻辑架构图"></a>逻辑架构图</h2>  <img src="/2021/06/08/1%E4%B8%80%E6%9D%A1sql%E7%9A%84%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B/%E9%80%BB%E8%BE%91%E6%9E%B6%E6%9E%84.png" class="">
+
+<ul>
+<li>大体来说，MySQL 可以分为 Server 层和存储引擎层两部分。</li>
+<li>Server 层包括连接器、查询缓存、分析器、优化器、执行器等，涵盖 MySQL 的大多数核心服务功能，以及所有的内置函数（如日期、时间、数学和加密函数等），所有跨存储引擎的功能都在这一层实现，比如存储过程、触发器、视图等。</li>
+<li>而存储引擎层负责数据的存储和提取。其架构模式是插件式的，支持 InnoDB、MyISAM、Memory 等多个存储引擎。现在最常用的存储引擎是 InnoDB，它从 MySQL 5.5.5 版本开始成为了默认存储引擎。</li>
 </ul>
-<h3 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h3><ul>
-<li>AVL</li>
-<li>红黑树</li>
+<h3 id="连接器"><a href="#连接器" class="headerlink" title="连接器"></a>连接器</h3><p>第一步，你会先连接到这个数据库上，这时候接待你的就是连接器。<br>mysql -h$ip -P$port -u$user -p</p>
+<p>通过show processlist 查看系统的连接情况，其中command中sleep是空闲连接的意思</p>
+<h4 id="推荐使用长连接，但是长连接会占用系统内存资源，需要办法解决"><a href="#推荐使用长连接，但是长连接会占用系统内存资源，需要办法解决" class="headerlink" title="推荐使用长连接，但是长连接会占用系统内存资源，需要办法解决"></a>推荐使用长连接，但是长连接会占用系统内存资源，需要办法解决</h4><ul>
+<li>定期断开长连接。使用一段时间，或者程序里面判断执行过一个占用内存的大查询后，断开连接，之后要查询再重连。</li>
+<li>如果你用的是 MySQL 5.7 或更新版本，可以在每次执行一个比较大的操作后，通过执行 mysql_reset_connection 来重新初始化连接资源。这个过程不需要重连和重新做权限验证，但是会将连接恢复到刚刚创建完时的状态。</li>
 </ul>
-<h2 id="红黑树定义"><a href="#红黑树定义" class="headerlink" title="红黑树定义"></a>红黑树定义</h2><ul>
-<li><p>所有节点是红黑和黑色组成</p>
-</li>
-<li><p>根节点是黑色的；</p>
-</li>
-<li><p>每个叶子节点都是黑色的空节点（NIL），也就是说，叶子节点不存储数据；</p>
-</li>
-<li><p>任何相邻的节点都不能同时为红色，也就是说，红色节点是被黑色节点隔开的；</p>
-</li>
-<li><p>每个节点，从该节点到达其可达叶子节点的所有路径，都包含相同数目的黑色节点；</p>
-</li>
-<li><p>性质：红黑树的高度只比高度平衡的 AVL 树的高度（log2n）仅仅大了一倍，在性能上，下降得并不多。这样推导出来的结果不够精确，实际上红黑树的性能更好。</p>
-</li>
+<h3 id="查询缓存"><a href="#查询缓存" class="headerlink" title="查询缓存"></a>查询缓存</h3><p>但是大多数情况下我会建议你不要使用查询缓存，为什么呢？因为查询缓存往往弊大于利。</p>
+<ul>
+<li>查询缓存的失效非常频繁，只要有对一个表的更新，这个表上所有的查询缓存都会被清空。</li>
+<li>query_cache_type 设置成 DEMAND</li>
+<li>MySQL 8.0 版本直接将查询缓存的整块功能删掉了，也就是说 8.0 开始彻底没有这个功能了。</li>
 </ul>
+<h3 id="分析器"><a href="#分析器" class="headerlink" title="分析器"></a>分析器</h3><ul>
+<li>分析器先会做“词法分析”。</li>
+<li>做完了这些识别以后，就要做“语法分析”。</li>
+<li>一般语法错误会提示第一个出现错误的位置，所以你要关注的是紧接“use near”的内容。</li>
+</ul>
+<h3 id="优化器"><a href="#优化器" class="headerlink" title="优化器"></a>优化器</h3><p>优化器是在表里面有多个索引的时候，决定使用哪个索引；或者在一个语句有多表关联（join）的时候，决定各个表的连接顺序。</p>
+<p>mysql&gt; select * from T where ID=10;</p>
+<p>比如我们这个例子中的表 T 中，ID 字段没有索引，那么执行器的执行流程是这样的：</p>
+<ul>
+<li>调用 InnoDB 引擎接口取这个表的第一行，判断 ID 值是不是 10，如果不是则跳过，如果是则将这行存在结果集中；</li>
+<li>调用引擎接口取“下一行”，重复相同的判断逻辑，直到取到这个表的最后一行。</li>
+<li>执行器将上述遍历过程中所有满足条件的行组成的记录集作为结果集返回给客户端。</li>
+</ul>
+<h2 id="重要的日志模块：redo-log"><a href="#重要的日志模块：redo-log" class="headerlink" title="重要的日志模块：redo log"></a>重要的日志模块：redo log</h2><p>InnoDB 的 redo log 是固定大小的，比如可以配置为一组 4 个文件，每个文件的大小是 1GB，那么这块“粉板”总共就可以记录 4GB 的操作。</p>
+  <img src="/2021/06/08/1%E4%B8%80%E6%9D%A1sql%E7%9A%84%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B/redolog.png" class="">
+
+<h2 id="重要的日志模块：binlog"><a href="#重要的日志模块：binlog" class="headerlink" title="重要的日志模块：binlog"></a>重要的日志模块：binlog</h2>  <img src="/2021/06/08/1%E4%B8%80%E6%9D%A1sql%E7%9A%84%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B/%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4.png" class="">
 
       
     </div>
@@ -779,7 +1838,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/12/%E4%BA%8C%E5%8F%89%E6%A0%91/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/06/%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -793,7 +1852,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/12/%E4%BA%8C%E5%8F%89%E6%A0%91/" class="post-title-link" itemprop="url">二叉树</a>
+            <a href="/2021/06/06/%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C/" class="post-title-link" itemprop="url">数据倾斜</a>
         </h2>
 
         <div class="post-meta">
@@ -803,14 +1862,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-05-12 21:44:33" itemprop="dateCreated datePublished" datetime="2021-05-12T21:44:33+08:00">2021-05-12</time>
+              <time title="创建时间：2021-06-06 13:16:02" itemprop="dateCreated datePublished" datetime="2021-06-06T13:16:02+08:00">2021-06-06</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-25 08:14:14" itemprop="dateModified" datetime="2021-05-25T08:14:14+08:00">2021-05-25</time>
+                <time title="修改时间：2021-06-07 08:13:52" itemprop="dateModified" datetime="2021-06-07T08:13:52+08:00">2021-06-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -818,7 +1877,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
                 </span>
             </span>
 
@@ -833,29 +1892,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="树"><a href="#树" class="headerlink" title="树"></a>树</h2><img src="/2021/05/12/%E4%BA%8C%E5%8F%89%E6%A0%91/%E9%AB%98%E6%B7%B1.jpg" class="">
-<img src="/2021/05/12/%E4%BA%8C%E5%8F%89%E6%A0%91/gaoshne.jpg" class="">
-
-<h2 id="二叉树"><a href="#二叉树" class="headerlink" title="二叉树"></a>二叉树</h2><h3 id="满二叉树"><a href="#满二叉树" class="headerlink" title="满二叉树"></a>满二叉树</h3><pre><code>除了叶子节点，其他节点都有左右两个子节点
-</code></pre>
-<h3 id="完全二叉树"><a href="#完全二叉树" class="headerlink" title="完全二叉树"></a>完全二叉树</h3><pre><code>叶子节点都在最底下两层，最后一层的叶子节点都靠左排列，并且除了最后一层，其他层的节点个数都要达到最大
-</code></pre>
-<h3 id="二叉树的遍历"><a href="#二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历</h3><pre><code>- 前序遍历
-
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pre_order</span>(<span class="params">root</span>):</span></span><br><span class="line">    <span class="keyword">if</span> root <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        <span class="keyword">return</span> </span><br><span class="line">    <span class="built_in">print</span>(root)</span><br><span class="line">    pre_order(root.left)</span><br><span class="line">    pre_order(root.right)</span><br></pre></td></tr></table></figure>
-
-- 中序遍历
-
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pre_order</span>(<span class="params">root</span>):</span></span><br><span class="line">    <span class="keyword">if</span> root <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        <span class="keyword">return</span> </span><br><span class="line">    pre_order(root.left)</span><br><span class="line">    <span class="built_in">print</span>(root)</span><br><span class="line">    pre_order(root.right)</span><br></pre></td></tr></table></figure>
-
-- 后续遍历
-
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pre_order</span>(<span class="params">root</span>):</span></span><br><span class="line">    <span class="keyword">if</span> root <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        <span class="keyword">return</span> </span><br><span class="line">    pre_order(root.left)</span><br><span class="line">    pre_order(root.right)</span><br><span class="line">    <span class="built_in">print</span>(root)</span><br></pre></td></tr></table></figure>
-</code></pre>
-<h2 id="二叉查找树-Binary-Search-Tree"><a href="#二叉查找树-Binary-Search-Tree" class="headerlink" title="二叉查找树(Binary Search Tree)"></a>二叉查找树(Binary Search Tree)</h2><ul>
-<li>二叉查找树要求，在树中的任意一个节点，其左子树中的每个节点的值，都要小于这个节点的值，而右子树节点的值都大于这个节点的值</li>
-<li>中序遍历二叉查找树，可以输出有序的数据序列，时间复杂度是 O(n)，非常高效</li>
+          <h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ul>
+<li>数据中有 bigkey，导致某个实例的数据量增加；</li>
+<li>Slot 手工分配不均，导致某个或某些实例上有大量数据；</li>
+<li>使用了 Hash Tag，导致数据集中到某些实例上。</li>
 </ul>
+<p>解决：</p>
+<img src="/2021/06/06/%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C/%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C.jpg" class="">
+<img src="/2021/06/06/%E6%95%B0%E6%8D%AE%E5%80%BE%E6%96%9C/6.0.jpg" class="">
 
       
     </div>
@@ -875,7 +1919,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/12/%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/06/%E4%BA%8B%E5%8A%A1ACID/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -889,7 +1933,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/12/%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">哈希算法</a>
+            <a href="/2021/06/06/%E4%BA%8B%E5%8A%A1ACID/" class="post-title-link" itemprop="url">事务ACID</a>
         </h2>
 
         <div class="post-meta">
@@ -898,23 +1942,17 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-05-12 21:42:54" itemprop="dateCreated datePublished" datetime="2021-05-12T21:42:54+08:00">2021-05-12</time>
+              <time title="创建时间：2021-06-06 10:28:43 / 修改时间：13:22:55" itemprop="dateCreated datePublished" datetime="2021-06-06T10:28:43+08:00">2021-06-06</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-14 07:20:59" itemprop="dateModified" datetime="2021-05-14T07:20:59+08:00">2021-05-14</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
                 </span>
             </span>
 
@@ -929,15 +1967,25 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><ul>
-<li>应用一：安全加密</li>
-<li>应用二：唯一标识</li>
-<li>应用三：数据校验</li>
-<li>应用四：散列函数</li>
-<li>应用五：负载均衡</li>
-<li>应用六：数据分片</li>
-<li>应用七：分布式存储</li>
+          <h2 id="Redis-如何实现事务"><a href="#Redis-如何实现事务" class="headerlink" title="Redis 如何实现事务"></a>Redis 如何实现事务</h2><ul>
+<li>第一步，客户端要使用一个命令显式地表示一个事务的开启。在 Redis 中，这个命令就是 MULTI。</li>
+<li>第二步，客户端把事务中本身要执行的具体操作（例如增删改数据）发送给服务器端。这些操作就是 Redis 本身提供的数据读写命令，例如 GET、SET 等。不过，这些命令虽然被客户端发送到了服务器端，但 Redis 实例只是把这些命令暂存到一个命令队列中，并不会立即执行。</li>
+<li>第三步，客户端向服务器端发送提交事务的命令，让数据库实际执行第二步中发送的具体操作。Redis 提供的 EXEC 命令就是执行事务提交的。当服务器端收到 EXEC 命令后，才会实际执行命令队列中的所有命令。</li>
 </ul>
+<h2 id="Redis-的事务机制能保证哪些属性"><a href="#Redis-的事务机制能保证哪些属性" class="headerlink" title="Redis 的事务机制能保证哪些属性"></a>Redis 的事务机制能保证哪些属性</h2><h3 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h3><ul>
+<li>命令入队时就报错，会放弃事务执行，保证原子性；</li>
+<li>命令入队时没报错，实际执行时报错，不保证原子性；</li>
+<li>EXEC 命令执行时实例故障，如果开启了 AOF 日志，可以保证原子性。</li>
+</ul>
+<h3 id="一致性"><a href="#一致性" class="headerlink" title="一致性"></a>一致性</h3><p>在命令执行错误或 Redis 发生故障的情况下，Redis 事务机制对一致性属性是有保证的。</p>
+<h3 id="隔离性"><a href="#隔离性" class="headerlink" title="隔离性"></a>隔离性</h3><ul>
+<li>并发操作在 EXEC 命令前执行，此时，隔离性的保证要使用 WATCH 机制来实现，否则隔离性无法保证；</li>
+<li>并发操作在 EXEC 命令后执行，此时，隔离性可以保证。</li>
+</ul>
+<h3 id="持久性"><a href="#持久性" class="headerlink" title="持久性"></a>持久性</h3><p>不管 Redis 采用什么持久化模式，事务的持久性属性是得不到保证的。</p>
+<img src="/2021/06/06/%E4%BA%8B%E5%8A%A1ACID/%E4%BA%8B%E5%8A%A1.jpg" class="">
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Redis 的事务机制可以保证一致性和隔离性，但是无法保证持久性。不过，因为 Redis 本身是内存数据库，持久性并不是一个必须的属性，我们更加关注的还是原子性、一致性和隔离性这三个属性。原子性的情况比较复杂，只有当事务中使用的命令语法有误时，原子性得不到保证，在其它情况下，事务都可以原子性执行。</p>
 
       
     </div>
@@ -957,7 +2005,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/12/%E6%95%A3%E5%88%97%E8%A1%A8/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/06/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -971,7 +2019,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/12/%E6%95%A3%E5%88%97%E8%A1%A8/" class="post-title-link" itemprop="url">散列表</a>
+            <a href="/2021/06/06/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" class="post-title-link" itemprop="url">分布式锁</a>
         </h2>
 
         <div class="post-meta">
@@ -980,23 +2028,17 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-05-12 21:39:51" itemprop="dateCreated datePublished" datetime="2021-05-12T21:39:51+08:00">2021-05-12</time>
+              <time title="创建时间：2021-06-06 09:27:00 / 修改时间：13:22:55" itemprop="dateCreated datePublished" datetime="2021-06-06T09:27:00+08:00">2021-06-06</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-14 07:20:59" itemprop="dateModified" datetime="2021-05-14T07:20:59+08:00">2021-05-14</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
                 </span>
             </span>
 
@@ -1011,10 +2053,49 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="散列冲突"><a href="#散列冲突" class="headerlink" title="散列冲突"></a>散列冲突</h2><ul>
-<li>开放寻址法</li>
-<li>链表法</li>
+          <h2 id="为甚们需要分布式锁"><a href="#为甚们需要分布式锁" class="headerlink" title="为甚们需要分布式锁"></a>为甚们需要分布式锁</h2><p>在分布式系统中，当有多个客户端需要获取锁时，我们需要分布式锁。此时，锁是保存在一个共享存储系统中的，可以被多个客户端共享访问和获取。</p>
+<h2 id="单机上的锁和分布式锁的联系与区别"><a href="#单机上的锁和分布式锁的联系与区别" class="headerlink" title="单机上的锁和分布式锁的联系与区别"></a>单机上的锁和分布式锁的联系与区别</h2><p>我们就可以得出实现分布式锁的两个要求：</p>
+<ul>
+<li>要求一：分布式锁的加锁和释放锁的过程，涉及多个操作。所以，在实现分布式锁时，我们需要保证这些锁操作的原子性；</li>
+<li>要求二：共享存储系统保存了锁变量，如果共享存储系统发生故障或宕机，那么客户端也就无法进行锁操作了。在实现分布式锁时，我们需要考虑保证共享存储系统的可靠性，进而保证锁的可靠性。</li>
 </ul>
+<h2 id="基于单个-Redis-节点实现分布式锁"><a href="#基于单个-Redis-节点实现分布式锁" class="headerlink" title="基于单个 Redis 节点实现分布式锁"></a>基于单个 Redis 节点实现分布式锁</h2><img src="/2021/06/06/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81.jpg" class="">
+
+<h3 id="SETNX-命令"><a href="#SETNX-命令" class="headerlink" title="SETNX 命令"></a>SETNX 命令</h3><p>它用于设置键值对的值。具体来说，就是这个命令在执行时会判断键值对是否存在，如果不存在，就设置键值对的值，如果存在，就不做任何设置。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 加锁</span><br><span class="line">SETNX lock_key 1</span><br><span class="line">// 业务逻辑</span><br><span class="line">DO THINGS</span><br><span class="line">// 释放锁</span><br><span class="line">DEL lock_key</span><br></pre></td></tr></table></figure>
+
+<p>为了防止锁无法释放，还会配置过期时间，并提供了set 命令，加上ex px</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SET key value [EX seconds | PX milliseconds]  [NX]</span><br></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 加锁, unique_value作为客户端唯一性的标识</span><br><span class="line">SET lock_key unique_value NX PX 10000</span><br></pre></td></tr></table></figure>
+
+<p>unique_value 是客户端的唯一标识，可以用一个随机生成的字符串来表示，PX 10000 则表示 lock_key 会在 10s 后过期，以免客户端在这期间发生异常而无法释放锁。</p>
+<h3 id="基于多个-Redis-节点实现高可靠的分布式锁"><a href="#基于多个-Redis-节点实现高可靠的分布式锁" class="headerlink" title="基于多个 Redis 节点实现高可靠的分布式锁"></a>基于多个 Redis 节点实现高可靠的分布式锁</h3><p>Redlock 算法的基本思路，是让客户端和多个独立的 Redis 实例依次请求加锁，如果客户端能够和半数以上的实例成功地完成加锁操作，那么我们就认为，客户端成功地获得分布式锁了，否则加锁失败。这样一来，即使有单个 Redis 实例发生故障，因为锁变量在其它实例上也有保存，所以，客户端仍然可以正常地进行锁操作，锁变量并不会丢失</p>
+<ul>
+<li>第一步是，客户端获取当前时间。</li>
+<li>第二步是，客户端按顺序依次向 N 个 Redis 实例执行加锁操作。<ul>
+<li>如果客户端在和一个 Redis 实例请求加锁时，一直到超时都没有成功，那么此时，客户端会和下一个 Redis 实例继续请求加锁。加锁操作的超时时间需要远远地小于锁的有效时间，一般也就是设置为几十毫秒。</li>
+</ul>
+</li>
+<li>第三步是，一旦客户端完成了和所有 Redis 实例的加锁操作，客户端就要计算整个加锁过程的总耗时。<ul>
+<li>条件一：客户端从超过半数（大于等于 N/2+1）的 Redis 实例上成功获取到了锁；</li>
+<li>条件二：客户端获取锁的总耗时没有超过锁的有效时间。<ul>
+<li>在满足了这两个条件后，我们需要重新计算这把锁的有效时间，计算的结果是锁的最初有效时间减去客户端为获取锁的总耗时。如果锁的有效时间已经来不及完成共享数据的操作了，我们可以释放锁，以免出现还没完成数据操作，锁就过期了的情况。</li>
+<li>当然，如果客户端在和所有实例执行完加锁操作后，没能同时满足这两个条件，那么，客户端向所有 Redis 节点发起释放锁的操作。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>总结：</p>
+<p>在基于单个 Redis 实例实现分布式锁时，对于加锁操作，我们需要满足三个条件。</p>
+<ul>
+<li>加锁包括了读取锁变量、检查锁变量值和设置锁变量值三个操作，但需要以原子操作的方式完成，所以，我们使用 SET 命令带上 NX 选项来实现加锁；</li>
+<li>锁变量需要设置过期时间，以免客户端拿到锁后发生异常，导致锁一直无法释放，所以，我们在 SET 命令执行时加上 EX/PX 选项，设置其过期时间；</li>
+<li>锁变量的值需要能区分来自不同客户端的加锁操作，以免在释放锁时，出现误释放操作，所以，我们使用 SET 命令设置锁变量值时，每个客户端设置的值是一个唯一值，用于标识客户端。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">acquire_lock_with_timeout</span>(<span class="params">conn, lock_name, acquire_timeout=<span class="number">3</span>, lock_timeout=<span class="number">2</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    基于 Redis 实现的分布式锁</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param conn: Redis 连接</span></span><br><span class="line"><span class="string">    :param lock_name: 锁的名称</span></span><br><span class="line"><span class="string">    :param acquire_timeout: 获取锁的超时时间，默认 3 秒</span></span><br><span class="line"><span class="string">    :param lock_timeout: 锁的超时时间，默认 2 秒</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    identifier = <span class="built_in">str</span>(uuid.uuid4())</span><br><span class="line">    lockname = <span class="string">f&#x27;lock:<span class="subst">&#123;lock_name&#125;</span>&#x27;</span></span><br><span class="line">    lock_timeout = <span class="built_in">int</span>(math.ceil(lock_timeout))</span><br><span class="line"></span><br><span class="line">    end = time.time() + acquire_timeout</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> time.time() &lt; end:</span><br><span class="line">        <span class="comment"># 如果不存在这个锁则加锁并设置过期时间，避免死锁</span></span><br><span class="line">        <span class="keyword">if</span> conn.<span class="built_in">set</span>(lockname, identifier, ex=lock_timeout, nx=<span class="literal">True</span>):</span><br><span class="line">            <span class="keyword">return</span> identifier</span><br><span class="line"></span><br><span class="line">        time.sleep(<span class="number">0.001</span>)</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">release_lock</span>(<span class="params">conn, lockname, identifier</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    释放锁</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param conn: Redis 连接</span></span><br><span class="line"><span class="string">    :param lockname: 锁的名称</span></span><br><span class="line"><span class="string">    :param identifier: 锁的标识</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># python中redis事务是通过pipeline的封装实现的</span></span><br><span class="line">    <span class="keyword">with</span> conn.pipeline() <span class="keyword">as</span> pipe:</span><br><span class="line">        lockname = <span class="string">&#x27;lock:&#x27;</span> + lockname</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                <span class="comment"># watch 锁, multi 后如果该 key 被其他客户端改变, 事务操作会抛出 WatchError 异常</span></span><br><span class="line">                pipe.watch(lockname)</span><br><span class="line">                iden = pipe.get(lockname)</span><br><span class="line">                <span class="keyword">if</span> iden <span class="keyword">and</span> iden.decode(<span class="string">&#x27;utf-8&#x27;</span>) == identifier:</span><br><span class="line">                    <span class="comment"># 事务开始</span></span><br><span class="line">                    pipe.multi()</span><br><span class="line">                    pipe.delete(lockname)</span><br><span class="line">                    pipe.execute()</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">                pipe.unwatch()</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            <span class="keyword">except</span> WatchError:</span><br><span class="line">                <span class="keyword">pass</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -1033,7 +2114,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1099,14 +2180,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-count">96</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
