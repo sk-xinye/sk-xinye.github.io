@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
   </script>
 
-  <meta name="description" content="docker基本操作docker tag IMAGEID(镜像id) REPOSITORY:TAG（仓库：标签） 修改标签，仓库名 docker rmi IMAGEID(镜像id) 删除镜像docker rm container(容器id) 删除容器 docker save -o es.tar dr.z&#x2F;elasticsearch&#x2F;elasticsearch-oss:6.3.2 保存镜像docke">
+  <meta name="description" content="镜像瘦身原因：冗余文件，冗余系统，层会占用空间，层越多，最终的镜像就越大。  COPY、ADD和RUN语句会在镜像中添加新层。可以用&amp;&amp;让镜像更小 我们来试试Docker的多阶段构建。  12345678910FROM node:8 as buildWORKDIR &#x2F;appCOPY package.json index.js .&#x2F;RUN npm installFROM node:8">
 <meta property="og:type" content="article">
 <meta property="og:title" content="镜像制作">
 <meta property="og:url" content="https://sk-xinye.github.io/2021/06/01/%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/index.html">
 <meta property="og:site_name" content="sk-xinyeの博客">
-<meta property="og:description" content="docker基本操作docker tag IMAGEID(镜像id) REPOSITORY:TAG（仓库：标签） 修改标签，仓库名 docker rmi IMAGEID(镜像id) 删除镜像docker rm container(容器id) 删除容器 docker save -o es.tar dr.z&#x2F;elasticsearch&#x2F;elasticsearch-oss:6.3.2 保存镜像docke">
+<meta property="og:description" content="镜像瘦身原因：冗余文件，冗余系统，层会占用空间，层越多，最终的镜像就越大。  COPY、ADD和RUN语句会在镜像中添加新层。可以用&amp;&amp;让镜像更小 我们来试试Docker的多阶段构建。  12345678910FROM node:8 as buildWORKDIR &#x2F;appCOPY package.json index.js .&#x2F;RUN npm installFROM node:8">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-06-01T02:53:30.000Z">
-<meta property="article:modified_time" content="2021-06-30T00:10:35.054Z">
+<meta property="article:modified_time" content="2021-09-24T23:57:55.311Z">
 <meta property="article:author" content="sk-xinye">
 <meta name="twitter:card" content="summary">
 
@@ -131,12 +131,12 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">13</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">15</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">96</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">111</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -224,7 +224,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-06-30 08:10:35" itemprop="dateModified" datetime="2021-06-30T08:10:35+08:00">2021-06-30</time>
+                <time title="修改时间：2021-09-25 07:57:55" itemprop="dateModified" datetime="2021-09-25T07:57:55+08:00">2021-09-25</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -247,17 +247,41 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="docker基本操作"><a href="#docker基本操作" class="headerlink" title="docker基本操作"></a>docker基本操作</h2><p>docker tag IMAGEID(镜像id) REPOSITORY:TAG（仓库：标签） 修改标签，仓库名</p>
+        <h2 id="镜像瘦身"><a href="#镜像瘦身" class="headerlink" title="镜像瘦身"></a>镜像瘦身</h2><p>原因：冗余文件，冗余系统，层会占用空间，层越多，最终的镜像就越大。</p>
+<ul>
+<li>COPY、ADD和RUN语句会在镜像中添加新层。可以用&amp;&amp;让镜像更小</li>
+<li>我们来试试Docker的多阶段构建。</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">FROM node:8 as build</span><br><span class="line">WORKDIR /app</span><br><span class="line">COPY package.json index.js ./</span><br><span class="line">RUN npm install</span><br><span class="line"></span><br><span class="line">FROM node:8</span><br><span class="line"></span><br><span class="line">COPY --from=build /app /</span><br><span class="line">EXPOSE 3000</span><br><span class="line">CMD [&quot;index.js&quot;]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用Distroless移除容器中的所有累赘</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">    FROM node:8 as build</span><br><span class="line"></span><br><span class="line">    WORKDIR /app</span><br><span class="line">    COPY package.json index.js ./</span><br><span class="line">    RUN npm install</span><br><span class="line"></span><br><span class="line">    FROM gcr.io/distroless/nodejs</span><br><span class="line"></span><br><span class="line">    COPY --from=build /app /</span><br><span class="line">    EXPOSE 3000</span><br><span class="line">    CMD [&quot;index.js&quot;]</span><br><span class="line">docker build -t node-distroless .</span><br></pre></td></tr></table></figure>
+
+<p>验证：<br>$ docker run -p 3000:3000 -ti –rm –init node-distroless</p>
+<ul>
+<li>使用Alpine作为更小的基础镜像</li>
+<li>编译完成后，清理编译环境和跟程序运行无关的软件和文件</li>
+</ul>
+<h2 id="docker基本操作"><a href="#docker基本操作" class="headerlink" title="docker基本操作"></a>docker基本操作</h2><p>docker iamge build -t dr.z/test:aliun .<br>docker tag IMAGEID(镜像id) REPOSITORY:TAG（仓库：标签） 修改标签，仓库名</p>
 <p>docker rmi IMAGEID(镜像id) 删除镜像<br>docker rm container(容器id) 删除容器</p>
 <p>docker save -o es.tar dr.z/elasticsearch/elasticsearch-oss:6.3.2 保存镜像<br>docker load &lt; /root/docker_result/images/es.tar 加载镜像<br>docker load -i zs_theft.xz 加载镜像</p>
-<p>docker cp container(容器id):/opt/py ./ 拷贝容器内容到本地<br>docker cp ./ container(容器id):/opt/py  拷贝本地到容器内容<br>docker commit container(容器id) centos-vim  保存容器为镜像</p>
+<p>docker cp container(容器id):/opt/py ./ 拷贝容器内容到本地<br>docker cp  /opt/test/file.txt container(容器id):/opt/py  拷贝本地到容器内容<br>docker commit container(容器id) centos-vim  保存容器为镜像</p>
 <p>docker run -it IMAGEID(镜像id) /bin/bash 运行并进入镜像</p>
-<h2 id="将-pip-源修改为阿里云源"><a href="#将-pip-源修改为阿里云源" class="headerlink" title="将 pip 源修改为阿里云源"></a>将 pip 源修改为阿里云源</h2><p>pip config list 查看当前 pip 的配置</p>
+<h3 id="保存镜像"><a href="#保存镜像" class="headerlink" title="保存镜像"></a>保存镜像</h3><p>docker save -o  /home/dyufei/tensorflow.tar  tensorflow/tensorflow 或者如下<br>docker save  tensorflow/tensorflow &gt; /home/dyufei/tensorflow.tar</p>
+<p>docker save alpine | gzip &gt; alpine-latest.tar.gz<br>docker load -i alpine-latest.tar.gz</p>
+<h3 id="加载本地镜像"><a href="#加载本地镜像" class="headerlink" title="加载本地镜像"></a>加载本地镜像</h3><p>docker load -i  tensorflow.tar</p>
+<h3 id="export-import与-save-load区别"><a href="#export-import与-save-load区别" class="headerlink" title="export/import与 save/load区别"></a>export/import与 save/load区别</h3><p>A ：export/import 是根据容器来导出镜像（因此没有镜像的历史记录）而 save/load 操作的对象是镜像<br>B ：export/import 镜像的历史记录再导后无法进行回滚操作，而save/load镜像有完整的历史记录可以回滚</p>
+<p>docker export tensorboard &gt; /home/dyufei/tensorflow_tensorboard.tar 或者如下<br>docker export -o /home/dyufei/tensorflow_tensorboard.tar  tensorboard</p>
+<h3 id="导入容器的镜像"><a href="#导入容器的镜像" class="headerlink" title="导入容器的镜像"></a>导入容器的镜像</h3><p>sudo docker import - /home/dyufei/tensorflow_tensorboard.tar</p>
+<h2 id="将-pip-源修改为阿里云源"><a href="#将-pip-源修改为阿里云源" class="headerlink" title="将 pip 源修改为阿里云源"></a>将 pip 源修改为阿里云源</h2><p>pip config list 查看当前 pip 的配置<br>pip config set global.index-url <a target="_blank" rel="noopener" href="https://mirrors.aliyun.com/pypi/simple/">https://mirrors.aliyun.com/pypi/simple/</a></p>
 <p>接着修改配置文件</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pip config set global.index-url http://mirrors.aliyun.com/pypi/simple/</span><br><span class="line">pip config set install.trusted-host mirrors.aliyun.com</span><br></pre></td></tr></table></figure>
 
-<h2 id="删除镜像失败"><a href="#删除镜像失败" class="headerlink" title="删除镜像失败"></a>删除镜像失败</h2><p>docker rmi $(docker images –filter “dangling=true” -q –no-trunc)<br>docker rmi images</p>
+<h2 id="删除镜像失败"><a href="#删除镜像失败" class="headerlink" title="删除镜像失败"></a>删除镜像失败</h2><p>docker rmi $(docker images –filter “dangling=true” -q –no-trunc)<br>docker rmi images<br>sudo docker rm <code>docker ps -a|grep Exited|awk &#39;&#123;print $1&#125;&#39;</code></p>
 <h2 id="linux-操作"><a href="#linux-操作" class="headerlink" title="linux 操作"></a>linux 操作</h2><p>rm -rf  ./test_chk_ln 删除软连接<br>ln -s 源文件 软链接</p>
+<h3 id="查看容器启动方式"><a href="#查看容器启动方式" class="headerlink" title="查看容器启动方式"></a>查看容器启动方式</h3><p>docker ps –no-trunc</p>
 
     </div>
 
@@ -338,7 +362,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#docker%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">docker基本操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86-pip-%E6%BA%90%E4%BF%AE%E6%94%B9%E4%B8%BA%E9%98%BF%E9%87%8C%E4%BA%91%E6%BA%90"><span class="nav-number">2.</span> <span class="nav-text">将 pip 源修改为阿里云源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E9%95%9C%E5%83%8F%E5%A4%B1%E8%B4%A5"><span class="nav-number">3.</span> <span class="nav-text">删除镜像失败</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-%E6%93%8D%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">linux 操作</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%95%9C%E5%83%8F%E7%98%A6%E8%BA%AB"><span class="nav-number">1.</span> <span class="nav-text">镜像瘦身</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">docker基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%9D%E5%AD%98%E9%95%9C%E5%83%8F"><span class="nav-number">2.1.</span> <span class="nav-text">保存镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E8%BD%BD%E6%9C%AC%E5%9C%B0%E9%95%9C%E5%83%8F"><span class="nav-number">2.2.</span> <span class="nav-text">加载本地镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#export-import%E4%B8%8E-save-load%E5%8C%BA%E5%88%AB"><span class="nav-number">2.3.</span> <span class="nav-text">export&#x2F;import与 save&#x2F;load区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5%E5%AE%B9%E5%99%A8%E7%9A%84%E9%95%9C%E5%83%8F"><span class="nav-number">2.4.</span> <span class="nav-text">导入容器的镜像</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86-pip-%E6%BA%90%E4%BF%AE%E6%94%B9%E4%B8%BA%E9%98%BF%E9%87%8C%E4%BA%91%E6%BA%90"><span class="nav-number">3.</span> <span class="nav-text">将 pip 源修改为阿里云源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E9%95%9C%E5%83%8F%E5%A4%B1%E8%B4%A5"><span class="nav-number">4.</span> <span class="nav-text">删除镜像失败</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux-%E6%93%8D%E4%BD%9C"><span class="nav-number">5.</span> <span class="nav-text">linux 操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">5.1.</span> <span class="nav-text">查看容器启动方式</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -352,14 +376,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">96</span>
+          <span class="site-state-item-count">111</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>

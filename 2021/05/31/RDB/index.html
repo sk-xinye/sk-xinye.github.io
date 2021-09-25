@@ -20,16 +20,16 @@
     var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
   </script>
 
-  <meta name="description" content="内存快照RDB:Redis DataBase(可以保证可靠性，还能在宕机时实现快速恢复的其他方法呢)我们还要考虑两个关键问题：  对哪些数据做快照？这关系到快照的执行效率问题； 做快照时，数据还能被增删改吗？这关系到 Redis 是否被阻塞，能否同时正常处理请求。  给哪些内存数据做快照？Redis 的数据都在内存中，为了提供所有数据的可靠性保证，它执行的是全量快照，也就是说，把内存中的所有数据都">
+  <meta name="description" content="内存快照RDB:Redis DataBase(可以保证可靠性，还能在宕机时实现快速恢复的其他方法呢)我们还要考虑两个关键问题：  对哪些数据做快照？这关系到快照的执行效率问题； 做快照时，数据还能被增删改吗？这关系到 Redis 是否被阻塞，能否同时正常处理请求。  给哪些内存数据做快照Redis 的数据都在内存中，为了提供所有数据的可靠性保证，它执行的是全量快照，也就是说，把内存中的所有数据都记">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RDB">
 <meta property="og:url" content="https://sk-xinye.github.io/2021/05/31/RDB/index.html">
 <meta property="og:site_name" content="sk-xinyeの博客">
-<meta property="og:description" content="内存快照RDB:Redis DataBase(可以保证可靠性，还能在宕机时实现快速恢复的其他方法呢)我们还要考虑两个关键问题：  对哪些数据做快照？这关系到快照的执行效率问题； 做快照时，数据还能被增删改吗？这关系到 Redis 是否被阻塞，能否同时正常处理请求。  给哪些内存数据做快照？Redis 的数据都在内存中，为了提供所有数据的可靠性保证，它执行的是全量快照，也就是说，把内存中的所有数据都">
+<meta property="og:description" content="内存快照RDB:Redis DataBase(可以保证可靠性，还能在宕机时实现快速恢复的其他方法呢)我们还要考虑两个关键问题：  对哪些数据做快照？这关系到快照的执行效率问题； 做快照时，数据还能被增删改吗？这关系到 Redis 是否被阻塞，能否同时正常处理请求。  给哪些内存数据做快照Redis 的数据都在内存中，为了提供所有数据的可靠性保证，它执行的是全量快照，也就是说，把内存中的所有数据都记">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://sk-xinye.github.io/2021/05/31/RDB/%E5%86%99%E6%97%B6%E5%A4%8D%E5%88%B6.jpg">
 <meta property="article:published_time" content="2021-05-31T00:02:45.000Z">
-<meta property="article:modified_time" content="2021-05-31T00:14:31.134Z">
+<meta property="article:modified_time" content="2021-09-10T13:07:40.747Z">
 <meta property="article:author" content="sk-xinye">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://sk-xinye.github.io/2021/05/31/RDB/%E5%86%99%E6%97%B6%E5%A4%8D%E5%88%B6.jpg">
@@ -133,12 +133,12 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">13</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">15</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">96</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">111</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -218,10 +218,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-05-31 08:02:45 / 修改时间：08:14:31" itemprop="dateCreated datePublished" datetime="2021-05-31T08:02:45+08:00">2021-05-31</time>
+              <time title="创建时间：2021-05-31 08:02:45" itemprop="dateCreated datePublished" datetime="2021-05-31T08:02:45+08:00">2021-05-31</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-09-10 21:07:40" itemprop="dateModified" datetime="2021-09-10T21:07:40+08:00">2021-09-10</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -248,13 +254,13 @@
 <li>对哪些数据做快照？这关系到快照的执行效率问题；</li>
 <li>做快照时，数据还能被增删改吗？这关系到 Redis 是否被阻塞，能否同时正常处理请求。</li>
 </ul>
-<h2 id="给哪些内存数据做快照？"><a href="#给哪些内存数据做快照？" class="headerlink" title="给哪些内存数据做快照？"></a>给哪些内存数据做快照？</h2><p>Redis 的数据都在内存中，为了提供所有数据的可靠性保证，它执行的是<strong>全量快照</strong>，也就是说，把内存中的所有数据都记录到磁盘中，这就类似于给 100 个人拍合影，把每一个人都拍进照片里。这样做的好处是，一次性记录了所有数据，一个都不少。</p>
+<h2 id="给哪些内存数据做快照"><a href="#给哪些内存数据做快照" class="headerlink" title="给哪些内存数据做快照"></a>给哪些内存数据做快照</h2><p>Redis 的数据都在内存中，为了提供所有数据的可靠性保证，它执行的是<strong>全量快照</strong>，也就是说，把内存中的所有数据都记录到磁盘中，这就类似于给 100 个人拍合影，把每一个人都拍进照片里。这样做的好处是，一次性记录了所有数据，一个都不少。</p>
 <p>Redis 提供了两个命令来生成 RDB 文件，分别是 save 和 bgsave。save：</p>
 <ul>
 <li>在主线程中执行，会导致阻塞；</li>
 <li>bgsave：创建一个子进程，专门用于写入 RDB 文件，避免了主线程的阻塞，这也是 Redis RDB 文件生成的默认配置。</li>
 </ul>
-<h2 id="快照时数据能修改吗"><a href="#快照时数据能修改吗" class="headerlink" title="快照时数据能修改吗?"></a>快照时数据能修改吗?</h2><p>写时复制技术（Copy-On-Write, COW）<br>    <img src="/2021/05/31/RDB/%E5%86%99%E6%97%B6%E5%A4%8D%E5%88%B6.jpg" class=""></p>
+<h2 id="快照时数据能修改吗"><a href="#快照时数据能修改吗" class="headerlink" title="快照时数据能修改吗"></a>快照时数据能修改吗</h2><p>写时复制技术（Copy-On-Write, COW）<br>    <img src="/2021/05/31/RDB/%E5%86%99%E6%97%B6%E5%A4%8D%E5%88%B6.jpg" class=""></p>
 <h2 id="增量快照"><a href="#增量快照" class="headerlink" title="增量快照"></a>增量快照</h2><p>Redis 4.0 中提出了一个混合使用 AOF 日志和内存快照的方法</p>
 <p>这样一来，快照不用很频繁地执行，这就避免了频繁 fork 对主线程的影响。而且，AOF 日志也只用记录两次快照间的操作，也就是说，不需要记录所有操作了，因此，就不会出现文件过大的情况了，也可以避免重写开销。</p>
 <h2 id="使用建议"><a href="#使用建议" class="headerlink" title="使用建议"></a>使用建议</h2><ul>
@@ -342,7 +348,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E5%BF%AB%E7%85%A7RDB-Redis-DataBase-%E5%8F%AF%E4%BB%A5%E4%BF%9D%E8%AF%81%E5%8F%AF%E9%9D%A0%E6%80%A7%EF%BC%8C%E8%BF%98%E8%83%BD%E5%9C%A8%E5%AE%95%E6%9C%BA%E6%97%B6%E5%AE%9E%E7%8E%B0%E5%BF%AB%E9%80%9F%E6%81%A2%E5%A4%8D%E7%9A%84%E5%85%B6%E4%BB%96%E6%96%B9%E6%B3%95%E5%91%A2"><span class="nav-number">1.</span> <span class="nav-text">内存快照RDB:Redis DataBase(可以保证可靠性，还能在宕机时实现快速恢复的其他方法呢)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%99%E5%93%AA%E4%BA%9B%E5%86%85%E5%AD%98%E6%95%B0%E6%8D%AE%E5%81%9A%E5%BF%AB%E7%85%A7%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">给哪些内存数据做快照？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%AB%E7%85%A7%E6%97%B6%E6%95%B0%E6%8D%AE%E8%83%BD%E4%BF%AE%E6%94%B9%E5%90%97"><span class="nav-number">3.</span> <span class="nav-text">快照时数据能修改吗?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A2%9E%E9%87%8F%E5%BF%AB%E7%85%A7"><span class="nav-number">4.</span> <span class="nav-text">增量快照</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%BB%BA%E8%AE%AE"><span class="nav-number">5.</span> <span class="nav-text">使用建议</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E5%BF%AB%E7%85%A7RDB-Redis-DataBase-%E5%8F%AF%E4%BB%A5%E4%BF%9D%E8%AF%81%E5%8F%AF%E9%9D%A0%E6%80%A7%EF%BC%8C%E8%BF%98%E8%83%BD%E5%9C%A8%E5%AE%95%E6%9C%BA%E6%97%B6%E5%AE%9E%E7%8E%B0%E5%BF%AB%E9%80%9F%E6%81%A2%E5%A4%8D%E7%9A%84%E5%85%B6%E4%BB%96%E6%96%B9%E6%B3%95%E5%91%A2"><span class="nav-number">1.</span> <span class="nav-text">内存快照RDB:Redis DataBase(可以保证可靠性，还能在宕机时实现快速恢复的其他方法呢)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%99%E5%93%AA%E4%BA%9B%E5%86%85%E5%AD%98%E6%95%B0%E6%8D%AE%E5%81%9A%E5%BF%AB%E7%85%A7"><span class="nav-number">2.</span> <span class="nav-text">给哪些内存数据做快照</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%AB%E7%85%A7%E6%97%B6%E6%95%B0%E6%8D%AE%E8%83%BD%E4%BF%AE%E6%94%B9%E5%90%97"><span class="nav-number">3.</span> <span class="nav-text">快照时数据能修改吗</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A2%9E%E9%87%8F%E5%BF%AB%E7%85%A7"><span class="nav-number">4.</span> <span class="nav-text">增量快照</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%BB%BA%E8%AE%AE"><span class="nav-number">5.</span> <span class="nav-text">使用建议</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -356,14 +362,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">96</span>
+          <span class="site-state-item-count">111</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>

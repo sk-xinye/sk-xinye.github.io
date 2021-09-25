@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="整体 apiVersion：此处值是v1，这个版本号需要根据安装的Kubernetes版本和资源类型进行变化，记住不是写死的。 kind：此处创建的是Pod，根据实际情况，此处资源类型可以是Deployment、Job、Ingress、Service、CronJob等。 metadata:包含Pod的一些meta信息，比如名称、namespace、标签等信息。 spec:包括一些container">
+<meta property="og:type" content="article">
+<meta property="og:title" content="9.yaml相关">
+<meta property="og:url" content="https://sk-xinye.github.io/2021/07/30/9-yaml%E7%9B%B8%E5%85%B3/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="整体 apiVersion：此处值是v1，这个版本号需要根据安装的Kubernetes版本和资源类型进行变化，记住不是写死的。 kind：此处创建的是Pod，根据实际情况，此处资源类型可以是Deployment、Job、Ingress、Service、CronJob等。 metadata:包含Pod的一些meta信息，比如名称、namespace、标签等信息。 spec:包括一些container">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-30T07:50:51.000Z">
+<meta property="article:modified_time" content="2021-08-08T13:43:29.700Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2021/07/30/9-yaml%E7%9B%B8%E5%85%B3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>9.yaml相关 | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">15</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">111</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/07/30/9-yaml%E7%9B%B8%E5%85%B3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          9.yaml相关
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-30 15:50:51" itemprop="dateCreated datePublished" datetime="2021-07-30T15:50:51+08:00">2021-07-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-08 21:43:29" itemprop="dateModified" datetime="2021-08-08T21:43:29+08:00">2021-08-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="整体"><a href="#整体" class="headerlink" title="整体"></a>整体</h2><ul>
+<li>apiVersion：此处值是v1，这个版本号需要根据安装的Kubernetes版本和资源类型进行变化，记住不是写死的。</li>
+<li>kind：此处创建的是Pod，根据实际情况，此处资源类型可以是Deployment、Job、Ingress、Service、CronJob等。</li>
+<li>metadata:包含Pod的一些meta信息，比如名称、namespace、标签等信息。</li>
+<li>spec:包括一些container，storage，volume以及其他Kubernetes需要的参数，以及诸如是否在容器失败时重新启动容器的属性。可在特定Kubernetes API找到完整的Kubernetes Pod的属性。</li>
+</ul>
+<h2 id="CronJobs"><a href="#CronJobs" class="headerlink" title="CronJobs"></a>CronJobs</h2><h3 id="jobTemplate"><a href="#jobTemplate" class="headerlink" title="jobTemplate"></a>jobTemplate</h3><p>spec.jobTemplate是任务的模版，它是必须的。它和 Job的语法完全一样， 除了它是嵌套的没有 apiVersion 和 kind。 编写任务的 .spec</p>
+<h3 id="并发行规则"><a href="#并发行规则" class="headerlink" title="并发行规则"></a>并发行规则</h3><p>spec.concurrencyPolicy 也是可选的。它声明了 CronJob 创建的任务执行时发生重叠如何处理。 spec 仅能声明下列规则中的一种：</p>
+<ul>
+<li>Allow (默认)：CronJob 允许并发任务执行。</li>
+<li>Forbid： CronJob 不允许并发任务执行；如果新任务的执行时间到了而老任务没有执行完，CronJob 会忽略新任务的执行。</li>
+<li>Replace：如果新任务的执行时间到了而老任务没有执行完，CronJob 会用新任务替换当前正在运行的任务。</li>
+</ul>
+<h3 id="任务历史限制"><a href="#任务历史限制" class="headerlink" title="任务历史限制"></a>任务历史限制</h3><p>spec.successfulJobsHistoryLimit 和 .spec.failedJobsHistoryLimit是可选的。 这两个字段指定应保留多少已完成和失败的任务。 默认设置为3和1。限制设置为0代表相应类型的任务完成后不会保留。</p>
+<h3 id="开始的最后期限"><a href="#开始的最后期限" class="headerlink" title="开始的最后期限"></a>开始的最后期限</h3><p>spec.startingDeadlineSeconds 域是可选的。 它表示任务如果由于某种原因错过了调度时间，开始该任务的截止时间的秒数。过了截止时间，CronJob 就不会开始任务。 不满足这种最后期限的任务会被统计为失败任务。如果该域没有声明，那任务就没有最后期限。</p>
+<h3 id="schedule"><a href="#schedule" class="headerlink" title="schedule"></a>schedule</h3><p>┌───────────── 分钟 (0 - 59)<br>│ ┌───────────── 小时 (0 - 23)<br>│ │ ┌───────────── 月的某天 (1 - 31)<br>│ │ │ ┌───────────── 月份 (1 - 12)<br>│ │ │ │ ┌───────────── 周的某天 (0 - 6) （周日到周一；在某些系统上，7 也是星期日）<br>│ │ │ │ │<br>│ │ │ │ │<br>│ │ │ │ │</p>
+<hr>
+<table>
+<thead>
+<tr>
+<th>输入</th>
+<th>描述</th>
+<th>相当于</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>@yearly (or @annually)</td>
+<td>每年 1 月 1 日的午夜运行一次</td>
+<td>0 0 1 1 *</td>
+</tr>
+<tr>
+<td>@monthly</td>
+<td>每月第一天的午夜运行一次</td>
+<td>0 0 1 * *</td>
+</tr>
+<tr>
+<td>@weekly</td>
+<td>每周的周日午夜运行一次</td>
+<td>0 0 * * 0</td>
+</tr>
+<tr>
+<td>@daily (or @midnight)</td>
+<td>每天午夜运行一次</td>
+<td>0 0 * * *</td>
+</tr>
+<tr>
+<td>@hourly</td>
+<td>每小时的开始一次</td>
+<td>0 * * * *</td>
+</tr>
+</tbody></table>
+<h3 id="cron-表达式"><a href="#cron-表达式" class="headerlink" title="cron 表达式"></a>cron 表达式</h3><table>
+<thead>
+<tr>
+<th>顺序</th>
+<th>秒</th>
+<th>分钟</th>
+<th>小时</th>
+<th>日期</th>
+<th>月份</th>
+<th>星期</th>
+<th>年(可选)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>取值</td>
+<td>0-59</td>
+<td>0-59</td>
+<td>0-23</td>
+<td>1-30(31)</td>
+<td>1月12日</td>
+<td>1月7日</td>
+<td></td>
+</tr>
+<tr>
+<td>允许特殊字符</td>
+<td>, - * /</td>
+<td>, - * /</td>
+<td>, - * /</td>
+<td>, - * / ? L W C</td>
+<td>, - * /</td>
+<td>, - * / L # C</td>
+<td>1970-2099 , - * /</td>
+</tr>
+</tbody></table>
+<p>字段含义</p>
+<ul>
+<li>*：代表所有可能的值</li>
+<li>-：指定范围</li>
+<li>,：列出枚举  例如在分钟里，”5,15”表示5分钟和20分钟触发</li>
+<li>/：指定增量  例如在分钟里，”3/15”表示从3分钟开始，没隔15分钟执行一次</li>
+<li>?：表示没有具体的值，使用?要注意冲突</li>
+<li>L：表示last，例如星期中表示7或SAT，月份中表示最后一天31或30，6L表示这个月倒数第6天，FRIL- 表示这个月的最后一个星期五</li>
+<li>W：只能用在月份中，表示最接近指定天的工作日</li>
+<li>#：只能用在星期中，表示这个月的第几个周几，例如6#3表示这个月的第3个周五</li>
+</ul>
+<p>示例</p>
+<ul>
+<li>0 * * * * ? 每1分钟触发一次</li>
+<li>0 0 * * * ? 每天每1小时触发一次</li>
+<li>0 0 10 * * ? 每天10点触发一次</li>
+<li>0 * 14 * * ? 在每天下午2点到下午2:59期间的每1分钟触发</li>
+<li>0 30 9 1 * ? 每月1号上午9点半</li>
+<li>0 15 10 15 * ? 每月15日上午10:15触发</li>
+<li>*/5 * * * * ? 每隔5秒执行一次</li>
+<li>0 */1 * * * ? 每隔1分钟执行一次</li>
+<li>0 0 5-15 * * ? 每天5-15点整点触发</li>
+<li>0 0/3 * * * ? 每三分钟触发一次</li>
+<li>0 0 0 1 * ?  每月1号凌晨执行一次</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/07/03/8-%E7%BD%91%E7%BB%9C/" rel="prev" title="8.网络">
+      <i class="fa fa-chevron-left"></i> 8.网络
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/08/25/ES%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB/" rel="next" title="1.初识ES">
+      1.初识ES <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E4%BD%93"><span class="nav-number">1.</span> <span class="nav-text">整体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CronJobs"><span class="nav-number">2.</span> <span class="nav-text">CronJobs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#jobTemplate"><span class="nav-number">2.1.</span> <span class="nav-text">jobTemplate</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E8%A1%8C%E8%A7%84%E5%88%99"><span class="nav-number">2.2.</span> <span class="nav-text">并发行规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E5%8E%86%E5%8F%B2%E9%99%90%E5%88%B6"><span class="nav-number">2.3.</span> <span class="nav-text">任务历史限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E7%9A%84%E6%9C%80%E5%90%8E%E6%9C%9F%E9%99%90"><span class="nav-number">2.4.</span> <span class="nav-text">开始的最后期限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#schedule"><span class="nav-number">2.5.</span> <span class="nav-text">schedule</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cron-%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">2.6.</span> <span class="nav-text">cron 表达式</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">111</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

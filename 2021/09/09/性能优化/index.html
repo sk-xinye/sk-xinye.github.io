@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="写入速度优化在es的默认设置下，是综合考虑数据可靠性、搜索实时性、写入速度等因素的。当离开默认配置、追求极致的写入速度时，很多是以牺牲可靠性和搜索实时性为代价的。有时候，业务上对数据可靠性和搜索实时性要求并不高，反而对写入速度要求很高，此时可以调整一些策略，最大化写入速度。接下来的优化基于集群正常运行的前提下，如果是集群首次批量导入数据，则可以将副本数设置为0，导入完毕在将副本数调整回去，这样副分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="性能优化">
+<meta property="og:url" content="https://sk-xinye.github.io/2021/09/09/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="写入速度优化在es的默认设置下，是综合考虑数据可靠性、搜索实时性、写入速度等因素的。当离开默认配置、追求极致的写入速度时，很多是以牺牲可靠性和搜索实时性为代价的。有时候，业务上对数据可靠性和搜索实时性要求并不高，反而对写入速度要求很高，此时可以调整一些策略，最大化写入速度。接下来的优化基于集群正常运行的前提下，如果是集群首次批量导入数据，则可以将副本数设置为0，导入完毕在将副本数调整回去，这样副分">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-09-09T06:35:09.000Z">
+<meta property="article:modified_time" content="2021-09-13T00:29:56.564Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2021/09/09/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>性能优化 | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">15</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">111</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/09/09/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          性能优化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-09-09 14:35:09" itemprop="dateCreated datePublished" datetime="2021-09-09T14:35:09+08:00">2021-09-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-09-13 08:29:56" itemprop="dateModified" datetime="2021-09-13T08:29:56+08:00">2021-09-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/es/" itemprop="url" rel="index"><span itemprop="name">es</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="写入速度优化"><a href="#写入速度优化" class="headerlink" title="写入速度优化"></a>写入速度优化</h2><p>在es的默认设置下，是综合考虑数据可靠性、搜索实时性、写入速度等因素的。当离开默认配置、追求极致的写入速度时，很多是以牺牲可靠性和搜索实时性为代价的。有时候，业务上对数据可靠性和搜索实时性要求并不高，反而对写入速度要求很高，此时可以调整一些策略，最大化写入速度。接下来的优化基于集群正常运行的前提下，如果是集群首次批量导入数据，则可以将副本数设置为0，导入完毕在将副本数调整回去，这样副分片只需要复制，节省了构建索引过程。综合来说，提升写入速度从以下几方面入手：</p>
+<ul>
+<li>加大translog flush间隔，目的是降低iops、writeblock</li>
+<li>加大index refresh间隔，除了降低I/O，更重要的是降低了segment merge频率</li>
+<li>调整bulk请求</li>
+<li>优化磁盘间的任务均匀情况，将shard 尽量均匀分布到物理主机的各个磁盘</li>
+<li>优化节点间的任务分布，将任务尽量均匀地分发各节点</li>
+<li>优化lucence层建立索引的过程，目的是降低CPU占用率及I/O，例如，禁用_all字段</li>
+</ul>
+<h3 id="translog-flush间隔调整"><a href="#translog-flush间隔调整" class="headerlink" title="translog flush间隔调整"></a>translog flush间隔调整</h3><p>这是影响ES写入速度的最大因素。但是只有这样，写操作才有可能是可靠的。如果系统可以接受一定概率的数据丢失（例如，数据写入主分片成功，尚未复制到副本分片时，主机断电。由于数据既没有刷到Lucene,translog 也没有刷盘，恢复时translog中没有这个数据，数据丢失），则调整translog持久化策略为周期性和一定大小的时候“flush”,例如：</p>
+<ul>
+<li>index.translog.durability:async<ul>
+<li>设置为async标识translog的刷盘策略按sync_interval配置指定时间周期进行</li>
+</ul>
+</li>
+<li>index.translog.sync_interval:120s<ul>
+<li>加大translog刷盘间隔时间。默认为5s，不可低于100ms</li>
+</ul>
+</li>
+<li>index.translog.flush_threshold_size:1024mb<ul>
+<li>超过这个大小会导致refresh操作，产生新的lucene分段。默认为512Mb</li>
+</ul>
+</li>
+</ul>
+<h3 id="索引刷新间隔refresh-interval"><a href="#索引刷新间隔refresh-interval" class="headerlink" title="索引刷新间隔refresh interval"></a>索引刷新间隔refresh interval</h3><p>默认情况下索引的refresh_interval为1秒，这意味着数据写1秒后就可以被搜索到，每次索引的refresh会产生一个新的lucene段，这会导致频繁的segment merge行为，如果不需要这么高的搜索实时性，应该降低索引refresh周期，例如：index.refresh_interval:120s</p>
+<h3 id="段合并"><a href="#段合并" class="headerlink" title="段合并"></a>段合并</h3><ul>
+<li>segmnet merge 操作对系统I/O和内存占用都比较高，merge行为由lucene控制，位置为：index.merge.scheduler.max_thread_count。</li>
+<li>最大线程数max_thread_count的默认值如下：Math.min(3, Runtime.getRuntime().availableProcessors() / 2)</li>
+<li>以上是一个比较理想值，如果只有一块硬盘并且非SSD,则应该把它设置为1，因为在旋转存储介质算上并发写，由于寻址的原因，只会降低写入速度。</li>
+</ul>
+<h3 id="indexing-buffer"><a href="#indexing-buffer" class="headerlink" title="indexing buffer"></a>indexing buffer</h3><ul>
+<li>indexing buffer 在为doc建立索引时使用，当缓冲满时会刷入磁盘，生成一个新的segmnet,这是除refresh_interval刷新索引外，另一个生成新segment的机会。</li>
+<li>每个shard有自己的indexing buffer,下面的这个buffer大小的配置需要除以这个节点上所有shard的数量：<br>indices.memory.index_buffer_size。默认为整个堆空间的10%。</li>
+<li>如果有了以上设置的话，那indices.memory.min_index_buffer_size默认为48MB，indices.memory.max_index_buffer_siz默认值为无限。</li>
+<li>在执行大量的索引操作时，indices.memory.index_buffer_size的默认设置可能不够，这和可用堆内存、单节点上的shard数量有关，可以考虑适当增大该值</li>
+</ul>
+<h3 id="使用bulk"><a href="#使用bulk" class="headerlink" title="使用bulk"></a>使用bulk</h3><p>批量写比一个索引请求只写单个文档的效率高得多，但是要注意bulk请求的整体字节数不要太大，太大的请求可能会给集群带来内存压力，因此每个请求最好避免超过几十兆字节，即使较大的请求看上去执行得更好</p>
+<h4 id="bulk线程池和队列"><a href="#bulk线程池和队列" class="headerlink" title="bulk线程池和队列"></a>bulk线程池和队列</h4><p>建立索引的过程属于计算密集型任务，应该使用固定大小的线程池配置，来不及处理的任务放入队列。线程池最大线程数量应配置为CPU核心数+1，这也是bulk线程池的默认设置，可以避免过多的上下文切换。队列大小可以适当增加，但一定要严格控制大小，过大的队列导致较高的GC压力，并可能导致Full GC 频繁发生</p>
+<h4 id="并发执行bulk请求"><a href="#并发执行bulk请求" class="headerlink" title="并发执行bulk请求"></a>并发执行bulk请求</h4><p>bulk写请求是个长任务，为了给系统增加足够的写入压力，写入过程应该多个客户端、多线程地并发执行，如果要验证系统的极限写入能力，那么目标就是把CPU压满。磁盘util、内存等一般都不是瓶颈。如果CPU没有压满，则应该提高写入端的并发数量。但是要注意bulk线程池队列的reject情况，出现reject代表ES的bulk队列已满，客户端请求被拒绝，此时客户端会收到429错误（TOO_MANAY_REQUESTS）,客户端对此的处理策略应该是延迟重试。不应该忽略这个异常，否则写入系统的数据会少于预期。即使客户端正确处理了429错误，我们仍然应该尽量避免产生reject。因此，在评估极限的写入并发量应该控制在不reject前提下的最大值为宜。</p>
+<h3 id="磁盘间的任务均衡"><a href="#磁盘间的任务均衡" class="headerlink" title="磁盘间的任务均衡"></a>磁盘间的任务均衡</h3><p>如果部署方案是为path.data配置多个路径来使用多块磁盘，则ES在分配shard时，落到各磁盘上的shard可能并不均匀，这种不均匀可能会导致某些磁盘繁忙，利用率在较长时间持续达到100%。这种不均匀达到一定程度会对写入性能产生负面影响。</p>
+<p>ES在处理多路径时，有限将shard分配到可用空间占比最多的磁盘上，因此短时间创建的shard 可能被击中分配到各个磁盘上，即使可用空间是99%和98%的差别。后来es在2.x版本开始解决这个问题：预估一下shard会使用的空间，从磁盘可用空间中减去这部分，直到现在6.x版也是这种处理方式。但是实现也存在一些问题：</p>
+<ul>
+<li>从可用空间减去预估大小这种机制只存在于一次索引创建的过程中，下一次的索引创建，磁盘可用空间并不是上次做减法后的结果。这也可以理解，毕竟预估是不准的，一直减下去空间很快就减没了。</li>
+<li>但是最终的效果是，这种机制并没有根本上解决问题，即使没有完美的解决方案，这种机制的效果也不够好。如果单一的机制不能解决所有的场景，那么至少应该为不同场景准备多种选择。为此，ES增加了两种策略。<ul>
+<li>简单轮询：在系统初始阶段，简单轮询的效果是最均匀的</li>
+<li>基于可用空间的动态加权轮询：以可用空间作为权重，在磁盘之间加权轮询</li>
+</ul>
+</li>
+</ul>
+<h3 id="节点间的任务均衡"><a href="#节点间的任务均衡" class="headerlink" title="节点间的任务均衡"></a>节点间的任务均衡</h3><p>为了节点间的任务林亮均衡，数据写入客户端应该把bulk请求轮询发送各个节点。<br>当适用JAVA API 或 REST API的bulk接口发送数据时，客户端将会轮询发送到集群节点，节点列表取决于：</p>
+<ul>
+<li>使用java API,当设置client.transport.sniff为true(默认为false)时，列表为所有数据节点，否则节点列表为构建客户端对象时传入的节点列表</li>
+<li>使用REST API时，列表为构建对象时添加进去的节点</li>
+</ul>
+<p>java API的TransportClient和REST API的RestClient都是线程安全的，如果写入程序自己创建线程池控制并发，则应该使用同一个Client对象。再次建议使用REST API，java API会在未来的版本中废弃，REST API有良好的版本兼容性。理论上，java api在序列化上有性能优势，但是只有在吞吐量非常大时才值得考虑序列化的开销带来的影响，通常搜索并不是高吞吐量的业务</p>
+<p>要观察bulk请求在不同节点间的均衡性，可以通过cat接口观察bulk线程池和队列情况：_cat/thread_pool</p>
+<h3 id="索引过程调整和优化"><a href="#索引过程调整和优化" class="headerlink" title="索引过程调整和优化"></a>索引过程调整和优化</h3><h4 id="自动生成doc-ID"><a href="#自动生成doc-ID" class="headerlink" title="自动生成doc ID"></a>自动生成doc ID</h4><p>通过ES写入流程可以看出，写入doc时如果外部指定了id,则ES会先尝试读取doc的版本号，以判断是否需要更新。这会涉及一次读取磁盘的操作，通过自动生成doc ID可以避免这个环节。</p>
+<h4 id="调整字段Mappings"><a href="#调整字段Mappings" class="headerlink" title="调整字段Mappings"></a>调整字段Mappings</h4><ul>
+<li>减少字段数量，对于不需要建立索引的字段，不写入ES</li>
+<li>将不需要建立索引的字段index属性设置为not_analyzed或no。对字段部分次，或者不索引，可以减少很多运算操作，降低CPU占用。尤其是binary类型，默认情况下占用CPU非常高，而这种类型进行分词通常没有什么意义。</li>
+<li>减少字段内容长度，如果原始数据的大段内容无需全部建立索引，则可以尽量减少不必要的内容</li>
+<li>使用不同的分词器（analyzer）,不同的分析器在索引过程中运算复杂度也有较大的差异</li>
+</ul>
+<h4 id="调整-source字段"><a href="#调整-source字段" class="headerlink" title="调整_source字段"></a>调整_source字段</h4><p>_source字段用于存储doc原始数据，对于部分不需要存储的字段，可以通过includes excludes 过滤，或者将_source禁用，一般用于索引和数据分离。这样可以降低I/O的压力，不过实际场景中大多不会禁用_source,而即使过滤掉某些字段，对于写入速度的提升作用也不大，满负荷情况下，基本是CPU先跑满了，瓶颈在与CPU。</p>
+<h4 id="禁用-all字段"><a href="#禁用-all字段" class="headerlink" title="禁用_all字段"></a>禁用_all字段</h4><p>从ES6.0开始，_all字段默认为不启用，而在此前的版本中，_all字段默认是开启的，_all字段中包含所有字段分词后的关键词，作用是可以在搜索的时候不指定特定字段，从所有字段中检索。ES6.0默认禁用_all字段主要有以下几点原因：</p>
+<ul>
+<li>由于需要从其他的全部字段复制所有字段值，导致_all字段占用非常大的空间。</li>
+<li>_all字段有自己的分词器，在进行某些查询时（例如，同义词），结果不符合预期，因为没有匹配同一个分词器</li>
+<li>由于数据重复引起的额外建立索引的开销</li>
+<li>想要调试时，其内容不容易检查</li>
+<li>有些用户甚至不知道存在这个字段，导致查询混乱</li>
+<li>有更好的替代方式</li>
+</ul>
+<p>关于此问题，可以参考 <a target="_blank" rel="noopener" href="https://github.com/elastic/elasticsearch/issues/19784">https:github.com/elastic/elasticsearch/issues/19784</a> 。在ES6.0之前的版本中，可以在mapping中将enabled设置为false 来禁用_all字段:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">curl -X PUT &quot;localhost:9200/my_index&quot; -H &#x27;Content-Type: application/json&#x27; -d &#x27;</span><br><span class="line">&#123;</span><br><span class="line">    &quot;mapping&quot;:&#123;</span><br><span class="line">    &quot;type_1&quot;:&#123;</span><br><span class="line">    &quot;_all&quot;:&#123;&quot;enabled&quot;:false&#125;,</span><br><span class="line">    &quot;properties&quot;:&#123;....&#125;</span><br><span class="line">&#125;&#125;&#125;&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>禁用_all字段可以明显降低对CPU和I/O的压力</p>
+<h4 id="对Analyzed的字段禁用Norms"><a href="#对Analyzed的字段禁用Norms" class="headerlink" title="对Analyzed的字段禁用Norms"></a>对Analyzed的字段禁用Norms</h4><p>Norms用于在搜索时计算doc的评分，如果不需要评分，则可以将其禁用：<br>“title”:{“type”:”string”,”norms”:{“enabled”:false}}</p>
+<h4 id="index-option设置"><a href="#index-option设置" class="headerlink" title="index option设置"></a>index option设置</h4><p>index_options用于控制在建立倒排索引过程中，哪些内容会被添加到倒排索引，例如，doc数量、词频、postions、offsets等信息，优化这些配置可以一定程度降低索引过程中的运算任务，节省CPU占用率。不过在实际场景中，通常很难确定业务将来会不会用到这个信息，除非一开始方案就明确这样设计的。</p>
+<h3 id="要用raid-0-或者10"><a href="#要用raid-0-或者10" class="headerlink" title="要用raid 0 或者10"></a>要用raid 0 或者10</h3><h2 id="ES-搜索速度优化"><a href="#ES-搜索速度优化" class="headerlink" title="ES 搜索速度优化"></a>ES 搜索速度优化</h2><h3 id="为文件系统cache预留足够的内存空间"><a href="#为文件系统cache预留足够的内存空间" class="headerlink" title="为文件系统cache预留足够的内存空间"></a>为文件系统cache预留足够的内存空间</h3><p>在一般情况下，应用程序的读写都是被操作系统”cache”(除了direct方式)，cache保存在系统物理内存中（线上应该禁用swap）,命中cache可以降低对磁盘的直接访问频率。搜索很依赖对系统cache的命中，如果某个请求需要从磁盘读取数据，则一定会产生相对较高的延迟。应该至少为系统cache预留一般的可用物理内存，更大的内存有更高的cache命中率。</p>
+<h3 id="使用更快的硬件"><a href="#使用更快的硬件" class="headerlink" title="使用更快的硬件"></a>使用更快的硬件</h3><p>写入性能对CPU的性能更敏感，而搜索性能在一般情况下更多的是在于I/O能力，使用ssd会比旋转类存储介质好得多。尽量避免使用NFS等远程文件系统，如果NFS比本地存储慢3倍，则在搜索场景下响应速度可能会慢10倍左右。这可能是因为搜索请求有更多的随机访问。</p>
+<p>如果搜索类型属于计算比较多，则可以考虑使用更快CPU。</p>
+<h3 id="文档类型"><a href="#文档类型" class="headerlink" title="文档类型"></a>文档类型</h3><p>为了让搜索时的成本更低，文档应该合理建模。特别是应该避免join操作，嵌套（nested）会使查询慢几倍，父子（parent-child）关系可能使查询慢数百倍，因此，如果可以通过非规范化（denormalizing）文档来回答相同的问题，则可以显著地提高搜索速度。</p>
+<h3 id="预索引数据"><a href="#预索引数据" class="headerlink" title="预索引数据"></a>预索引数据</h3><p>还可以针对某些查询的模式来优化数据的索引方式。例如，如果所有文档都有一个price字段，并且大多数查询在一个固定的范围上运行range聚合，那么可以通过将范围“pre-indexing”到索引中并使用聚合来加快聚合速度。</p>
+<h3 id="字段映射"><a href="#字段映射" class="headerlink" title="字段映射"></a>字段映射</h3><p>有些字段的内容是数值，但并不意味着其总是应该被映射为数值类型，例如，一些标识符，将他们映射为keyword可能会比integer或long更好。</p>
+<h3 id="避免使用脚本"><a href="#避免使用脚本" class="headerlink" title="避免使用脚本"></a>避免使用脚本</h3><p>一般来说，应该避免使用脚本。如果一定要用，则应该优先考虑painless和expressions.</p>
+<h3 id="优化日期搜索"><a href="#优化日期搜索" class="headerlink" title="优化日期搜索"></a>优化日期搜索</h3><p>在使用日期范围检索时，使用now的查询通常不能缓存，因为匹配到的范围一直在变化。但是，从用户体验角度来看，切换到完整的日期通常是可以接受的，这样可以更好地利用查询缓存。</p>
+<h3 id="为只读索引执行force-merge"><a href="#为只读索引执行force-merge" class="headerlink" title="为只读索引执行force-merge"></a>为只读索引执行force-merge</h3><p>为不再更新的只读索引执行force merge,将lucene索引合并为单个分段，可以提升查询速度。当一个lucene索引存在多个分段时，每个分段会单独执行搜索再将结果合并，将只读索引强制合并为一个lucene分段不仅可以优化搜索过程，对索引恢复速度也有好处。</p>
+<p>基于日期进行轮询的索引的旧数据一般都不会再更新。此前的章节中说过，应该避免持续地写一个固定的索引，直到它巨大无比，而应该按照一定的策略，例如，每天生成一个新的索引，然后用别名关联，或者使用索引通配符。这样，可以每天选一个时间点对昨天的索引执行force-merge、Shrink等操作。</p>
+<h3 id="globle-ordinals"><a href="#globle-ordinals" class="headerlink" title="globle ordinals"></a>globle ordinals</h3><p>全局序号是一种数据结构，用于在keyword字段上运行terms聚合。他用一个数值来代表字段中的字符串值，然后为每一数值分配一个bucket.这需要一个对global ordinals和bucket的构建过程。默认情况下，他们被延迟构建，因为ES不知道哪些字段将用于terms聚合，哪些字段不会。<br>参考：<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/guide/current/preload-fielddata.html">https://www.elastic.co/guide/en/elasticsearch/guide/current/preload-fielddata.html</a> <a target="_blank" rel="noopener" href="https://blog.csdn.net/zwgdft/artical/details/83215977">https://blog.csdn.net/zwgdft/artical/details/83215977</a></p>
+<h3 id="execution-hint"><a href="#execution-hint" class="headerlink" title="execution hint"></a>execution hint</h3><p>terms 聚合有两种不同机制：</p>
+<ul>
+<li>通过直接使用字段值来聚合每个桶的数据（map）</li>
+<li>通过使用字段的全局序号并为每个全局序号分配一个bucket(global_ordinals).</li>
+</ul>
+<p>ES 使用global_ordinals作为keyword字段的默认选项，它使用全局序号动态地分配bucket,因此内存使用与聚合结果中的字段数量是线性关系。在大部分情况下，这种方式的速度很快。当查询只会匹配少量文档时，可以考虑使用map.默认情况下，map只在脚本上运行聚合时使用，因为他们没有序数。</p>
+<h3 id="预热文件系统cache"><a href="#预热文件系统cache" class="headerlink" title="预热文件系统cache"></a>预热文件系统cache</h3><p>如果ES主机重启，则文件系统缓存将为空，此时搜索会比较慢。可以使用index.store.preload设置，通过指定文件扩展名，显式地告诉操作系统应该将哪些文件加载到内存中，例如，配置到elasticsearch.yml文件中：<br>index.store.preload:[“nvd”,”dvd”]</p>
+<p>或者在索引创建时设置：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PUT /my_index</span><br><span class="line">&#123;</span><br><span class="line">  &quot;settings&quot;:&#123;</span><br><span class="line">    &quot;index.store.preload&quot;:[&quot;nvd&quot;,&quot;dvd&quot;]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果文件缓存不够大，则无法保存所有数据，那么为太多文件预加载数据到文件系统缓存中会使搜索速度变慢，应谨慎使用。</p>
+<h3 id="转换查询表达式"><a href="#转换查询表达式" class="headerlink" title="转换查询表达式"></a>转换查询表达式</h3><p>在组合查询中通过bool过滤器进行and、or和not的多个逻辑组合检索，这种组合查询中的表达式在下面的情况下可以做等价转换：<br>（A|B）&amp;(C|D)==&gt;(A&amp;B)|（A&amp;D）|(B&amp;C)|(B&amp;D)</p>
+<h3 id="使用近似聚合"><a href="#使用近似聚合" class="headerlink" title="使用近似聚合"></a>使用近似聚合</h3><p>近似聚合以牺牲少量的精度为代价，大幅度提高执行效率，降低了内存使用。近似聚合的方式可以参考官方手册：<br>Percentiles Aggregation(<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-precentile-aggregation.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-precentile-aggregation.html</a>)</p>
+<p>Cardinality Aggregation(<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-cardinality-aggregation.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-cardinality-aggregation.html</a>)</p>
+<h3 id="深度优先还是广度优先"><a href="#深度优先还是广度优先" class="headerlink" title="深度优先还是广度优先"></a>深度优先还是广度优先</h3><p>ES 有两种不同的聚合方式：深度优先和广度优先。深度优先是默认，先构建完整的树，然后修剪无用节点。大多数情况下深度聚合都能正常工作，但是在特殊场合适合广度优先，先执行第一次聚合，再继续下一层之前修剪，官方例子：<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/cn/elasticsearch/guide/curretn/_preventing_combinatorial_explosions.html">https://www.elastic.co/guide/cn/elasticsearch/guide/curretn/_preventing_combinatorial_explosions.html</a></p>
+<h3 id="限制搜索请求分片数"><a href="#限制搜索请求分片数" class="headerlink" title="限制搜索请求分片数"></a>限制搜索请求分片数</h3><p>一个搜索请求涉及的分片数量越多，协调节点的CPU和内存压力越大。默认情况下，ES会拒绝超过1000个分片的搜索请求。我们应该更好的组织数据，让搜索请求的分片数更少。如果想调节这个值，则可以通过actions.search.shard_count配置项进行修改</p>
+<p>虽然限制搜索的分片数并不能直接提升单个索引请求的速度，但协调节点的压力会间接影响搜索速度，例如，占用更多内存会产生更多GC压力，可能导致更多的stop-the-world时间等，因此间接影响了协调节点的性能，所以我们仍把它列作本章的一部分</p>
+<h3 id="利用自适应副本选择（ARS）提升ES响应速度"><a href="#利用自适应副本选择（ARS）提升ES响应速度" class="headerlink" title="利用自适应副本选择（ARS）提升ES响应速度"></a>利用自适应副本选择（ARS）提升ES响应速度</h3><p>为了充分利用计算资源和负载均衡，协调节点将搜索请求轮询转发到分片的每个副本，轮询策略是负载均衡中最简答的策略，任何一个负载均衡器都具备这种基础的策略，缺点是不考虑后端实际系统压力和健康水平。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/09/08/6-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" rel="prev" title="6.性能优化">
+      <i class="fa fa-chevron-left"></i> 6.性能优化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/09/12/%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95/" rel="next" title="性能测试">
+      性能测试 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%99%E5%85%A5%E9%80%9F%E5%BA%A6%E4%BC%98%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">写入速度优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#translog-flush%E9%97%B4%E9%9A%94%E8%B0%83%E6%95%B4"><span class="nav-number">1.1.</span> <span class="nav-text">translog flush间隔调整</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E5%88%B7%E6%96%B0%E9%97%B4%E9%9A%94refresh-interval"><span class="nav-number">1.2.</span> <span class="nav-text">索引刷新间隔refresh interval</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AE%B5%E5%90%88%E5%B9%B6"><span class="nav-number">1.3.</span> <span class="nav-text">段合并</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#indexing-buffer"><span class="nav-number">1.4.</span> <span class="nav-text">indexing buffer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8bulk"><span class="nav-number">1.5.</span> <span class="nav-text">使用bulk</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#bulk%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%92%8C%E9%98%9F%E5%88%97"><span class="nav-number">1.5.1.</span> <span class="nav-text">bulk线程池和队列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E6%89%A7%E8%A1%8Cbulk%E8%AF%B7%E6%B1%82"><span class="nav-number">1.5.2.</span> <span class="nav-text">并发执行bulk请求</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E9%97%B4%E7%9A%84%E4%BB%BB%E5%8A%A1%E5%9D%87%E8%A1%A1"><span class="nav-number">1.6.</span> <span class="nav-text">磁盘间的任务均衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8A%82%E7%82%B9%E9%97%B4%E7%9A%84%E4%BB%BB%E5%8A%A1%E5%9D%87%E8%A1%A1"><span class="nav-number">1.7.</span> <span class="nav-text">节点间的任务均衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E8%BF%87%E7%A8%8B%E8%B0%83%E6%95%B4%E5%92%8C%E4%BC%98%E5%8C%96"><span class="nav-number">1.8.</span> <span class="nav-text">索引过程调整和优化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90doc-ID"><span class="nav-number">1.8.1.</span> <span class="nav-text">自动生成doc ID</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E6%95%B4%E5%AD%97%E6%AE%B5Mappings"><span class="nav-number">1.8.2.</span> <span class="nav-text">调整字段Mappings</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B0%83%E6%95%B4-source%E5%AD%97%E6%AE%B5"><span class="nav-number">1.8.3.</span> <span class="nav-text">调整_source字段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A6%81%E7%94%A8-all%E5%AD%97%E6%AE%B5"><span class="nav-number">1.8.4.</span> <span class="nav-text">禁用_all字段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9Analyzed%E7%9A%84%E5%AD%97%E6%AE%B5%E7%A6%81%E7%94%A8Norms"><span class="nav-number">1.8.5.</span> <span class="nav-text">对Analyzed的字段禁用Norms</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#index-option%E8%AE%BE%E7%BD%AE"><span class="nav-number">1.8.6.</span> <span class="nav-text">index option设置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A6%81%E7%94%A8raid-0-%E6%88%96%E8%80%8510"><span class="nav-number">1.9.</span> <span class="nav-text">要用raid 0 或者10</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ES-%E6%90%9C%E7%B4%A2%E9%80%9F%E5%BA%A6%E4%BC%98%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">ES 搜索速度优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9Fcache%E9%A2%84%E7%95%99%E8%B6%B3%E5%A4%9F%E7%9A%84%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4"><span class="nav-number">2.1.</span> <span class="nav-text">为文件系统cache预留足够的内存空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%9B%B4%E5%BF%AB%E7%9A%84%E7%A1%AC%E4%BB%B6"><span class="nav-number">2.2.</span> <span class="nav-text">使用更快的硬件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E6%A1%A3%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.3.</span> <span class="nav-text">文档类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E7%B4%A2%E5%BC%95%E6%95%B0%E6%8D%AE"><span class="nav-number">2.4.</span> <span class="nav-text">预索引数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E6%AE%B5%E6%98%A0%E5%B0%84"><span class="nav-number">2.5.</span> <span class="nav-text">字段映射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%81%BF%E5%85%8D%E4%BD%BF%E7%94%A8%E8%84%9A%E6%9C%AC"><span class="nav-number">2.6.</span> <span class="nav-text">避免使用脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E6%97%A5%E6%9C%9F%E6%90%9C%E7%B4%A2"><span class="nav-number">2.7.</span> <span class="nav-text">优化日期搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E5%8F%AA%E8%AF%BB%E7%B4%A2%E5%BC%95%E6%89%A7%E8%A1%8Cforce-merge"><span class="nav-number">2.8.</span> <span class="nav-text">为只读索引执行force-merge</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#globle-ordinals"><span class="nav-number">2.9.</span> <span class="nav-text">globle ordinals</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#execution-hint"><span class="nav-number">2.10.</span> <span class="nav-text">execution hint</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E7%83%AD%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9Fcache"><span class="nav-number">2.11.</span> <span class="nav-text">预热文件系统cache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AC%E6%8D%A2%E6%9F%A5%E8%AF%A2%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">2.12.</span> <span class="nav-text">转换查询表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%BF%91%E4%BC%BC%E8%81%9A%E5%90%88"><span class="nav-number">2.13.</span> <span class="nav-text">使用近似聚合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E8%BF%98%E6%98%AF%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88"><span class="nav-number">2.14.</span> <span class="nav-text">深度优先还是广度优先</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%90%E5%88%B6%E6%90%9C%E7%B4%A2%E8%AF%B7%E6%B1%82%E5%88%86%E7%89%87%E6%95%B0"><span class="nav-number">2.15.</span> <span class="nav-text">限制搜索请求分片数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E8%87%AA%E9%80%82%E5%BA%94%E5%89%AF%E6%9C%AC%E9%80%89%E6%8B%A9%EF%BC%88ARS%EF%BC%89%E6%8F%90%E5%8D%87ES%E5%93%8D%E5%BA%94%E9%80%9F%E5%BA%A6"><span class="nav-number">2.16.</span> <span class="nav-text">利用自适应副本选择（ARS）提升ES响应速度</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">111</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

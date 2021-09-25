@@ -129,12 +129,12 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">13</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">15</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">96</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">111</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -191,7 +191,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/12/%E6%95%A3%E5%88%97%E8%A1%A8/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/23/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -205,7 +205,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/12/%E6%95%A3%E5%88%97%E8%A1%A8/" class="post-title-link" itemprop="url">散列表</a>
+            <a href="/2021/05/23/%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F/" class="post-title-link" itemprop="url">单例模式</a>
         </h2>
 
         <div class="post-meta">
@@ -215,14 +215,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-05-12 21:39:51" itemprop="dateCreated datePublished" datetime="2021-05-12T21:39:51+08:00">2021-05-12</time>
+              <time title="创建时间：2021-05-23 16:08:44" itemprop="dateCreated datePublished" datetime="2021-05-23T16:08:44+08:00">2021-05-23</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-14 07:20:59" itemprop="dateModified" datetime="2021-05-14T07:20:59+08:00">2021-05-14</time>
+                <time title="修改时间：2021-05-24 08:11:07" itemprop="dateModified" datetime="2021-05-24T08:11:07+08:00">2021-05-24</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -230,7 +230,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
                 </span>
             </span>
 
@@ -245,9 +245,180 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="散列冲突"><a href="#散列冲突" class="headerlink" title="散列冲突"></a>散列冲突</h2><ul>
-<li>开放寻址法</li>
-<li>链表法</li>
+          <h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>单例设计模式（Singleton Design Pattern）理解起来非常简单。一个类只允许创建一个对象（或者实例），那这个类就是一个单例类，这种设计模式就叫作单例设计模式，简称单例模式。</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><h3 id="java"><a href="#java" class="headerlink" title="java"></a>java</h3><ul>
+<li>饿汉式<br>饿汉式的实现方式，在类加载的期间，就已经将 instance 静态实例初始化好了，所以，instance 实例的创建是线程安全的。不过，这样的实现方式不支持延迟加载实例。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123; </span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance = <span class="keyword">new</span> Singleton(); </span><br><span class="line">   <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span> <span class="params">()</span></span>&#123;&#125;</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123; </span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line"> &#125; &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>懒汉式<br>懒汉式相对于饿汉式的优势是支持延迟加载。这种实现方式会导致频繁加锁、释放锁，以及并发度低等问题，频繁的调用会产生性能瓶颈。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance;  </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span> <span class="params">()</span></span>&#123;&#125;  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;  </span><br><span class="line">        instance = <span class="keyword">new</span> Singleton();  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">return</span> instance;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>双重检测<br>双重检测实现方式既支持延迟加载、又支持高并发的单例实现方式。只要 instance 被创建之后，再调用 getInstance() 函数都不会进入到加锁逻辑中。所以，这种实现方式解决了懒汉式并发度低的问题。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> Singleton singleton;  </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span> <span class="params">()</span></span>&#123;&#125;  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getSingleton</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">if</span> (singleton == <span class="keyword">null</span>) &#123;  </span><br><span class="line">            <span class="keyword">synchronized</span> (Singleton.class) &#123;  </span><br><span class="line">                <span class="keyword">if</span> (singleton == <span class="keyword">null</span>) &#123;  </span><br><span class="line">                    singleton = <span class="keyword">new</span> Singleton();  </span><br><span class="line">                &#125;  </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">return</span> singleton;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>静态内部类<br>SingletonHolder 是一个静态内部类，当外部类 IdGenerator 被加载的时候，并不会创建 SingletonHolder 实例对象。只有当调用 getInstance() 方法时，SingletonHolder 才会被加载，这个时候才会创建 instance。instance 的唯一性、创建过程的线程安全性，都由 JVM 来保证。所以，这种实现方法既保证了线程安全，又能做到延迟加载。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SingletonHolder</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton INSTANCE = <span class="keyword">new</span> Singleton();  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span> <span class="params">()</span></span>&#123;&#125;  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">return</span> SingletonHolder.INSTANCE;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>枚举<br>最简单的实现方式，基于枚举类型的单例实现。这种实现方式通过 Java 枚举类型本身的特性，保证了实例创建的线程安全性和实例的唯一性。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">enum</span> <span class="title">Singleton</span> </span>&#123;  </span><br><span class="line">    INSTANCE;  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">whateverMethod</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="python"><a href="#python" class="headerlink" title="python"></a>python</h3><ul>
+<li>使用函数装饰器实现单例</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">singleton</span>(<span class="params">cls</span>):</span></span><br><span class="line">    _instance = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">inner</span>():</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> _instance:</span><br><span class="line">            _instance[cls] = cls()</span><br><span class="line">        <span class="keyword">return</span> _instance[cls]</span><br><span class="line">    <span class="keyword">return</span> inner</span><br><span class="line">    </span><br><span class="line"><span class="meta">@singleton</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cls</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">cls1 = Cls()</span><br><span class="line">cls2 = Cls()</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(cls1) == <span class="built_in">id</span>(cls2))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用类装饰器实现单例</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, cls</span>):</span></span><br><span class="line">        self._cls = cls</span><br><span class="line">        self._instance = &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self._cls <span class="keyword">not</span> <span class="keyword">in</span> self._instance:</span><br><span class="line">            self._instance[self._cls] = self._cls()</span><br><span class="line">        <span class="keyword">return</span> self._instance[self._cls]</span><br><span class="line"></span><br><span class="line"><span class="meta">@Singleton</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cls2</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">cls1 = Cls2()</span><br><span class="line">cls2 = Cls2()</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(cls1) == <span class="built_in">id</span>(cls2))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用 new 关键字实现单例模式</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Single</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    _instance = <span class="literal">None</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span>(<span class="params">cls, *args, **kw</span>):</span></span><br><span class="line">        <span class="keyword">if</span> cls._instance <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            cls._instance = <span class="built_in">object</span>.__new__(cls, *args, **kw)</span><br><span class="line">        <span class="keyword">return</span> cls._instance</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">single1 = Single()</span><br><span class="line">single2 = Single()</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(single1) == <span class="built_in">id</span>(single2))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用 metaclass 实现单例模式</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span>(<span class="params"><span class="built_in">type</span></span>):</span></span><br><span class="line">    _instances = &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span>(<span class="params">cls, *args, **kwargs</span>):</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> cls._instances:</span><br><span class="line">            cls._instances[cls] = <span class="built_in">super</span>(Singleton, cls).__call__(*args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> cls._instances[cls]</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cls4</span>(<span class="params">metaclass=Singleton</span>):</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">cls1 = Cls4()</span><br><span class="line">cls2 = Cls4()</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">id</span>(cls1) == <span class="built_in">id</span>(cls2))</span><br></pre></td></tr></table></figure>
+
+<h2 id="单例模式存在问题"><a href="#单例模式存在问题" class="headerlink" title="单例模式存在问题"></a>单例模式存在问题</h2><ol>
+<li>单例对 OOP 特性的支持不友好</li>
+<li>单例会隐藏类之间的依赖关系</li>
+<li>单例对代码的扩展性不友好</li>
+<li>单例对代码的可测试性不友好</li>
+<li>单例不支持有参数的构造函数</li>
+</ol>
+<h2 id="分布式单例模式"><a href="#分布式单例模式" class="headerlink" title="分布式单例模式"></a>分布式单例模式</h2><h3 id="如何理解单例模式的唯一性？"><a href="#如何理解单例模式的唯一性？" class="headerlink" title="如何理解单例模式的唯一性？"></a>如何理解单例模式的唯一性？</h3><p>单例类中对象的唯一性的作用范围是“进程唯一”的。“进程唯一”指的是进程内唯一，进程间不唯一；“线程唯一”指的是线程内唯一，线程间可以不唯一。实际上，“进程唯一”就意味着线程内、线程间都唯一，这也是“进程唯一”和“线程唯一”的区别之处。“集群唯一”指的是进程内唯一、进程间也唯一。</p>
+<h3 id="如何实现线程唯一的单例？"><a href="#如何实现线程唯一的单例？" class="headerlink" title="如何实现线程唯一的单例？"></a>如何实现线程唯一的单例？</h3><p>我们通过一个 HashMap 来存储对象，其中 key 是线程 ID，value 是对象。这样我们就可以做到，不同的线程对应不同的对象，同一个线程只能对应一个对象。实际上，Java 语言本身提供了 ThreadLocal 并发工具类，可以更加轻松地实现线程唯一单例。</p>
+<h3 id="如何实现集群环境下的单例？"><a href="#如何实现集群环境下的单例？" class="headerlink" title="如何实现集群环境下的单例？"></a>如何实现集群环境下的单例？</h3><p>我们需要把这个单例对象序列化并存储到外部共享存储区（比如文件）。进程在使用这个单例对象的时候，需要先从外部共享存储区中将它读取到内存，并反序列化成对象，然后再使用，使用完成之后还需要再存储回外部共享存储区。为了保证任何时刻在进程间都只有一份对象存在，一个进程在获取到对象之后，需要对对象加锁，避免其他进程再将其获取。在进程使用完这个对象之后，需要显式地将对象从内存中删除，并且释放对对象的加锁。</p>
+<h3 id="如何实现一个多例模式？"><a href="#如何实现一个多例模式？" class="headerlink" title="如何实现一个多例模式？"></a>如何实现一个多例模式？</h3><p>“单例”指的是一个类只能创建一个对象。对应地，“多例”指的就是一个类可以创建多个对象，但是个数是有限制的，比如只能创建 3 个对象。多例的实现也比较简单，通过一个 Map 来存储对象类型和对象之间的对应关系，来控制对象的个数。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/20/%E8%A7%84%E8%8C%83%E4%B8%8E%E9%87%8D%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/20/%E8%A7%84%E8%8C%83%E4%B8%8E%E9%87%8D%E6%9E%84/" class="post-title-link" itemprop="url">规范与重构</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-20 09:42:34" itemprop="dateCreated datePublished" datetime="2021-05-20T09:42:34+08:00">2021-05-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-23 16:07:28" itemprop="dateModified" datetime="2021-05-23T16:07:28+08:00">2021-05-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="why-what-when-how"><a href="#why-what-when-how" class="headerlink" title="why what when how"></a>why what when how</h2><h3 id="重构的目的：为什么重构（why）"><a href="#重构的目的：为什么重构（why）" class="headerlink" title="重构的目的：为什么重构（why）"></a>重构的目的：为什么重构（why）</h3><p>对于项目来言，重构可以保持代码质量持续处于一个可控状态，不至于腐化到无可救药的地步。对于个人而言，重构非常锻炼一个人的代码能力，并且是一件非常有成就感的事情。它是我们学习的经典设计思想、原则、模式、编程规范等理论知识的练兵场。</p>
+<h3 id="重构的对象：重构什么（what）"><a href="#重构的对象：重构什么（what）" class="headerlink" title="重构的对象：重构什么（what）"></a>重构的对象：重构什么（what）</h3><p>按照重构的规模，我们可以将重构大致分为大规模高层次的重构和小规模低层次的重构。大规模高层次重构包括对代码分层、模块化、解耦、梳理类之间的交互关系、抽象复用组件等等。这部分工作利用的更多的是比较抽象、比较顶层的设计思想、原则、模式。小规模低层次的重构包括规范命名、注释、修正函数参数过多、消除超大类、提取重复代码等等编程细节问题，主要是针对类、函数级别的重构。小规模低层次的重构更多的是利用编码规范这一理论知识。</p>
+<h3 id="重构的时机：什么时候重构（when）"><a href="#重构的时机：什么时候重构（when）" class="headerlink" title="重构的时机：什么时候重构（when）"></a>重构的时机：什么时候重构（when）</h3><p>我反复强调，我们一定要建立持续重构意识，把重构作为开发必不可少的部分，融入到日常开发中，而不是等到代码出现很大问题的时候，再大刀阔斧地重构。</p>
+<h3 id="重构的方法：如何重构（how）"><a href="#重构的方法：如何重构（how）" class="headerlink" title="重构的方法：如何重构（how）"></a>重构的方法：如何重构（how）</h3><p>大规模高层次的重构难度比较大，需要组织、有计划地进行，分阶段地小步快跑，时刻让代码处于一个可运行的状态。而小规模低层次的重构，因为影响范围小，改动耗时短，所以，只要你愿意并且有时间，随时随地都可以去做。</p>
+<h2 id="如果保证重构的正确性（单元测试）"><a href="#如果保证重构的正确性（单元测试）" class="headerlink" title="如果保证重构的正确性（单元测试）"></a>如果保证重构的正确性（单元测试）</h2><h3 id="单元测试与集成测试概念"><a href="#单元测试与集成测试概念" class="headerlink" title="单元测试与集成测试概念"></a>单元测试与集成测试概念</h3><ul>
+<li>单元测试：测试对象是类或者函数，用来测试一个类和函数是否都按照预期的逻辑执行。这是代码层级的测试。</li>
+<li>集成测试：测试对象是整个系统或者某个功能模块，比如测试用户注册、登录功能是否正常，是一种端到端（end to end）的测试</li>
+</ul>
+<h3 id="为什么要写单元测试"><a href="#为什么要写单元测试" class="headerlink" title="为什么要写单元测试"></a>为什么要写单元测试</h3><ul>
+<li>单元测试能有效地帮你发现代码中的 bug能否写出 bug free 的代码，是判断工程师编码能力的BUG</li>
+<li>写单元测试能帮你发现代码设计上的问题</li>
+<li>单元测试是对集成测试的有力补充</li>
+<li>写单元测试的过程本身就是代码重构的过程</li>
+<li>阅读单元测试能帮助你快速熟悉代码</li>
+<li>单元测试是 TDD 可落地执行的改进方案测试驱动开发（Test-Driven Development，简称 TDD)</li>
+</ul>
+<h3 id="如何编写单元测试"><a href="#如何编写单元测试" class="headerlink" title="如何编写单元测试"></a>如何编写单元测试</h3><p>写单元测试就是针对代码设计各种测试用例，以覆盖各种输入、异常、边界情况，并将其翻译成代码。我们可以利用一些测试框架来简化单元测试的编写。除此之外，对于单元测试，我们需要建立以下正确的认知：</p>
+<ul>
+<li>编写单元测试尽管繁琐，但并不是太耗时；</li>
+<li>我们可以稍微放低对单元测试代码质量的要求；</li>
+<li>覆盖率作为衡量单元测试质量的唯一标准是不合理的；</li>
+<li>单元测试不要依赖被测代码的具体实现逻辑；</li>
+<li>单元测试框架无法测试，多半是因为代码的可测试性不好。</li>
+</ul>
+<h3 id="代码可测试性"><a href="#代码可测试性" class="headerlink" title="代码可测试性"></a>代码可测试性</h3><h4 id="什么是代码可测试性"><a href="#什么是代码可测试性" class="headerlink" title="什么是代码可测试性"></a>什么是代码可测试性</h4><p>粗略地讲，所谓代码的可测试性，就是针对代码编写单元测试的难易程度。对于一段代码，如果很难为其编写单元测试，或者单元测试写起来很费劲，需要依靠单元测试框架中很高级的特性，那往往就意味着代码设计得不够合理，代码的可测试性不好。</p>
+<h4 id="编写可测试性代码有效手段"><a href="#编写可测试性代码有效手段" class="headerlink" title="编写可测试性代码有效手段"></a>编写可测试性代码有效手段</h4><p>依赖注入是编写可测试性代码的最有效手段。通过依赖注入，我们在编写单元测试的时候，可以通过 mock 的方法解依赖外部服务，这也是我们在编写单元测试的过程中最有技术挑战的地方。</p>
+<h4 id="常见的反模式"><a href="#常见的反模式" class="headerlink" title="常见的反模式"></a>常见的反模式</h4><ul>
+<li>代码中包含未决行为逻辑</li>
+<li>滥用可变全局变量</li>
+<li>滥用静态方法</li>
+<li>使用复杂的继承关系</li>
+<li>高度耦合的代码</li>
+</ul>
+<h2 id="如何解耦"><a href="#如何解耦" class="headerlink" title="如何解耦"></a>如何解耦</h2><h3 id="封装与抽象"><a href="#封装与抽象" class="headerlink" title="封装与抽象"></a>封装与抽象</h3><p>封装和抽象作为两个非常通用的设计思想，可以应用在很多设计场景中，比如系统、模块、lib、组件、接口、类等等的设计。封装和抽象可以有效地隐藏实现的复杂性，隔离实现的易变性，给依赖的模块提供稳定且易用的抽象接口。</p>
+<h3 id="中间层"><a href="#中间层" class="headerlink" title="中间层"></a>中间层</h3><p>引入中间层能简化模块或类之间的依赖关系</p>
+<h3 id="模块化"><a href="#模块化" class="headerlink" title="模块化"></a>模块化</h3><h2 id="代码质量把控"><a href="#代码质量把控" class="headerlink" title="代码质量把控"></a>代码质量把控</h2><h3 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h3><ul>
+<li>命名的关键是能准确达意</li>
+<li>我们可以借助类的信息来简化属性、函数的命名，利用函数的信息来简化函数参数的命名。</li>
+<li>命名要可读、可搜索</li>
+<li>接口有两种命名方式：一种是在接口中带前缀“I”；另一种是在接口的实现类中带后缀“Impl”。对于抽象类的命名，也有两种方式，一种是带上前缀“Abstract”，一种是不带前缀。这两种命名方式都可以，关键是要在项目中统一</li>
+</ul>
+<h3 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h3><ul>
+<li>注释的目的就是让代码更容易看懂。只要符合这个要求的内容，你就可以将它写到注释里。总结一下，注释的内容主要包含这样三个方面：做什么、为什么、怎么做。对于一些复杂的类和接口，我们可能还需要写明“如何用”。</li>
+<li>注释本身有一定的维护成本，所以并非越多越好。类和函数一定要写注释，而且要写得尽可能全面、详细，而函数内部的注释要相对少一些，一般都是靠好的命名、提炼函数、解释性变量、总结性注释来提高代码可读性。</li>
 </ul>
 
       
@@ -268,7 +439,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/12/%E4%BA%8C%E5%88%86/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/19/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -282,7 +453,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/12/%E4%BA%8C%E5%88%86/" class="post-title-link" itemprop="url">二分</a>
+            <a href="/2021/05/19/%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" class="post-title-link" itemprop="url">设计原则</a>
         </h2>
 
         <div class="post-meta">
@@ -292,14 +463,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-05-12 08:14:17" itemprop="dateCreated datePublished" datetime="2021-05-12T08:14:17+08:00">2021-05-12</time>
+              <time title="创建时间：2021-05-19 09:22:18" itemprop="dateCreated datePublished" datetime="2021-05-19T09:22:18+08:00">2021-05-19</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-06-07 08:13:48" itemprop="dateModified" datetime="2021-06-07T08:13:48+08:00">2021-06-07</time>
+                <time title="修改时间：2021-05-23 16:07:28" itemprop="dateModified" datetime="2021-05-23T16:07:28+08:00">2021-05-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -307,7 +478,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
                 </span>
             </span>
 
@@ -322,222 +493,75 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="易出错"><a href="#易出错" class="headerlink" title="易出错"></a>易出错</h2><ul>
+          <h2 id="主要原则（SOLID、KISS、YAGNI、DRY、LOD-等）"><a href="#主要原则（SOLID、KISS、YAGNI、DRY、LOD-等）" class="headerlink" title="主要原则（SOLID、KISS、YAGNI、DRY、LOD 等）"></a>主要原则（SOLID、KISS、YAGNI、DRY、LOD 等）</h2><h3 id="单一职责（Single-Responsibility-Principle，缩写为-SRP）"><a href="#单一职责（Single-Responsibility-Principle，缩写为-SRP）" class="headerlink" title="单一职责（Single Responsibility Principle，缩写为 SRP）"></a>单一职责（Single Responsibility Principle，缩写为 SRP）</h3><p>一个类或者模块只负责完成一个职责（或者功能）</p>
+<ul>
+<li>类中的代码行数、函数或者属性过多；</li>
+<li>类依赖的其他类过多，或者依赖类的其他类过多；</li>
+<li>私有方法过多；</li>
+<li>比较难给类起一个合适的名字；</li>
+<li>类中大量的方法都是集中操作类中的某几个属性</li>
+</ul>
+<h3 id="开闭原则（Open-Closed-Principle，简写为-OCP）"><a href="#开闭原则（Open-Closed-Principle，简写为-OCP）" class="headerlink" title="开闭原则（Open Closed Principle，简写为 OCP）"></a>开闭原则（Open Closed Principle，简写为 OCP）</h3><ul>
+<li>我们要时刻具备扩展意识、抽象意识、封装意识。在写代码的时候，我们要多花点时间思考一下，这段代码未来可能有哪些需求变更，如何设计代码结构，事先留好扩展点，以便在未来需求变更的时候，在不改动代码整体结构、做到最小代码改动的情况下，将新的代码灵活地插入到扩展点上。</li>
+<li>很多设计原则、设计思想、设计模式，都是以提高代码的扩展性为最终目的的。特别是 23 种经典设计模式，大部分都是为了解决代码的扩展性问题而总结出来的，都是以开闭原则为指导原则的。最常用来提高代码扩展性的方法有：多态、依赖注入、基于接口而非实现编程，以及大部分的设计模式（比如，装饰、策略、模板、职责链、状态）</li>
+</ul>
+<h3 id="里氏替换原则（Liskov-Substitution-Principle，缩写为-LSP）"><a href="#里氏替换原则（Liskov-Substitution-Principle，缩写为-LSP）" class="headerlink" title="里氏替换原则（Liskov Substitution Principle，缩写为 LSP）"></a>里氏替换原则（Liskov Substitution Principle，缩写为 LSP）</h3><p>子类对象（object of subtype/derived class）能够替换程序（program）中父类对象（object of base/parent class）出现的任何地方，并且保证原来程序的逻辑行为（behavior）不变及正确性不被破坏。</p>
+<ul>
 <li><ol>
-<li>循环退出条件<br>注意是 low&lt;=high，而不是 low &lt; high</li>
+<li>子类违背父类声明要实现的功能</li>
 </ol>
 </li>
 <li><ol start="2">
-<li>mid 的取值<br>mid = low+((high-low)&gt;&gt;1)</li>
+<li>子类违背父类对输入、输出、异常的约定</li>
 </ol>
 </li>
 <li><ol start="3">
-<li>low 和 high 的更新<br>low=mid+1，high=mid-1</li>
-</ol>
-</li>
-<li><ol start="4">
-<li>当寻找旋转排序数组的话，low &lt; hight</li>
+<li>子类违背父类注释中所罗列的任何特殊说明</li>
 </ol>
 </li>
 </ul>
-<h2 id="普通二分"><a href="#普通二分" class="headerlink" title="普通二分"></a>普通二分</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">common_search</span>(<span class="params">arr,dest</span>):</span></span><br><span class="line">    low ,high = <span class="number">0</span>,<span class="built_in">len</span>(arr)</span><br><span class="line">    <span class="keyword">while</span>(low&lt;=high):</span><br><span class="line">        mid = low+((high-low)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span>(arr[mid]==dest):</span><br><span class="line">            <span class="keyword">return</span> mid</span><br><span class="line">        <span class="keyword">elif</span> arr[mid]&lt;dest:</span><br><span class="line">            low = mid+<span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> arr[mid]&gt;dest:</span><br><span class="line">            high = mid-<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="查找第一个等于给定元素值"><a href="#查找第一个等于给定元素值" class="headerlink" title="查找第一个等于给定元素值"></a>查找第一个等于给定元素值</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">first_dest</span>(<span class="params">arr,dest</span>):</span></span><br><span class="line">    low,high = <span class="number">0</span>,<span class="built_in">len</span>(arr)-<span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span>(low&lt;=high):</span><br><span class="line">        mid = low + ((high-low)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span>(arr[mid]&lt;dest):</span><br><span class="line">            low = mid +<span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> arr[mid]&gt;dest:</span><br><span class="line">            high = mid -<span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> mid ==<span class="number">0</span> <span class="keyword">or</span> arr[mid-<span class="number">1</span>]!=dest:</span><br><span class="line">                <span class="keyword">return</span> mid</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                high = mid -<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="查找最后一个等于给定元素"><a href="#查找最后一个等于给定元素" class="headerlink" title="查找最后一个等于给定元素"></a>查找最后一个等于给定元素</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">last_dest</span>(<span class="params">arr,dest</span>):</span></span><br><span class="line">    low,high = <span class="number">0</span>,<span class="built_in">len</span>(dest)-<span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span>(low&lt;=high):</span><br><span class="line">        mid = low + ((high-low)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span> (arr[mid] &lt; dest):</span><br><span class="line">            low = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> arr[mid] &gt; dest:</span><br><span class="line">            high = mid - <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> mid==<span class="built_in">len</span>(arr)-<span class="number">1</span> <span class="keyword">or</span> arr[mid+<span class="number">1</span>]!= dest:</span><br><span class="line">                <span class="keyword">return</span> mid</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                low = mid +<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="查找第一个大于等于给定元素"><a href="#查找第一个大于等于给定元素" class="headerlink" title="查找第一个大于等于给定元素"></a>查找第一个大于等于给定元素</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">first_gte_dest</span>(<span class="params">arr,dest</span>):</span></span><br><span class="line">    low,high = <span class="number">0</span>,<span class="built_in">len</span>(arr)-<span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span>(low&lt;=high):</span><br><span class="line">        mid = low + ((high-low)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span> arr[mid]&gt;=dest:</span><br><span class="line">            <span class="keyword">if</span> mid==<span class="number">0</span> <span class="keyword">or</span> arr[mid-<span class="number">1</span>]&lt;dest:</span><br><span class="line">                <span class="keyword">return</span> mid</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                high = mid-<span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            low = mid +<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="查找最后一个小于等于给定元素"><a href="#查找最后一个小于等于给定元素" class="headerlink" title="查找最后一个小于等于给定元素"></a>查找最后一个小于等于给定元素</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">last_lt_dest</span>(<span class="params">arr,dest</span>):</span></span><br><span class="line">    low,high = <span class="number">0</span>,<span class="built_in">len</span>(arr)-<span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span>(low&lt;=high):</span><br><span class="line">        mid = low+((high-low)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span> arr[mid]&lt;=dest:</span><br><span class="line">            <span class="keyword">if</span> mid==<span class="built_in">len</span>(arr)-<span class="number">1</span> <span class="keyword">or</span> arr[mid +<span class="number">1</span>]&gt;dest:</span><br><span class="line">                <span class="keyword">return</span> mid</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                low = mid+<span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            high = mid-<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="x平方根"><a href="#x平方根" class="headerlink" title="x平方根"></a>x平方根</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">mySqrt</span>(<span class="params">self, x</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type x: int</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        l,r,ans = <span class="number">0</span>,x,-<span class="number">1</span></span><br><span class="line">        <span class="keyword">while</span> l&lt;=r:</span><br><span class="line">            mid = l+((r-l)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">            <span class="keyword">if</span> mid*mid&lt;=x:</span><br><span class="line">                ans = mid</span><br><span class="line">                l=mid+<span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                r=mid-<span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> ans</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/12/%E6%8E%92%E5%BA%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/12/%E6%8E%92%E5%BA%8F/" class="post-title-link" itemprop="url">排序</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-12 07:51:13" itemprop="dateCreated datePublished" datetime="2021-05-12T07:51:13+08:00">2021-05-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-17 08:12:21" itemprop="dateModified" datetime="2021-05-17T08:12:21+08:00">2021-05-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="冒泡"><a href="#冒泡" class="headerlink" title="冒泡"></a>冒泡</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 冒泡排序，a表示数组，n表示数组大小</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bubbleSort</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line"> <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    <span class="comment">// 提前退出冒泡循环的标志位</span></span><br><span class="line">    <span class="keyword">boolean</span> flag = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n - i - <span class="number">1</span>; ++j) &#123;</span><br><span class="line">      <span class="keyword">if</span> (a[j] &gt; a[j+<span class="number">1</span>]) &#123; <span class="comment">// 交换</span></span><br><span class="line">        <span class="keyword">int</span> tmp = a[j];</span><br><span class="line">        a[j] = a[j+<span class="number">1</span>];</span><br><span class="line">        a[j+<span class="number">1</span>] = tmp;</span><br><span class="line">        flag = <span class="keyword">true</span>;  <span class="comment">// 表示有数据交换      </span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!flag) <span class="keyword">break</span>;  <span class="comment">// 没有数据交换，提前退出</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 插入排序，a表示数组，n表示数组大小</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insertionSort</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    <span class="keyword">int</span> value = a[i];</span><br><span class="line">    <span class="keyword">int</span> j = i - <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 查找插入的位置</span></span><br><span class="line">    <span class="keyword">for</span> (; j &gt;= <span class="number">0</span>; --j) &#123;</span><br><span class="line">      <span class="keyword">if</span> (a[j] &gt; value) &#123;</span><br><span class="line">        a[j+<span class="number">1</span>] = a[j];  <span class="comment">// 数据移动</span></span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    a[j+<span class="number">1</span>] = value; <span class="comment">// 插入数据</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="归并"><a href="#归并" class="headerlink" title="归并"></a>归并</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">递推公式：</span><br><span class="line">merge_sort(p…r) = merge(merge_sort(p…q), merge_sort(q+<span class="number">1</span>…r))</span><br><span class="line"></span><br><span class="line">终止条件：</span><br><span class="line">p &gt;= r 不用再继续分解</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge</span>(<span class="params">arr</span>):</span></span><br><span class="line">    merge_sort(arr,<span class="number">0</span>,<span class="built_in">len</span>(arr)-<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge_sort</span>(<span class="params">arr,start,end</span>):</span></span><br><span class="line">    <span class="keyword">if</span> start&gt;=end:</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    mid = start + ((end-start)&gt;&gt;<span class="number">1</span>)</span><br><span class="line">    merge_sort(arr,start,mid)</span><br><span class="line">    merge_sort(arr,mid+<span class="number">1</span>,end)</span><br><span class="line">    merge_all(arr,start,mid,end)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge_all</span>(<span class="params">arr,start,mid,end</span>):</span></span><br><span class="line">    i,j = start,mid+<span class="number">1</span></span><br><span class="line">    tmp = []</span><br><span class="line">    <span class="keyword">while</span> i&lt;=mid <span class="keyword">and</span> j&lt;=end:</span><br><span class="line">        <span class="keyword">if</span> arr[i]&lt;=arr[j]:</span><br><span class="line">            tmp.append(arr[i])</span><br><span class="line">            i+=<span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            tmp.append(arr[j])</span><br><span class="line">            j+=<span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> i&lt;=mid: tmp.extend(arr[i:mid+<span class="number">1</span>])</span><br><span class="line">    <span class="keyword">if</span> j&lt;=end: tmp.extend(arr[j:end+<span class="number">1</span>])</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(tmp)):</span><br><span class="line">        arr[i+start] = tmp[i]</span><br></pre></td></tr></table></figure>
-
-<h2 id="快排"><a href="#快排" class="headerlink" title="快排"></a>快排</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">递推公式：</span><br><span class="line">quick_sort(p…r) = quick_sort(p…q-<span class="number">1</span>) + quick_sort(q+<span class="number">1</span>… r)</span><br><span class="line"></span><br><span class="line">终止条件：</span><br><span class="line">p &gt;= r</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">quick</span>(<span class="params">arr</span>):</span></span><br><span class="line">    quick_sort(arr,<span class="number">0</span>,<span class="built_in">len</span>(arr)-<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">quick_sort</span>(<span class="params">arr,start,end</span>):</span></span><br><span class="line">    <span class="keyword">if</span> start&gt;=end:</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    partition = get_partition(arr,start,end)</span><br><span class="line">    quick_sort(arr,start,partition-<span class="number">1</span>)</span><br><span class="line">    quick_sort(arr,partition+<span class="number">1</span>,end)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_partition</span>(<span class="params">arr,start,end</span>):</span></span><br><span class="line">    tmp = arr[end]</span><br><span class="line">    i = start</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(start,end):</span><br><span class="line">        <span class="keyword">if</span> arr[j]&lt;tmp:</span><br><span class="line">            arr[i],arr[j]= arr[j],arr[i]</span><br><span class="line">            i+=<span class="number">1</span></span><br><span class="line">    arr[i],arr[end]= arr[end],arr[i]</span><br><span class="line">    <span class="keyword">return</span> i</span><br></pre></td></tr></table></figure>
-
-<h2 id="O-n-找数组中最大元素"><a href="#O-n-找数组中最大元素" class="headerlink" title="O(n)找数组中最大元素"></a>O(n)找数组中最大元素</h2><p>我们选择数组区间 A[0…n-1]的最后一个元素 A[n-1]作为 pivot，对数组 A[0…n-1]原地分区，这样数组就分成了三部分，A[0…p-1]、A[p]、A[p+1…n-1]。如果 p+1=K，那 A[p]就是要求解的元素；如果 K&gt;p+1, 说明第 K 大元素出现在 A[p+1…n-1]区间，我们再按照上面的思路递归地在 A[p+1…n-1]这个区间内查找。同理，如果 K</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_k</span>(<span class="params">arr,k</span>):</span></span><br><span class="line">    k(arr,<span class="number">0</span>,<span class="built_in">len</span>(arr-<span class="number">1</span>))</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">k</span>(<span class="params">arr,start,end,k</span>):</span></span><br><span class="line">    <span class="keyword">if</span> start&gt;=end:</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    partition = get_partition(arr,start,end,k)</span><br><span class="line">    <span class="keyword">if</span> arr[partition+<span class="number">1</span>] == k:</span><br><span class="line">        <span class="keyword">return</span> arr[partition+<span class="number">1</span>]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="堆排序"><a href="#堆排序" class="headerlink" title="堆排序"></a>堆排序</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">heapify</span>(<span class="params">arr,last_num,top_num</span>):</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        max_num = top_num</span><br><span class="line">        <span class="keyword">if</span> top_num*<span class="number">2</span>&lt;=last_num <span class="keyword">and</span> arr[top_num]&lt;arr[top_num*<span class="number">2</span>]: max_num = top_num*<span class="number">2</span></span><br><span class="line">        <span class="keyword">if</span> top_num*<span class="number">2</span>+<span class="number">1</span>&lt;=last_num <span class="keyword">and</span> arr[max_num]&lt;arr[top_num*<span class="number">2</span>+<span class="number">1</span>]: max_num = top_num*<span class="number">2</span>+<span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> top_num == max_num: <span class="keyword">break</span></span><br><span class="line">        arr[top_num],arr[max_num] = arr[max_num],arr[top_num]</span><br><span class="line">        top_num = max_num</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_heap</span>(<span class="params">arr,last_num</span>):</span></span><br><span class="line">    i = last_num//<span class="number">2</span></span><br><span class="line">    <span class="keyword">while</span>(i&gt;=<span class="number">1</span>):</span><br><span class="line">        heapify(arr,last_num,i)</span><br><span class="line">        i-=<span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">heap_sort</span>(<span class="params">arr,last_num</span>):</span></span><br><span class="line">    build_heap(arr,last_num)</span><br><span class="line">    s = last_num</span><br><span class="line">    <span class="keyword">while</span>(s&gt;<span class="number">1</span>):</span><br><span class="line">        arr[<span class="number">1</span>],arr[s] = arr[s],arr[<span class="number">1</span>]</span><br><span class="line">        s-=<span class="number">1</span></span><br><span class="line">        heapify(arr,s,<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">topk </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_least_numbers</span>(<span class="params">arr,k</span>):</span></span><br><span class="line">    <span class="keyword">if</span> k==<span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">list</span>()</span><br><span class="line">    hp = [-x <span class="keyword">for</span> x <span class="keyword">in</span> arr[:k]]</span><br><span class="line">    heapq.heapify(hp)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(k,<span class="built_in">len</span>(arr)):</span><br><span class="line">        <span class="keyword">if</span> -hp[<span class="number">0</span>]&gt;arr[i]:</span><br><span class="line">            heapq.heappop(hp)</span><br><span class="line">            heapq.heappush(hp,-arr[i])</span><br><span class="line">    ans = [-x <span class="keyword">for</span> x <span class="keyword">in</span> hp]</span><br><span class="line">    <span class="keyword">return</span>  ans</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getMaxNumbers</span>(<span class="params">arr,k</span>):</span></span><br><span class="line">    <span class="keyword">if</span> k == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">list</span>()</span><br><span class="line">    hp = [x <span class="keyword">for</span> x <span class="keyword">in</span> arr[:k]]</span><br><span class="line">    heapq.heapify(hp)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(k, <span class="built_in">len</span>(arr)):</span><br><span class="line">        <span class="keyword">if</span> hp[<span class="number">0</span>] &lt; arr[i]:</span><br><span class="line">            heapq.heappop(hp)</span><br><span class="line">            heapq.heappush(hp, arr[i])</span><br><span class="line">    ans = [x <span class="keyword">for</span> x <span class="keyword">in</span> hp]</span><br><span class="line">    <span class="keyword">return</span> ans</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/12/%E9%80%92%E5%BD%92/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/12/%E9%80%92%E5%BD%92/" class="post-title-link" itemprop="url">递归</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-12 07:35:47" itemprop="dateCreated datePublished" datetime="2021-05-12T07:35:47+08:00">2021-05-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-27 08:11:33" itemprop="dateModified" datetime="2021-05-27T08:11:33+08:00">2021-05-27</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h2><ul>
-<li><ol>
-<li>一个问题的解可以分解为几个子问题的解</li>
-</ol>
-</li>
-<li><ol start="2">
-<li>这个问题与分解之后的子问题，除了数据规模不同，求解思路完全一样</li>
-</ol>
-</li>
-<li><ol start="3">
-<li>存在递归终止条件</li>
-</ol>
+<h3 id="接口隔离原则（Interface-Segregation-Principle，缩写为-ISP）"><a href="#接口隔离原则（Interface-Segregation-Principle，缩写为-ISP）" class="headerlink" title="接口隔离原则（Interface Segregation Principle，缩写为 ISP）"></a>接口隔离原则（Interface Segregation Principle，缩写为 ISP）</h3><ul>
+<li>一组 API 接口集合</li>
+<li>单个 API 接口或函数</li>
+<li>OOP 中的接口概念接下来，我就按照这三种理解</li>
+</ul>
+<h3 id="控制反转（Inversion-Of-Control，缩写为-IOC）"><a href="#控制反转（Inversion-Of-Control，缩写为-IOC）" class="headerlink" title="控制反转（Inversion Of Control，缩写为 IOC）"></a>控制反转（Inversion Of Control，缩写为 IOC）</h3><p>将需要程序员控制的代码交给框架来管理，扩展代码时只要增加扩展点就好，流程不用管</p>
+<h3 id="依赖注入（Dependency-Injection，缩写为-DI）"><a href="#依赖注入（Dependency-Injection，缩写为-DI）" class="headerlink" title="依赖注入（Dependency Injection，缩写为 DI）"></a>依赖注入（Dependency Injection，缩写为 DI）</h3><p>不通过 new() 的方式在类内部创建依赖类对象，而是将依赖的类对象在外部创建好之后，通过构造函数、函数参数等方式传递（或注入）给类使用。</p>
+<h3 id="依赖反转原则（Dependency-Inversion-Principle，缩写为-DIP）"><a href="#依赖反转原则（Dependency-Inversion-Principle，缩写为-DIP）" class="headerlink" title="依赖反转原则（Dependency Inversion Principle，缩写为 DIP）"></a>依赖反转原则（Dependency Inversion Principle，缩写为 DIP）</h3><p>依赖反转原则也叫作依赖倒置原则。这条原则跟控制反转有点类似，主要用来指导框架层面的设计。高层模块不依赖低层模块，它们共同依赖同一个抽象。抽象不要依赖具体实现细节，具体实现细节依赖抽象。</p>
+<h3 id="KISS原则（Keep-It-Short-and-Simple）"><a href="#KISS原则（Keep-It-Short-and-Simple）" class="headerlink" title="KISS原则（Keep It Short and Simple）"></a>KISS原则（Keep It Short and Simple）</h3><h3 id="YAGNI原则（You-Ain’t-Gonna-Need-It）"><a href="#YAGNI原则（You-Ain’t-Gonna-Need-It）" class="headerlink" title="YAGNI原则（You Ain’t Gonna Need It）"></a>YAGNI原则（You Ain’t Gonna Need It）</h3><h3 id="DRY原则（Don’t-Repeat-Yourself）"><a href="#DRY原则（Don’t-Repeat-Yourself）" class="headerlink" title="DRY原则（Don’t Repeat Yourself）"></a>DRY原则（Don’t Repeat Yourself）</h3><ul>
+<li>实现的逻辑重复<br>简单的copy-pase</li>
+<li>实现的功能语义重复<br>代码干的一件事，只是实现方式不同</li>
+<li>代码执行重复<br>重复的执行某段代码</li>
+<li>提高代码复用性<ul>
+<li>减少代码耦合</li>
+<li>满足单一职责原则</li>
+<li>模块化</li>
+<li>业务与非业务逻辑分离</li>
+<li>通用代码下沉</li>
+<li>继承、多态、抽象、封装</li>
+<li>应用模板等设计模式</li>
+</ul>
 </li>
 </ul>
-<h2 id="如何编写递归"><a href="#如何编写递归" class="headerlink" title="如何编写递归"></a>如何编写递归</h2><ul>
-<li>写递归代码的关键就是找到如何将大问题分解为小问题的规律</li>
-<li>并且基于此写出递推公式</li>
-<li>然后再推敲终止条件</li>
-<li>最后将递推公式和终止条件翻译成代码。</li>
+<h3 id="迪米特法则（Law-of-Demeter，缩写是-LOD-The-Least-Knowledge-Principle）"><a href="#迪米特法则（Law-of-Demeter，缩写是-LOD-The-Least-Knowledge-Principle）" class="headerlink" title="迪米特法则（Law of Demeter，缩写是 LOD  The Least Knowledge Principle）"></a>迪米特法则（Law of Demeter，缩写是 LOD  The Least Knowledge Principle）</h3><p>不该有直接依赖关系的类之间，不要有依赖；有依赖关系的类之间，尽量只依赖必要的接口。迪米特法则是希望减少类之间的耦合，让类越独立越好。每个类都应该少了解系统的其他部分。一旦发生变化，需要了解这一变化的类就会比较少。</p>
+<h3 id="分层作用"><a href="#分层作用" class="headerlink" title="分层作用"></a>分层作用</h3><ul>
+<li>分层能起到代码复用的作用</li>
+<li>分层能起到隔离变化的作用</li>
+<li>分层能起到隔离关注点的作用</li>
+<li>分层能提高代码的可测试性</li>
+<li>分层能应对系统的复杂性</li>
 </ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 递推公式：f(n) = f(n-1)+f(n-2)</span></span><br><span class="line"><span class="comment">// 条件n ==1 n==2 </span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">2</span>) <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// hasSolvedList可以理解成一个Map，key是n，value是f(n)</span></span><br><span class="line">  <span class="keyword">if</span> (hasSolvedList.containsKey(n)) &#123;</span><br><span class="line">    <span class="keyword">return</span> hasSolvedList.get(n);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">int</span> ret = f(n-<span class="number">1</span>) + f(n-<span class="number">2</span>);</span><br><span class="line">  hasSolvedList.put(n, ret);</span><br><span class="line">  <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">2</span>) <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">int</span> pre = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">int</span> prepre = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">3</span>; i &lt;= n; ++i) &#123;</span><br><span class="line">    ret = pre + prepre;</span><br><span class="line">    prepre = pre;</span><br><span class="line">    pre = ret;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>确定递归函数的参数和返回值：确定哪些参数是递归的过程中需要处理的，那么就在递归函数里加上这个参数， 并且还要明确每次递归的返回值是什么进而确定递归函数的返回类型。</p>
-</li>
-<li><p>确定终止条件：写完了递归算法, 运行的时候，经常会遇到栈溢出的错误，就是没写终止条件或者终止条件写的不对，操作系统也是用一个栈的结构来保存每一层递归的信息，如果递归没有终止，操作系统的内存栈必然就会溢出。</p>
-</li>
-<li><p>确定单层递归的逻辑：确定每一层递归需要处理的信息。在这里也就会重复调用自己来实现递归的过程。</p>
-</li>
+<h3 id="需求分析"><a href="#需求分析" class="headerlink" title="需求分析"></a>需求分析</h3><ul>
+<li>画产品线框图、</li>
+<li>聚焦简单应用场景、</li>
+<li>设计实现最小原型、</li>
+<li>画系统设计图</li>
+</ul>
+<h3 id="面向对象设计与实现（就是将合适的代码放到合适的类中）"><a href="#面向对象设计与实现（就是将合适的代码放到合适的类中）" class="headerlink" title="面向对象设计与实现（就是将合适的代码放到合适的类中）"></a>面向对象设计与实现（就是将合适的代码放到合适的类中）</h3><ul>
+<li>划分职责进而识别出有哪些类</li>
+<li>定义类及类与类之间的关系</li>
+<li>将类组装起来并提供执行入口</li>
+<li>Review 设计与实现</li>
 </ul>
 
       
@@ -558,7 +582,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/11/%E6%A0%88/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/17/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -572,7 +596,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/11/%E6%A0%88/" class="post-title-link" itemprop="url">栈</a>
+            <a href="/2021/05/17/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/" class="post-title-link" itemprop="url">面向对象</a>
         </h2>
 
         <div class="post-meta">
@@ -582,14 +606,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-05-11 07:58:07" itemprop="dateCreated datePublished" datetime="2021-05-11T07:58:07+08:00">2021-05-11</time>
+              <time title="创建时间：2021-05-17 21:25:03" itemprop="dateCreated datePublished" datetime="2021-05-17T21:25:03+08:00">2021-05-17</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-06-17 21:06:33" itemprop="dateModified" datetime="2021-06-17T21:06:33+08:00">2021-06-17</time>
+                <time title="修改时间：2021-05-23 16:07:28" itemprop="dateModified" datetime="2021-05-23T16:07:28+08:00">2021-05-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -597,215 +621,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><p>先进后出，后进先出；<br>当某个数据集合只涉及在一端插入和删除数据，并且满足后进先出、先进后出的特性，这时我们就应该首选“栈”这种数据结构。</p>
-<h3 id="栈操作"><a href="#栈操作" class="headerlink" title="栈操作"></a>栈操作</h3><ul>
-<li>有效括号</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">isValid</span>(<span class="params">self, s</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type s: str</span></span><br><span class="line"><span class="string">        :rtype: bool</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(s)%<span class="number">2</span>!=<span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        stack = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> s:</span><br><span class="line">            <span class="keyword">if</span> i ==<span class="string">&#x27;(&#x27;</span>: stack.append(<span class="string">&#x27;)&#x27;</span>)</span><br><span class="line">            <span class="keyword">elif</span> i==<span class="string">&quot;&#123;&quot;</span>: stack.append(<span class="string">&quot;&#125;&quot;</span>)</span><br><span class="line">            <span class="keyword">elif</span> i==<span class="string">&quot;[&quot;</span>: stack.append(<span class="string">&quot;]&quot;</span>)</span><br><span class="line">            <span class="keyword">elif</span> <span class="keyword">not</span> stack <span class="keyword">or</span> stack.pop() != i: <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">if</span> stack:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>最小栈</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MinStack</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        initialize your data structure here.</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        self.cache = []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">push</span>(<span class="params">self, val</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type val: int</span></span><br><span class="line"><span class="string">        :rtype: None</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> self.cache:</span><br><span class="line">            self.cache.append((val,val))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.cache.append((val,<span class="built_in">min</span>(val,self.cache[-<span class="number">1</span>][<span class="number">1</span>])))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">pop</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :rtype: None</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">return</span> self.cache.pop()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">top</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">return</span> self.cache[-<span class="number">1</span>][<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getMin</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">return</span> self.cache[-<span class="number">1</span>][<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/09/%E9%93%BE%E8%A1%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/09/%E9%93%BE%E8%A1%A8/" class="post-title-link" itemprop="url">链表</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-09 17:49:37" itemprop="dateCreated datePublished" datetime="2021-05-09T17:49:37+08:00">2021-05-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-17 08:12:23" itemprop="dateModified" datetime="2021-05-17T08:12:23+08:00">2021-05-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="常见缓存"><a href="#常见缓存" class="headerlink" title="常见缓存"></a>常见缓存</h2><ul>
-<li>先进先出策略 FIFO（First In，First Out）</li>
-<li>最少使用策略 LFU（Least Frequently Used）</li>
-<li>最近最少使用策略 LRU（Least Recently Used）  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">josephus1</span>(<span class="params">num, k, m</span>):</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">约瑟夫环（约瑟夫问题）是一个数学的应用问题：</span></span><br><span class="line"><span class="string">已知num个人（以编号1，2，3...n分别表示）围坐在一张圆桌周围。</span></span><br><span class="line"><span class="string">从编号为k的人开始报数，数到m的那个人出列；</span></span><br><span class="line"><span class="string">他的下一个人又从1开始报数，数到m的那个人又出列；</span></span><br><span class="line"><span class="string">依此规律重复下去，直到圆桌周围的人全部出列。</span></span><br><span class="line"><span class="string">:param num:总人数</span></span><br><span class="line"><span class="string">:param k:开始的编号</span></span><br><span class="line"><span class="string">:param m:数到m的出列</span></span><br><span class="line"><span class="string">:return:</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">alist = [x + <span class="number">1</span> <span class="keyword">for</span> x <span class="keyword">in</span> <span class="built_in">range</span>(num)]</span><br><span class="line"><span class="built_in">print</span>(alist)  <span class="comment"># [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]</span></span><br><span class="line"></span><br><span class="line">index, step = k-<span class="number">1</span>, m  <span class="comment"># 从1号开始报数，数到3的那个人出列</span></span><br><span class="line"><span class="keyword">while</span> <span class="built_in">len</span>(alist) &gt; <span class="number">1</span>:</span><br><span class="line">    index = (index + step - <span class="number">1</span>) % <span class="built_in">len</span>(alist)  <span class="comment"># 列表的索引</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;出去的数：&#x27;</span>, alist[index])</span><br><span class="line">    <span class="comment"># del alist[index]</span></span><br><span class="line">    alist.pop(index)</span><br><span class="line"><span class="keyword">return</span> <span class="string">&#x27;最后的一个数：%s&#x27;</span> % alist[<span class="number">0</span>]</span><br><span class="line"><span class="built_in">print</span>(josephus1(<span class="number">13</span>, <span class="number">1</span>, <span class="number">3</span>)) </span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="LRU实现"><a href="#LRU实现" class="headerlink" title="LRU实现"></a>LRU实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, capacity</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    :type capacity: int</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    self.capacity = capacity</span><br><span class="line">    self.cache = collections.OrderedDict()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, key</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    :type key: int</span></span><br><span class="line"><span class="string">    :rtype: int</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> key <span class="keyword">not</span> <span class="keyword">in</span> self.cache:</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span></span><br><span class="line">    value = self.cache.pop(key)    </span><br><span class="line">    self.cache[key]=value</span><br><span class="line">    <span class="keyword">return</span> value</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">put</span>(<span class="params">self, key, value</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    :type key: int</span></span><br><span class="line"><span class="string">    :type value: int</span></span><br><span class="line"><span class="string">    :rtype: None</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> key <span class="keyword">in</span> self.cache:</span><br><span class="line">        self.cache.pop(key)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">if</span> self.capacity==<span class="number">0</span>:</span><br><span class="line">            self.cache.popitem(last=<span class="literal">False</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.capacity -=<span class="number">1</span></span><br><span class="line">    self.cache[key] = value</span><br></pre></td></tr></table></figure>
-
-<h2 id="链表操作"><a href="#链表操作" class="headerlink" title="链表操作"></a>链表操作</h2><h3 id="指针含义"><a href="#指针含义" class="headerlink" title="指针含义"></a>指针含义</h3><ul>
-<li>有些语言有“指针”的概念，比如 C 语言；有些语言没有指针，取而代之的是“引用”，比如 Java、Python。不管是“指针”还是“引用”，实际上，它们的意思都是一样的，都是存储所指对象的内存地址。</li>
-<li><strong>将某个变量赋值给指针，实际上就是将这个变量的地址赋值给指针，或者反过来说，指针中存储了这个变量的内存地址，指向了这个变量，通过指针就能找到这个变量。</strong></li>
-</ul>
-<h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><img src="/2021/05/09/%E9%93%BE%E8%A1%A8/%E6%8C%87%E9%92%88%E6%93%8D%E4%BD%9C.jpg" class="">
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">错误实现</span><br><span class="line">p-&gt;next = x;  <span class="comment">// 将p的next指针指向x结点；</span></span><br><span class="line">x-&gt;next = p-&gt;next;  <span class="comment">// 将x的结点的next指针指向b结点；</span></span><br><span class="line"></span><br><span class="line">正确</span><br><span class="line">new_node-&gt;next = p-&gt;next;</span><br><span class="line">p-&gt;next = new_node;</span><br><span class="line"></span><br><span class="line">删除节点</span><br><span class="line">p-&gt;next = p-&gt;next-&gt;next;</span><br></pre></td></tr></table></figure>
-
-<p>我们插入结点时，一定要注意操作的顺序，<br>要先将结点 x 的 next 指针指向结点 b，<br>再把结点 a 的 next 指针指向结点 x，<br>这样才不会丢失指针，导致内存泄漏。</p>
-<h3 id="利用哨兵"><a href="#利用哨兵" class="headerlink" title="利用哨兵"></a>利用哨兵</h3><p>在头节点前插入哨兵，指向头节点，这样下来，当遇到头节点为空，或者末尾节点为空的时候，就不用多余的判断了，可以继续使用上面的操作</p>
-<h3 id="重点留意边界问题"><a href="#重点留意边界问题" class="headerlink" title="重点留意边界问题"></a>重点留意边界问题</h3><ul>
-<li>如果链表为空时，代码是否能正常工作？</li>
-<li>如果链表只包含一个结点时，代码是否能正常工作？</li>
-<li>如果链表只包含两个结点时，代码是否能正常工作？</li>
-<li>代码逻辑在处理头结点和尾结点的时候，是否能正常工作？、</li>
-</ul>
-<h3 id="常见链表操作"><a href="#常见链表操作" class="headerlink" title="常见链表操作"></a>常见链表操作</h3><ul>
-<li>单链表反转</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">reverseList</span>(<span class="params">self, head</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        pre = <span class="literal">None</span></span><br><span class="line">        cur = head</span><br><span class="line">        <span class="keyword">while</span> cur <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            tmp = cur.<span class="built_in">next</span></span><br><span class="line">            cur.<span class="built_in">next</span> = pre</span><br><span class="line">            pre = cur</span><br><span class="line">            cur = tmp</span><br><span class="line">        <span class="keyword">return</span> pre </span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>链表中环的检测</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">hasCycle</span>(<span class="params">self, head</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        是否有环</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :rtype: bool</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        fast,slow = head,head</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            <span class="keyword">if</span> fast <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span>  fast.<span class="built_in">next</span> <span class="keyword">is</span>  <span class="literal">None</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">            slow,fast = slow.<span class="built_in">next</span> , fast.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">            <span class="keyword">if</span> slow == fast:</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">detectCycle</span>(<span class="params">self, head</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        环的位置</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        slow,fast = head,head</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            <span class="keyword">if</span> fast <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> fast.<span class="built_in">next</span> <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">            slow,fast = slow.<span class="built_in">next</span>,fast.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">            <span class="keyword">if</span> slow==fast:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        slow = head</span><br><span class="line">        <span class="keyword">while</span>(slow!=fast):</span><br><span class="line">            slow,fast = slow.<span class="built_in">next</span>,fast.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">return</span> slow</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>两个有序的链表合并</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">mergeTwoLists</span>(<span class="params">self, l1, l2</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type l1: ListNode</span></span><br><span class="line"><span class="string">        :type l2: ListNode</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        pre = ListNode()</span><br><span class="line">        result = pre</span><br><span class="line">        <span class="keyword">while</span> l1 <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">and</span> l2 <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">if</span> l1.val &lt;= l2.val:</span><br><span class="line">                result.<span class="built_in">next</span> = l1</span><br><span class="line">                l1 = l1.<span class="built_in">next</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                result.<span class="built_in">next</span> = l2</span><br><span class="line">                l2= l2.<span class="built_in">next</span></span><br><span class="line">            result = result.<span class="built_in">next</span></span><br><span class="line">        result.<span class="built_in">next</span> = l1 <span class="keyword">if</span> l1 <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> l2 </span><br><span class="line">        <span class="keyword">return</span> pre.<span class="built_in">next</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>删除链表倒数第 n 个结点</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">removeNthFromEnd</span>(<span class="params">self, head, n</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :type n: int</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        pre  = ListNode(-<span class="number">1</span>,head)</span><br><span class="line">        fast = pre</span><br><span class="line">        slow = pre</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>,n+<span class="number">2</span>):</span><br><span class="line">            fast = fast.<span class="built_in">next</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">while</span>(fast!=<span class="literal">None</span>):</span><br><span class="line">            fast = fast.<span class="built_in">next</span></span><br><span class="line">            slow = slow.<span class="built_in">next</span></span><br><span class="line">        slow.<span class="built_in">next</span> = slow.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">return</span> pre.<span class="built_in">next</span></span><br><span class="line">        </span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>求链表的中间结点</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">middleNode</span>(<span class="params">self, head</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">if</span> head <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> head.<span class="built_in">next</span> ==<span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> head</span><br><span class="line">        slow,fast = head,head</span><br><span class="line">        <span class="keyword">while</span>(fast !=<span class="literal">None</span> <span class="keyword">and</span> fast.<span class="built_in">next</span> !=<span class="literal">None</span>):</span><br><span class="line">            slow = slow.<span class="built_in">next</span></span><br><span class="line">            fast = fast.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">return</span> slow</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>两两交换节点</li>
-</ul>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">swapPairs</span>(<span class="params">self, head</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">if</span> head <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> head.<span class="built_in">next</span> <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> head</span><br><span class="line">        tmp = head.<span class="built_in">next</span></span><br><span class="line">        head.<span class="built_in">next</span> = self.swapPairs(tmp.<span class="built_in">next</span>)</span><br><span class="line">        tmp.<span class="built_in">next</span> = head</span><br><span class="line">        <span class="keyword">return</span> tmp</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/09/%E6%95%B0%E7%BB%84/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/09/%E6%95%B0%E7%BB%84/" class="post-title-link" itemprop="url">数组</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-09 17:22:45" itemprop="dateCreated datePublished" datetime="2021-05-09T17:22:45+08:00">2021-05-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-17 08:12:23" itemprop="dateModified" datetime="2021-05-17T08:12:23+08:00">2021-05-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
                 </span>
             </span>
 
@@ -821,45 +637,25 @@
 
       
           <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><ul>
-<li><p>数组（Array）是一种线性表数据结构。它用一组连续的内存空间，来存储一组具有相同类型的数据。</p>
-</li>
-<li><p>第一是线性表（Linear List）。顾名思义，线性表就是数据排成像一条线一样的结构。</p>
-<img src="/2021/05/09/%E6%95%B0%E7%BB%84/%E7%BA%BF%E6%80%A7%E8%A1%A8.jpg" class=""></li>
-<li><p>非线性表，比如二叉树、堆、图等。</p>
-<img src="/2021/05/09/%E6%95%B0%E7%BB%84/%E9%9D%9E%E7%BA%BF%E6%80%A7%E8%A1%A8.jpg" class=""></li>
-<li><p><strong>链表适合插入、删除，时间复杂度 O(1),数组支持随机访问，根据下标随机访问的时间复杂度为 O(1)</strong></p>
-</li>
+<li>什么是面向对象编程：面向对象编程是一种编程范式或编程风格。它以类或对象作为组织代码的基本单元，并将封装、抽象、继承、多态四个特性，作为代码设计和实现的基石 。</li>
+<li>什么是面向对象编程语言：面向对象编程语言是支持类或对象的语法机制，并有现成的语法机制，能方便地实现面向对象编程四大特性（封装、抽象、继承、多态）的编程语言。</li>
+<li>如何判定一个编程语言是否是面向对象编程语言：如果按照严格的的定义，需要有现成的语法支持类、对象、四大特性才能叫作面向对象编程语言。如果放宽要求的话，只要某种编程语言支持类、对象语法机制，那基本上就可以说这种编程语言是面向对象编程语言了，不一定非得要求具有所有的四大特性。</li>
+<li>什么是面向对象分析和面向对象设计：简单点讲，面向对象分析就是要搞清楚做什么，面向对象设计就是要搞清楚怎么做。两个阶段最终的产出是类的设计，包括程序被拆解为哪些类，每个类有哪些属性方法、类与类之间如何交互等等。</li>
+<li>关于封装特性：<strong>封装也叫作信息隐藏或者数据访问保护</strong>。类通过暴露有限的访问接口，授权外部仅能通过类提供的方式来访问内部信息或者数据。它需要编程语言提供权限访问控制语法来支持，例如 Java 中的 private、protected、public 关键字。封装特性存在的意义，一方面是保护数据不被随意修改，提高代码的可维护性；另一方面是仅暴露有限的必要接口，提高类的易用性。</li>
+<li>关于抽象特性：封装主要讲如何隐藏信息、保护数据，<strong>那抽象就是讲如何隐藏方法的具体实现，让使用者只需要关心方法提供了哪些功能，不需要知道这些功能是如何实现的</strong>。抽象可以通过接口类或者抽象类来实现，但也并不需要特殊的语法机制来支持。抽象存在的意义，一方面是提高代码的可扩展性、维护性，修改实现不需要改变定义，减少代码的改动范围；另一方面，它也是处理复杂系统的有效手段，能有效地过滤掉不必要关注的信息。</li>
+<li>关于继承特性：继承是用来表示类之间的 is-a 关系，分为两种模式：单继承和多继承。单继承表示一个子类只继承一个父类，多继承表示一个子类可以继承多个父类。为了实现继承这个特性，编程语言需要提供特殊的语法机制来支持。继承主要是用来解决代码复用的问题。</li>
+<li>关于多态特性：多态是指子类可以替换父类，在实际的代码运行过程中，调用子类的方法实现。多态这种特性也需要编程语言提供特殊的语法机制来实现，比如继承、接口类、duck-typing。多态可以提高代码的扩展性和复用性，是很多设计模式、设计原则、编程技巧的代码实现基础。</li>
 </ul>
-<h2 id="低效的“插入”和“删除”"><a href="#低效的“插入”和“删除”" class="headerlink" title="低效的“插入”和“删除”"></a>低效的“插入”和“删除”</h2><ul>
-<li>如果需要数组有序，需要挪动数组数据，很低效</li>
-<li>如果不需要有序，只需要将要插入位置的数据插入到末尾，然后将数据进行插入即可</li>
-<li>删除操作时，可以先进行标记，有必要的时候在进行数组移动</li>
-</ul>
-<h2 id="经验总结"><a href="#经验总结" class="headerlink" title="经验总结"></a>经验总结</h2><ul>
-<li><ol>
-<li>Java ArrayList 无法存储基本类型，比如 int、long，需要封装为 Integer、Long 类，而 Autoboxing、Unboxing 则有一定的性能消耗，所以如果特别关注性能，或者希望使用基本类型，就可以选用数组。</li>
+<h2 id="接口和抽象类"><a href="#接口和抽象类" class="headerlink" title="接口和抽象类"></a>接口和抽象类</h2><ol>
+<li>抽象类和接口的语法特性：抽象类不允许被实例化，只能被继承。它可以包含属性和方法。方法既可以包含代码实现，也可以不包含代码实现。不包含代码实现的方法叫作抽象方法。子类继承抽象类，必须实现抽象类中的所有抽象方法。接口不能包含属性，只能声明方法，方法不能包含代码实现。类实现接口的时候，必须实现接口中声明的所有方法。</li>
+<li>抽象类和接口存在的意义：抽象类是对成员变量和方法的抽象，是一种 is-a 关系，是为了解决代码复用问题。接口仅仅是对方法的抽象，是一种 has-a 关系，表示具有某一组行为特性，是为了解决解耦问题，隔离接口和具体的实现，提高代码的扩展性。</li>
+<li>抽象类和接口的应用场景区别：什么时候该用抽象类？什么时候该用接口？实际上，判断的标准很简单。如果要表示一种 is-a 的关系，并且是为了解决代码复用问题，我们就用抽象类；如果要表示一种 has-a 关系，并且是为了解决抽象而非代码复用问题，那我们就用接口。</li>
 </ol>
-</li>
-<li><ol start="2">
-<li>如果数据操作非常简大小事先已知，并且对数据的单，用不到 ArrayList 提供的大部分方法，也可以直接使用数组。</li>
+<h2 id="技巧"><a href="#技巧" class="headerlink" title="技巧"></a>技巧</h2><ol>
+<li>基于接口变成而非实现类编程：越抽象、越顶层、越脱离具体某一实现的设计，越能提高代码的灵活性，越能应对未来的需求变化。好的代码设计，不仅能应对当下的需求，而且在将来需求发生变化的时候，仍然能够在不破坏原有代码设计的情况下灵活应对。而抽象就是提高代码扩展性、灵活性、可维护性最有效的手段之一。</li>
+<li>多用组合少用继承</li>
 </ol>
-</li>
-<li><ol start="3">
-<li>还有一个是我个人的喜好，当要表示多维数组时，用数组往往会更加直观。比如 Object[][] array；而用容器的话则需要这样定义：ArrayList &gt; array。</li>
-</ol>
-</li>
-<li>我总结一下，对于业务开发，直接使用容器就足够了，省时省力。毕竟损耗一丢丢性能，完全不会影响到系统整体的性能。但如果你是做一些非常底层的开发，比如开发网络框架，性能的优化需要做到极致，这个时候数组就会优于容器，成为首选。</li>
-</ul>
-<h2 id="为什么要从0开始不是1"><a href="#为什么要从0开始不是1" class="headerlink" title="为什么要从0开始不是1"></a>为什么要从0开始不是1</h2><ul>
-<li>如果从0开始，那a[k]的寻址公式即：a[k]_address = base_address + k * type_size</li>
-<li>如果从1开始，那a[K]的寻址公式即：a[k]_address = base_address + (k-1)*type_size,每次多一个减法操作</li>
-<li>历史原因 C语言最开始就用的0 ，然后别的语言都开始模仿，久而久之</li>
-</ul>
-<h2 id="题"><a href="#题" class="headerlink" title="题"></a>题</h2><h3 id="三数之和"><a href="#三数之和" class="headerlink" title="三数之和"></a>三数之和</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">threeSum</span>(<span class="params">self, nums</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type nums: List[int]</span></span><br><span class="line"><span class="string">        :rtype: List[List[int]]</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        nums.sort()</span><br><span class="line">        result = []</span><br><span class="line">        k = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>,<span class="built_in">len</span>(nums)-<span class="number">2</span>):</span><br><span class="line">            <span class="keyword">if</span> nums[k]&gt;<span class="number">0</span>:<span class="keyword">break</span></span><br><span class="line">            <span class="keyword">if</span> k&gt;<span class="number">0</span> <span class="keyword">and</span> nums[k]==nums[k-<span class="number">1</span>]:<span class="keyword">continue</span></span><br><span class="line">            i,j = k+<span class="number">1</span>,<span class="built_in">len</span>(nums)-<span class="number">1</span></span><br><span class="line">            <span class="keyword">while</span> i&lt;j:</span><br><span class="line">                s = nums[i] + nums[k]+ nums[j]</span><br><span class="line">                <span class="keyword">if</span> s&lt;<span class="number">0</span>:</span><br><span class="line">                    i+=<span class="number">1</span></span><br><span class="line">                    <span class="keyword">while</span> i&lt;j <span class="keyword">and</span> nums[i]==nums[i-<span class="number">1</span>]:i+=<span class="number">1</span></span><br><span class="line">                <span class="keyword">elif</span> s&gt;<span class="number">0</span>:</span><br><span class="line">                    j-=<span class="number">1</span></span><br><span class="line">                    <span class="keyword">while</span> i&lt;j <span class="keyword">and</span> nums[j]==nums[j+<span class="number">1</span>]:j-=<span class="number">1</span></span><br><span class="line">                <span class="keyword">elif</span> s==<span class="number">0</span>:</span><br><span class="line">                    result.append([nums[k],nums[i],nums[j]])</span><br><span class="line">                    i+=<span class="number">1</span></span><br><span class="line">                    j-=<span class="number">1</span></span><br><span class="line">                    <span class="keyword">while</span> i&lt;j <span class="keyword">and</span> nums[i]==nums[i-<span class="number">1</span>]:i+=<span class="number">1</span></span><br><span class="line">                    <span class="keyword">while</span> i&lt;j <span class="keyword">and</span> nums[j]==nums[j+<span class="number">1</span>]:j-=<span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
-
-<h3 id="两数之和"><a href="#两数之和" class="headerlink" title="两数之和"></a>两数之和</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">twoSum</span>(<span class="params">self, nums, target</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type nums: List[int]</span></span><br><span class="line"><span class="string">        :type target: int</span></span><br><span class="line"><span class="string">        :rtype: List[int]</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        cache = &#123;&#125;</span><br><span class="line">        <span class="keyword">for</span> i,num <span class="keyword">in</span> <span class="built_in">enumerate</span>(nums):</span><br><span class="line">            <span class="keyword">if</span> num <span class="keyword">in</span> cache:</span><br><span class="line">                <span class="keyword">return</span> [cache[num],i]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                cache[target-num]=i</span><br><span class="line">        <span class="keyword">return</span> []</span><br></pre></td></tr></table></figure>
-
-<h3 id="多数元素"><a href="#多数元素" class="headerlink" title="多数元素"></a>多数元素</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">majorityElement</span>(<span class="params">self, nums</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        :type nums: List[int]</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        nums.sort()</span><br><span class="line">        <span class="keyword">return</span> nums[<span class="built_in">len</span>(nums)//<span class="number">2</span>]</span><br></pre></td></tr></table></figure>
+<h2 id="贫血模型OOP-与充血模型DDD"><a href="#贫血模型OOP-与充血模型DDD" class="headerlink" title="贫血模型OOP 与充血模型DDD"></a>贫血模型OOP 与充血模型DDD</h2><p>其实就是service 层中BO的数据类中是否包含有相应的操作，即，操作与数据是否在一块</p>
 
       
     </div>
@@ -879,7 +675,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/15/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -893,7 +689,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/" class="post-title-link" itemprop="url">时间复杂度</a>
+            <a href="/2021/05/15/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" class="post-title-link" itemprop="url">动态规划</a>
         </h2>
 
         <div class="post-meta">
@@ -903,14 +699,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-05-09 16:33:52" itemprop="dateCreated datePublished" datetime="2021-05-09T16:33:52+08:00">2021-05-09</time>
+              <time title="创建时间：2021-05-15 20:11:46" itemprop="dateCreated datePublished" datetime="2021-05-15T20:11:46+08:00">2021-05-15</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-14 07:20:59" itemprop="dateModified" datetime="2021-05-14T07:20:59+08:00">2021-05-14</time>
+                <time title="修改时间：2021-06-04 08:16:50" itemprop="dateModified" datetime="2021-06-04T08:16:50+08:00">2021-06-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -933,51 +729,79 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="时间复杂度"><a href="#时间复杂度" class="headerlink" title="时间复杂度"></a>时间复杂度</h2><h3 id="大O复杂度表示法"><a href="#大O复杂度表示法" class="headerlink" title="大O复杂度表示法"></a>大O复杂度表示法</h3><pre><code>所有代码的执行时间 T(n) 与每行代码的执行次数 f(n) 成正比。
-</code></pre>
-<img src="/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/%E5%A4%A7O%E8%A1%A8%E7%A4%BA%E6%B3%95.png" class="">
+          <h2 id="动态规划学习路线"><a href="#动态规划学习路线" class="headerlink" title="动态规划学习路线"></a>动态规划学习路线</h2><p>动态规划比较适合用来求解最优问题，比如求最大值、最小值等等</p>
+<p>明确「状态」 -&gt; 定义 dp 数组/函数的含义 -&gt; 明确「选择」-&gt; 明确 base<br>case。</p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2>
+      
+    </div>
 
-<h3 id="时间复杂度分析"><a href="#时间复杂度分析" class="headerlink" title="时间复杂度分析"></a>时间复杂度分析</h3><ul>
-<li><ol>
-<li>只关注循环执行次数最多的一段代码<br>我们在分析一个算法、一段代码的时间复杂度的时候，也只关注循环执行次数最多的那一段代码就可以了</li>
-</ol>
-</li>
-<li><ol start="2">
-<li>加法法则：总复杂度等于量级最大的那段代码的复杂度<br>总的时间复杂度就等于量级最大的那段代码的时间复杂度</li>
-</ol>
-</li>
-<li><ol start="3">
-<li>乘法法则：嵌套代码的复杂度等于嵌套内外代码复杂度的乘积</li>
-</ol>
-</li>
-</ul>
-<h3 id="几种常见的时间复杂度"><a href="#几种常见的时间复杂度" class="headerlink" title="几种常见的时间复杂度"></a>几种常见的时间复杂度</h3><img src="/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6.jpg" class="">
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
 
-<h4 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h4><ul>
-<li>我们可以粗略地分为两类，多项式量级和非多项式量级。其中，非多项式量级只有两个：O(2n) 和 O(n!)。</li>
-<li>我们把时间复杂度为非多项式量级的算法问题叫作 NP（Non-Deterministic Polynomial，非确定多项式）问题。</li>
-</ul>
-<h4 id="具体分析"><a href="#具体分析" class="headerlink" title="具体分析"></a>具体分析</h4><ul>
-<li><ol>
-<li>O(1)</li>
-</ol>
-<p>  一般情况下，只要算法中不存在循环语句、递归语句，即使有成千上万行的代码，其时间复杂度也是Ο(1)。</p>
-</li>
-<li><ol start="2">
-<li>O(logn)、O(nlogn)</li>
-</ol>
-<p>归并排序、快速排序的时间复杂度都是 O(nlogn)</p>
-</li>
-<li><ol start="3">
-<li>O(m+n)、O(m*n)</li>
-</ol>
-</li>
-</ul>
-<h2 id="空间复杂度"><a href="#空间复杂度" class="headerlink" title="空间复杂度"></a>空间复杂度</h2><pre><code>渐进时间复杂度，表示算法的执行时间与数据规模之间的增长关系。类比一下，空间复杂度全称就是渐进空间复杂度（asymptotic space complexity），表示算法的存储空间与数据规模之间的增长关系。
-我们常见的空间复杂度就是 O(1)、O(n)、O(n2 )，像 O(logn)、O(nlogn) 这样的对数阶复杂度平时都用不到。
-</code></pre>
-<img src="/2021/05/09/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6/%E5%A4%8D%E6%9D%82%E5%BA%A6%E6%9B%B2%E7%BA%BF.jpg" class="">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/15/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/">
 
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/15/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">回溯算法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-05-15 18:36:16 / 修改时间：22:21:02" itemprop="dateCreated datePublished" datetime="2021-05-15T18:36:16+08:00">2021-05-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="如何理解“回溯算法”（最直观的就是DFS）？"><a href="#如何理解“回溯算法”（最直观的就是DFS）？" class="headerlink" title="如何理解“回溯算法”（最直观的就是DFS）？"></a>如何理解“回溯算法”（最直观的就是DFS）？</h2><p>回溯的处理思想，有点类似枚举搜索。我们枚举所有的解，找到满足期望的解。为了有规律地枚举所有可能的解，避免遗漏和重复，我们把问题求解的过程分为多个阶段。每个阶段，我们都会面对一个岔路口，我们先随意选一条路走，当发现这条路走不通的时候（不符合期望的解），就回退到上一个岔路口，另选一种走法继续走。</p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><h3 id="八皇后"><a href="#八皇后" class="headerlink" title="八皇后"></a>八皇后</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">int</span>[] result = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">8</span>];<span class="comment">//全局或成员变量,下标表示行,值表示queen存储在哪一列</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">cal8queens</span><span class="params">(<span class="keyword">int</span> row)</span> </span>&#123; <span class="comment">// 调用方式：cal8queens(0);</span></span><br><span class="line">  <span class="keyword">if</span> (row == <span class="number">8</span>) &#123; <span class="comment">// 8个棋子都放置好了，打印结果</span></span><br><span class="line">    printQueens(result);</span><br><span class="line">    <span class="keyword">return</span>; <span class="comment">// 8行棋子都放好了，已经没法再往下递归了，所以就return</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> column = <span class="number">0</span>; column &lt; <span class="number">8</span>; ++column) &#123; <span class="comment">// 每一行都有8中放法</span></span><br><span class="line">    <span class="keyword">if</span> (isOk(row, column)) &#123; <span class="comment">// 有些放法不满足要求</span></span><br><span class="line">      result[row] = column; <span class="comment">// 第row行的棋子放到了column列</span></span><br><span class="line">      cal8queens(row+<span class="number">1</span>); <span class="comment">// 考察下一行</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">isOk</span><span class="params">(<span class="keyword">int</span> row, <span class="keyword">int</span> column)</span> </span>&#123;<span class="comment">//判断row行column列放置是否合适</span></span><br><span class="line">  <span class="keyword">int</span> leftup = column - <span class="number">1</span>, rightup = column + <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = row-<span class="number">1</span>; i &gt;= <span class="number">0</span>; --i) &#123; <span class="comment">// 逐行往上考察每一行</span></span><br><span class="line">    <span class="keyword">if</span> (result[i] == column) <span class="keyword">return</span> <span class="keyword">false</span>; <span class="comment">// 第i行的column列有棋子吗？</span></span><br><span class="line">    <span class="keyword">if</span> (leftup &gt;= <span class="number">0</span>) &#123; <span class="comment">// 考察左上对角线：第i行leftup列有棋子吗？</span></span><br><span class="line">      <span class="keyword">if</span> (result[i] == leftup) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (rightup &lt; <span class="number">8</span>) &#123; <span class="comment">// 考察右上对角线：第i行rightup列有棋子吗？</span></span><br><span class="line">      <span class="keyword">if</span> (result[i] == rightup) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    --leftup; ++rightup;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">printQueens</span><span class="params">(<span class="keyword">int</span>[] result)</span> </span>&#123; <span class="comment">// 打印出一个二维矩阵</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> row = <span class="number">0</span>; row &lt; <span class="number">8</span>; ++row) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> column = <span class="number">0</span>; column &lt; <span class="number">8</span>; ++column) &#123;</span><br><span class="line">      <span class="keyword">if</span> (result[row] == column) System.out.print(<span class="string">&quot;Q &quot;</span>);</span><br><span class="line">      <span class="keyword">else</span> System.out.print(<span class="string">&quot;* &quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println();</span><br><span class="line">  &#125;</span><br><span class="line">  System.out.println();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>深度优先搜索、八皇后、0-1 背包问题、图的着色、旅行商问题、数独、全排列、正则表达式匹配</p>
 
       
     </div>
@@ -997,7 +821,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/15/%E5%88%86%E6%B2%BB%E7%AE%97%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1011,7 +835,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" class="post-title-link" itemprop="url">分布式事务</a>
+            <a href="/2021/05/15/%E5%88%86%E6%B2%BB%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">分治算法</a>
         </h2>
 
         <div class="post-meta">
@@ -1021,14 +845,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-05-06 16:34:18" itemprop="dateCreated datePublished" datetime="2021-05-06T16:34:18+08:00">2021-05-06</time>
+              <time title="创建时间：2021-05-15 16:44:15" itemprop="dateCreated datePublished" datetime="2021-05-15T16:44:15+08:00">2021-05-15</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-04 17:38:08" itemprop="dateModified" datetime="2021-07-04T17:38:08+08:00">2021-07-04</time>
+                <time title="修改时间：2021-05-25 07:32:32" itemprop="dateModified" datetime="2021-05-25T07:32:32+08:00">2021-05-25</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1036,7 +860,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">分布式</span></a>
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
                 </span>
             </span>
 
@@ -1051,108 +875,26 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="分布式事务解决方案"><a href="#分布式事务解决方案" class="headerlink" title="分布式事务解决方案"></a>分布式事务解决方案</h2><h3 id="数据库事务"><a href="#数据库事务" class="headerlink" title="数据库事务"></a>数据库事务</h3><ul>
-<li>原子性(Atomicity )</li>
-<li>一致性( Consistency )</li>
-<li>隔离性或独立性( Isolation)</li>
-<li>持久性(Durabilily)</li>
-</ul>
-<h3 id="分布式理论"><a href="#分布式理论" class="headerlink" title="分布式理论"></a>分布式理论</h3><h4 id="CAP理论"><a href="#CAP理论" class="headerlink" title="CAP理论"></a>CAP理论</h4><p>CAP定理是由加州大学伯克利分校Eric Brewer教授提出来的，他指出WEB服务无法同时满足一下3个属性：</p>
+          <h2 id="如何理解分治算法？"><a href="#如何理解分治算法？" class="headerlink" title="如何理解分治算法？"></a>如何理解分治算法？</h2><p>分治算法是一种处理问题的思想，递归是一种编程技巧，一般用递归实现，分为三步：</p>
 <ul>
-<li>一致性(Consistency) ： 客户端知道一系列的操作都会同时发生(生效)</li>
-<li>可用性(Availability) ： 每个操作都必须以可预期的响应结束</li>
-<li>分区容错性(Partition tolerance) ： 即使出现单个组件无法可用,操作依然可以完成</li>
-<li><strong>CAP原则指CAP三者不能同时满足，要么能同时满足CP即同时满足区分容错性和一致性，要么同时满足AP即同时满足区分容错性和可用性。从中可以看出，P是分布式系统的基础，没有区分容错性就谈不上分布式系统了</strong></li>
+<li>分解：将原问题分解成一系列子问题；</li>
+<li>解决：递归地求解各个子问题，若子问题足够小，则直接求解；</li>
+<li>合并：将子问题的结果合并成原问题。</li>
 </ul>
-<h4 id="BASE理论"><a href="#BASE理论" class="headerlink" title="BASE理论"></a>BASE理论</h4><p>前面讲到分布式系统的CAP原则要么同时满足AP要么同时满足CP，那么BASE理论则是CAP原则权衡的结果。BASE是指Basically Available（基本可用的）,Soft state（软状态）,Eventual consistency（最终一致性）。</p>
+<p>分治算法能解决的问题，一般需要满足下面这几个条件：</p>
 <ul>
-<li><p>Basically Available是指在分布式集群节点中，若某个节点宕机，或者在数据在节点间复制的过程中，只有部分数据不可用，但不影响整个系统的整体的可用性。</p>
-</li>
-<li><p>Soft state是指软状态即这个状态只是一个中间状态，允许数据在节点集群间操作过程中存在存在一个时延，这个中间状态最终会转化为最终状态。</p>
-</li>
-<li><p>Eventual consistency是指数据在分布式集群节点间操作过程中存在时延，与ACID相反，最终一致性不是强一致性，在经过一定时间后，分布式集群节点间的数据拷贝能达到最终一致的状态。</p>
-</li>
+<li>原问题与分解成的小问题具有相同的模式；</li>
+<li>原问题分解成的子问题可以独立求解，子问题之间没有相关性，这一点是分治算法跟动态规划的明显区别，等我们讲到动态规划的时候，会详细对比这两种算法；</li>
+<li>具有分解终止条件，也就是说，当问题足够小时，可以直接求解；</li>
+<li>可以将子问题合并成原问题，而这个合并操作的复杂度不能太高，否则就起不到减小算法总体复杂度的效果了。</li>
 </ul>
-<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><h4 id="两阶段提交-2pc"><a href="#两阶段提交-2pc" class="headerlink" title="两阶段提交(2pc)"></a>两阶段提交(2pc)</h4><ul>
-<li>准备阶段<ul>
-<li>协调者节点向所有参与者节点询问是否可以执行提交操作(vote)，并开始等待各参与者节点的响应。</li>
-<li>参与者节点执行询问发起为止的所有事务操作，并将Undo信息和Redo信息写入日志。（注意：若成功这里其实每个参与者已经执行了事务操作）</li>
-<li>各参与者节点响应协调者节点发起的询问。如果参与者节点的事务操作实际执行成功，则它返回一个”同意”消息；如果参与者节点的事务操作实际执行失败，则它返回一个”中止”消息。由协调者判断是否继续</li>
-</ul>
-</li>
-<li>提交阶段<ul>
-<li>当协调者节点从所有参与者节点获得的相应消息都为”同意”时：</li>
-<li>协调者节点向所有参与者节点发出”正式提交(commit)”的请求。</li>
-<li>参与者节点正式完成操作，并释放在整个事务期间内占用的资源。</li>
-<li>参与者节点向协调者节点发送”完成”消息。</li>
-<li>协调者节点受到所有参与者节点反馈的”完成”消息后，完成事务。</li>
-<li>如果任一参与者节点在第一阶段返回的响应消息为”中止”，或者 协调者节点在第一阶段的询问超时之前无法获取所有参与者节点的响应消息时：<ul>
-<li>协调者节点向所有参与者节点发出”回滚操作(rollback)”的请求。</li>
-<li>参与者节点利用之前写入的Undo信息执行回滚，并释放在整个事务期间内占用的资源。</li>
-<li>参与者节点向协调者节点发送”回滚完成”消息。</li>
-<li>协调者节点受到所有参与者节点反馈的”回滚完成”消息后，取消事务。</li>
-<li>不管最后结果如何，第二阶段都会结束当前事务。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>问题<ul>
-<li>2PC是一个强一致性协议，同时它在实际应用中还存在几个问题：<ul>
-<li>同步阻塞，2PC的两个阶段中，协调者和参与者的通信都是同步的，这会导致整个事务的长时间阻塞</li>
-<li>Coordinator的单点问题</li>
-<li>数据不一致，在Commit阶段，可能存在只有部分参与者收到Commit消息（或处理成功）的情况</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h4 id="三阶段提交-3PC"><a href="#三阶段提交-3PC" class="headerlink" title="三阶段提交(3PC)"></a>三阶段提交(3PC)</h4><p>3PC即三阶段提交，它比2PC多了一个阶段，即把原来2PC的准备阶段拆分成CanCommit和PreCommit两个阶段，同时引入超时机制来解决2PC的同步阻塞问题。<br>    <img src="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/3%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%E5%9B%BE.png" class=""><br>但是在我看来3PC并没有解决2PC的根本问题，它只是在2PC的基础上做了一些优化，它增加了一个阶段（也增加了1个RTT）来提高对方可用性的概率，这本质跟TCP的三次握手一样，同样也改为四次握手，五次握手等等。</p>
-<p>第二阶段超时回滚，第三阶段超时提交</p>
-<h4 id="补偿事务-TCC-Try-Confirm-Cancel"><a href="#补偿事务-TCC-Try-Confirm-Cancel" class="headerlink" title="补偿事务(TCC:Try-Confirm-Cancel)"></a>补偿事务(TCC:Try-Confirm-Cancel)</h4><ul>
-<li><p>TCC 其实就是采用的补偿机制，其核心思想是：针对每个操作，都要注册一个与其对应的确认和补偿（撤销）操作。它分为三个阶段：</p>
+<h2 id="分治算法应用举例分析"><a href="#分治算法应用举例分析" class="headerlink" title="分治算法应用举例分析"></a>分治算法应用举例分析</h2><h3 id="归并求逆序度"><a href="#归并求逆序度" class="headerlink" title="归并求逆序度"></a>归并求逆序度</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> num = <span class="number">0</span>; <span class="comment">// 全局变量或者成员变量</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">count</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  num = <span class="number">0</span>;</span><br><span class="line">  mergeSortCounting(a, <span class="number">0</span>, n-<span class="number">1</span>);</span><br><span class="line">  <span class="keyword">return</span> num;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">mergeSortCounting</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> p, <span class="keyword">int</span> r)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (p &gt;= r) <span class="keyword">return</span>;</span><br><span class="line">  <span class="keyword">int</span> q = (p+r)/<span class="number">2</span>;</span><br><span class="line">  mergeSortCounting(a, p, q);</span><br><span class="line">  mergeSortCounting(a, q+<span class="number">1</span>, r);</span><br><span class="line">  merge(a, p, q, r);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">merge</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> p, <span class="keyword">int</span> q, <span class="keyword">int</span> r)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> i = p, j = q+<span class="number">1</span>, k = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">int</span>[] tmp = <span class="keyword">new</span> <span class="keyword">int</span>[r-p+<span class="number">1</span>];</span><br><span class="line">  <span class="keyword">while</span> (i&lt;=q &amp;&amp; j&lt;=r) &#123;</span><br><span class="line">    <span class="keyword">if</span> (a[i] &lt;= a[j]) &#123;</span><br><span class="line">      tmp[k++] = a[i++];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      num += (q-i+<span class="number">1</span>); <span class="comment">// 统计p-q之间，比a[j]大的元素个数</span></span><br><span class="line">      tmp[k++] = a[j++];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">while</span> (i &lt;= q) &#123; <span class="comment">// 处理剩下的</span></span><br><span class="line">    tmp[k++] = a[i++];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">while</span> (j &lt;= r) &#123; <span class="comment">// 处理剩下的</span></span><br><span class="line">    tmp[k++] = a[j++];</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt;= r-p; ++i) &#123; <span class="comment">// 从tmp拷贝回a</span></span><br><span class="line">    a[p+i] = tmp[i];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><p>关于分治算法，我这还有两道比较经典的问题，你可以自己练习一下。</p>
 <ul>
-<li>Try 阶段主要是对业务系统做检测及资源预留</li>
-<li>Confirm 阶段主要是对业务系统做确认提交，Try阶段执行成功并开始执行 Confirm阶段时，默认 Confirm阶段是不会出错的。即：只要Try成功，Confirm一定成功。</li>
-<li>Cancel 阶段主要是在业务执行错误，需要回滚的状态下执行的业务取消，预留资源释放。</li>
+<li>二维平面上有 n 个点，如何快速计算出两个距离最近的点对？</li>
+<li>有两个 n<em>n 的矩阵 A，B，如何快速求解两个矩阵的乘积 C=A</em>B？</li>
 </ul>
-</li>
-<li><p>举个例子，假入 Bob 要向 Smith 转账，思路大概是：<br>  我们有一个本地方法，里面依次调用</p>
-<ul>
-<li>1、首先在 Try 阶段，要先调用远程接口把 Smith 和 Bob 的钱给冻结起来。</li>
-<li>2、在 Confirm 阶段，执行远程调用的转账的操作，转账成功进行解冻。</li>
-<li>3、如果第2步执行成功，那么转账成功，如果第二步执行失败，则调用远程冻结接口对应的解冻方法 (Cancel)。</li>
-</ul>
-</li>
-<li><p>优点： 跟2PC比起来，实现以及流程相对简单了一些，但数据的一致性比2PC也要差一些</p>
-</li>
-<li><p>缺点： 缺点还是比较明显的，在2,3步中都有可能失败。TCC属于应用层的一种补偿方式，所以需要程序员在实现的时候多写很多补偿的代码，在一些场景中，一些业务流程可能用TCC不太好定义及处理。</p>
-</li>
-</ul>
-<h4 id="本地消息表"><a href="#本地消息表" class="headerlink" title="本地消息表"></a>本地消息表</h4><p>本地消息表方案应该是业界内使用最为广泛的，因为它使用简单，成本比较低。<br>本地消息表的方案最初是由eBay提出（完整方案），核心思路是将分布式事务拆分成本地事务进行处理。它的处理流程如下：</p>
-<ul>
-<li>事务发起方把要处理的业务事务和写消息表这两个操作放在同一个本地事务里</li>
-<li>事务发起方有一个定时任务轮询消息表，把没处理的消息发送到消息中间件</li>
-<li>事务被动方从消息中间件获取消息后，返回成功</li>
-<li>事务发起方更新消息状态为已成功  <img src="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/%E6%9C%AC%E5%9C%B0%E6%B6%88%E6%81%AF%E8%A1%A8.png" class=""></li>
-</ul>
-<p>一些分析:</p>
-<ul>
-<li>把业务处理和写消息表放在同一个事务是为了失败/异常后可以同时回滚</li>
-<li>为什么不直接发消息，而是先写消息表？试想，如果发送消息超时了，即不确定消息中间件收到消息没，那么你是重试还是抛异常回滚事务呢？回滚是不行的，因为可能消息中间件已经收到消息，接收方收到消息后做处理，导致双方数据不一致了；重试也是不行的，因为有可能会一直重试失败，导致事务阻塞。  </li>
-<li>基于上述分析，消息的接收方是需要做幂等操作的</li>
-</ul>
-<p>本地消息表方案整体来说还是比较简单、可用的，但是也有以下缺点：</p>
-<ul>
-<li>消息数据和业务数据耦合，消息表需要根据具体的业务场景制定，不能公用。就算可以公用消息表，对于分库的业务来说每个库都是需要消息表的。</li>
-<li>只适用于最终一致的业务场景。例如在 A -&gt; B场景下，在不考虑网络异常、宕机等非业务异常的情况下，A成功的话，B肯定也会成功的。</li>
-<li><strong>生产者记录任务，处理消息，发送消息；接受者从队列拿取消息，并更改生产者的消息状态；定时轮询生产者中本地记录任务，当存在没有发送成功的，就进行重发；接受者需要启用幂等</strong></li>
-</ul>
-<h4 id="Sagas事务模型"><a href="#Sagas事务模型" class="headerlink" title="Sagas事务模型"></a>Sagas事务模型</h4><p>Saga事务模型又叫做长时间运行的事务（Long-running-transaction）, 它是由普林斯顿大学的H.Garcia-Molina等人提出，它描述的是另外一种在没有两阶段提交的的情况下解决分布式系统中复杂的业务事务问题。<br>我们这里说的是一种基于 Sagas 机制的工作流事务模型，这个模型的相关理论目前来说还是比较新的，以至于百度上几乎没有什么相关资料。</p>
-<p>该模型其核心思想就是拆分分布式系统中的长事务为多个短事务，或者叫多个本地事务，然后由 Sagas 工作流引擎负责协调，如果整个流程正常结束，那么就算是业务成功完成，如果在这过程中实现失败，那么Sagas工作流引擎就会以相反的顺序调用补偿操作，重新进行业务回滚。</p>
-<p>比如我们一次关于购买旅游套餐业务操作涉及到三个操作，他们分别是预定车辆，预定宾馆，预定机票，他们分别属于三个不同的远程接口。可能从我们程序的角度来说他们不属于一个事务，但是从业务角度来说是属于同一个事务的。<br>    <img src="/2021/05/06/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/sagas.png" class=""></p>
-<p>们的执行顺序如上图所示，所以当发生失败时，会依次进行取消的补偿操作。</p>
-<p>因为长事务被拆分了很多个业务流，所以 Sagas 事务模型最重要的一个部件就是工作流或者你也可以叫流程管理器（Process Manager），工作流引擎和Process Manager虽然不是同一个东西，但是在这里，他们的职责是相同的</p>
-<p><a target="_blank" rel="noopener" href="https://albenw.github.io/posts/425b6837/">https://albenw.github.io/posts/425b6837/</a><br><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903647197806605">https://juejin.cn/post/6844903647197806605</a><br><a target="_blank" rel="noopener" href="https://www.sofastack.tech/blog/sofa-meetup-3-seata-retrospect/">https://www.sofastack.tech/blog/sofa-meetup-3-seata-retrospect/</a><br><a target="_blank" rel="noopener" href="https://albenw.github.io/posts/255bd548/">https://albenw.github.io/posts/255bd548/</a> 可以参考他的分布式事务</p>
 
       
     </div>
@@ -1172,7 +914,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/15/%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -1186,7 +928,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/" class="post-title-link" itemprop="url">用户态及内核态</a>
+            <a href="/2021/05/15/%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">贪心算法</a>
         </h2>
 
         <div class="post-meta">
@@ -1195,23 +937,17 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-05-06 14:44:38" itemprop="dateCreated datePublished" datetime="2021-05-06T14:44:38+08:00">2021-05-06</time>
+              <time title="创建时间：2021-05-15 16:26:50 / 修改时间：22:21:02" itemprop="dateCreated datePublished" datetime="2021-05-15T16:26:50+08:00">2021-05-15</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-08 21:59:05" itemprop="dateModified" datetime="2021-05-08T21:59:05+08:00">2021-05-08</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
                 </span>
             </span>
 
@@ -1226,49 +962,197 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="为什么要有用户态和内核态"><a href="#为什么要有用户态和内核态" class="headerlink" title="为什么要有用户态和内核态"></a>为什么要有用户态和内核态</h2><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><ul>
-<li><p>Linux所谓的用户态和内核态，本质是对CPU提供的功能的一层封装抽象。</p>
-</li>
-<li><p>现代CPU，其设计目标主要是为了完美高效的实现一个多任务系统，多任务系统的三个核心特征是：</p>
-<ul>
-<li>权限分级</li>
-<li>数据隔离</li>
-<li>任务切换。</li>
+          <h2 id="如何理解“贪心算法”？"><a href="#如何理解“贪心算法”？" class="headerlink" title="如何理解“贪心算法”？"></a>如何理解“贪心算法”？</h2><ul>
+<li>第一步，当我们看到这类问题的时候，首先要联想到贪心算法：针对一组数据，我们定义了限制值和期望值，希望从中选出几个数据，在满足限制值的情况下，期望值最大。</li>
+<li>第二步，我们尝试看下这个问题是否可以用贪心算法解决：每次选择当前情况下，在对限制值同等贡献量的情况下，对期望值贡献最大的数据。</li>
+<li>第三步，我们举几个例子看下贪心算法产生的结果是否是最优的。大部分情况下，举几个例子验证一下就可以了。</li>
+<li>第四步，当前面的选择会影响后面的选择时，就无法用贪心策略了，无后效性，即每一次选择都是同样的</li>
 </ul>
-</li>
-<li><p>以X86_64架构为例，</p>
-<ul>
-<li>权限分级通过CPU的多模式机制和分段机制实现，</li>
-<li>数据隔离通过分页机制实现，</li>
-<li>任务切换通过中断机制和任务机制（TR/TSS）实现。</li>
+<h2 id="贪心算法实战分析"><a href="#贪心算法实战分析" class="headerlink" title="贪心算法实战分析"></a>贪心算法实战分析</h2><h3 id="背包装豆子"><a href="#背包装豆子" class="headerlink" title="背包装豆子"></a>背包装豆子</h3><ul>
+<li>限制值：背包载重100kg 期望值：总价值最大</li>
+<li>在同等重量下，期望获取最大的价值的豆子即可</li>
+<li>无后效性</li>
 </ul>
-</li>
-<li><p>内核态和用户态的概念，是Linux为了有效实现CPU的权限分级和数据隔离的目标而出现的，是通过组合CPU的分段机制+分页机制而形成的。</p>
-<ul>
-<li>当CPU处于保护模式下时（X86_64CPU有5种模式，保护模式是其中之一，此时CPU.CR0.PE=1），</li>
-<li>当CPU.CS=系统代码段时（CS.CPL=0）为内核态，此时通过CPU的指令有操控全部寄存器的权限（包括FLAGS和CR寄存器），</li>
-<li>当CPU.CS=用户代码段时（CS.CPL=3）为用户态，此时通过CPU的指令只有操控部分寄存器的权限。</li>
+<h3 id="分糖果"><a href="#分糖果" class="headerlink" title="分糖果"></a>分糖果</h3><ul>
+<li>限制值：糖果数量M 期望值：孩子的数量N</li>
+<li>在相同的糖果下，孩子的个数最多，即在一个糖果的情况下，孩子需求越小，孩子越可能满足条件</li>
+<li>无后效性</li>
 </ul>
-</li>
-<li><p>所谓“一个进程主动跳进内核态”，是指该进程中的一个执行线程通过INT或者SYSCALL指令，使得当前线程的CS=系统代码段（这里还有不同的细节，不多说了）。</p>
-</li>
-<li><p>每个用户进程都有自己的虚拟地址空间，用户进程之间切换的时候，通过切换页表（CR3）来实现，不用改CS寄存器和DS寄存器。所以没有“代码映射在0-3G”一说。就像班级名称和学号，同样的学号在不同的班级代表不同的人，同样的虚拟地址在不同的页表中代表不同的物理内存空间。</p>
-</li>
-<li><p>内核态允许多个用户线程同时进入，不存在阻塞的现象，尤其是多核CPU的情况下。</p>
-</li>
-<li><p>除了用户线程可以进入内核态之外，还有内核线程，即内核自己要干的事情，这种线程只运行在内核态</p>
-</li>
-<li><p>图1：从CPU的寄存器视角看，指令运行所处的三种CPU状态</p>
-<!-- ![cpu角度](./用户态及内核态/cpu.jpg) -->
-<img src="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/cpu.jpg" class=""></li>
-<li><p>图2：从Linux线程角度看，指令运行所处的两种状态（要么属于某线程，要么黑色切换中）</p>
-<!-- ![linux线程角度](./用户态及内核态/xiancheng.jpg) -->
-<img src="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/xiancheng.jpg" class=""></li>
-<li><p>图3：Linux下，线程类型*CPU状态决定数据空间</p>
-<!-- ![线程类型](./用户态及内核态/yonghu.jpg) -->
-<img src="/2021/05/06/%E7%94%A8%E6%88%B7%E6%80%81%E5%8F%8A%E5%86%85%E6%A0%B8%E6%80%81/yonghu.jpg" class=""></li>
+<h3 id="钱币找零"><a href="#钱币找零" class="headerlink" title="钱币找零"></a>钱币找零</h3><ul>
+<li>限制值：钱总数 期望值：纸币数量最少</li>
+<li>在相同钱的情况下，面值越大，纸币数量越少</li>
+<li>无后效性</li>
+</ul>
+<h3 id="区间覆盖"><a href="#区间覆盖" class="headerlink" title="区间覆盖"></a>区间覆盖</h3><ul>
+<li>限制值：区间长度 期望值：子区间越多越好</li>
+<li>在同样长度的区间下，子区间越小，越能满足条件，即找一个满足条件的尾区间最小的</li>
+<li>无后效性</li>
 </ul>
 
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/14/Trie%E6%A0%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/14/Trie%E6%A0%91/" class="post-title-link" itemprop="url">Trie树</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-05-14 07:51:27 / 修改时间：08:08:18" itemprop="dateCreated datePublished" datetime="2021-05-14T07:51:27+08:00">2021-05-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Trie树（字典树）"><a href="#Trie树（字典树）" class="headerlink" title="Trie树（字典树）"></a>Trie树（字典树）</h2><p>Trie 树的本质，就是利用字符串之间的公共前缀，将重复的前缀合并在一起。</p>
+<img src="/2021/05/14/Trie%E6%A0%91/%E5%AD%97%E5%85%B8%E6%A0%91.jpg" class="">
+
+<h2 id="如何实现一棵-Trie-树？"><a href="#如何实现一棵-Trie-树？" class="headerlink" title="如何实现一棵 Trie 树？"></a>如何实现一棵 Trie 树？</h2><p>借助散列表的思想，我们通过一个下标与字符一一映射的数组，来存储子节点的指针。</p>
+<img src="/2021/05/14/Trie%E6%A0%91/%E5%AD%98%E5%82%A8.jpg" class="">
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Trie</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> TrieNode root = <span class="keyword">new</span> TrieNode(<span class="string">&#x27;/&#x27;</span>); <span class="comment">// 存储无意义字符</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 往Trie树中插入一个字符串</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(<span class="keyword">char</span>[] text)</span> </span>&#123;</span><br><span class="line">    TrieNode p = root;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; text.length; ++i) &#123;</span><br><span class="line">      <span class="keyword">int</span> index = text[i] - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">      <span class="keyword">if</span> (p.children[index] == <span class="keyword">null</span>) &#123;</span><br><span class="line">        TrieNode newNode = <span class="keyword">new</span> TrieNode(text[i]);</span><br><span class="line">        p.children[index] = newNode;</span><br><span class="line">      &#125;</span><br><span class="line">      p = p.children[index];</span><br><span class="line">    &#125;</span><br><span class="line">    p.isEndingChar = <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 在Trie树中查找一个字符串</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">find</span><span class="params">(<span class="keyword">char</span>[] pattern)</span> </span>&#123;</span><br><span class="line">    TrieNode p = root;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; pattern.length; ++i) &#123;</span><br><span class="line">      <span class="keyword">int</span> index = pattern[i] - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">      <span class="keyword">if</span> (p.children[index] == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>; <span class="comment">// 不存在pattern</span></span><br><span class="line">      &#125;</span><br><span class="line">      p = p.children[index];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (p.isEndingChar == <span class="keyword">false</span>) <span class="keyword">return</span> <span class="keyword">false</span>; <span class="comment">// 不能完全匹配，只是前缀</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="keyword">true</span>; <span class="comment">// 找到pattern</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TrieNode</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">char</span> data;</span><br><span class="line">    <span class="keyword">public</span> TrieNode[] children = <span class="keyword">new</span> TrieNode[<span class="number">26</span>];</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">boolean</span> isEndingChar = <span class="keyword">false</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TrieNode</span><span class="params">(<span class="keyword">char</span> data)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.data = data;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 Trie 树中，查找某个字符串的时间复杂度是多少？(构建是O(n),查找是O(k))</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/" class="post-title-link" itemprop="url">字符串匹配</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-05-14 07:26:57 / 修改时间：08:08:18" itemprop="dateCreated datePublished" datetime="2021-05-14T07:26:57+08:00">2021-05-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="BF-算法-Brute-Force-强制匹配算法-O-n-m"><a href="#BF-算法-Brute-Force-强制匹配算法-O-n-m" class="headerlink" title="BF 算法(Brute Force 强制匹配算法 O(n*m))"></a>BF 算法(Brute Force 强制匹配算法 O(n*m))</h2><p>我们在主串中，检查起始位置分别是 0、1、2….n-m 且长度为 m 的 n-m+1 个子串，看有没有跟模式串匹配的</p>
+<img src="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/BF.jpg" class="">
+<p>尽管理论上，BF 算法的时间复杂度很高，是 O(n*m)，但在实际的开发中，它却是一个比较常用的字符串匹配算法。为什么这么说呢？原因有两点。</p>
+<ul>
+<li>第一，实际的软件开发中，大部分情况下，模式串和主串的长度都不会太长。而且每次模式串与主串中的子串匹配的时候，当中途遇到不能匹配的字符的时候，就可以就停止了，不需要把 m 个字符都比对一下。所以，尽管理论上的最坏情况时间复杂度是 O(n*m)，但是，统计意义上，大部分情况下，算法执行效率要比这个高很多。</li>
+<li>第二，朴素字符串匹配算法思想简单，代码实现也非常简单。简单意味着不容易出错，如果有 bug 也容易暴露和修复。在工程中，在满足性能要求的前提下，简单是首选。这也是我们常说的KISS（Keep it Simple and Stupid）设计原则。</li>
+</ul>
+<h2 id="RK-算法（Rabin-Karp-人名-O-n-）"><a href="#RK-算法（Rabin-Karp-人名-O-n-）" class="headerlink" title="RK 算法（Rabin-Karp 人名 O(n)）"></a>RK 算法（Rabin-Karp 人名 O(n)）</h2><p>RK 算法的思路是这样的：我们通过哈希算法对主串中的 n-m+1 个子串分别求哈希值，然后逐个与模式串的哈希值比较大小。如果某个子串的哈希值与模式串相等，那就说明对应的子串和模式串匹配了（这里先不考虑哈希冲突的问题，后面我们会讲到）。因为哈希值是一个数字，数字之间比较是否相等是非常快速的，所以模式串和子串比较的效率就提高了<br>当我们发现一个子串的哈希值跟模式串的哈希值相等的时候，我们只需要再对比一下子串和模式串本身就好了。当然，如果子串的哈希值与模式串的哈希值不相等，那对应的子串和模式串肯定也是不匹配的，就不需要比对子串和模式串本身了。</p>
+<h2 id="BM（Boyer-Moore）算法"><a href="#BM（Boyer-Moore）算法" class="headerlink" title="BM（Boyer-Moore）算法"></a>BM（Boyer-Moore）算法</h2><p>BM 算法包含两部分，分别是坏字符规则（bad character rule）和好后缀规则（good suffix shift）。</p>
+<ol>
+<li><p>坏字符规则:当发生不匹配的时候，我们把坏字符对应的模式串中的字符下标记作 si。如果坏字符在模式串中存在，我们把这个坏字符在模式串中的下标记作 xi。如果不存在，我们把 xi 记作 -1。那模式串往后移动的位数就等于 si-xi。（注意，我这里说的下标，都是字符在模式串的下标）。</p>
+<img src="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/%E5%9D%8F%E5%AD%97%E7%AC%A6.jpg" class=""> 
+<img src="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/%E5%9D%8F%E5%AD%97%E7%AC%A6%E6%BB%91%E5%8A%A8%E4%BD%8D%E6%95%B0.jpg" class=""></li>
+<li><p>好后缀规则：</p>
+<img src="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/%E5%A5%BD%E5%90%8E%E7%BC%80.jpg" class=""> 
+<img src="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/%E6%9C%89%E9%87%8D%E5%90%88.jpg" class="">
+<img src="/2021/05/14/%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/%E6%B2%A1%E9%87%8D%E5%90%88%E5%89%8D%E7%BC%80.jpg" class="">
+<p>我们可以分别计算好后缀和坏字符往后滑动的位数，然后取两个数中最大的，作为模式串往后滑动的位数。这种处理方法还可以避免我们前面提到的，根据坏字符规则，计算得到的往后滑动的位数，有可能是负数的情况。</p>
+</li>
+</ol>
+<h2 id="KMP-算法基本原理"><a href="#KMP-算法基本原理" class="headerlink" title="KMP 算法基本原理"></a>KMP 算法基本原理</h2>
       
     </div>
 
@@ -1286,7 +1170,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1352,14 +1236,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">96</span>
+          <span class="site-state-item-count">111</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
