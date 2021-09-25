@@ -191,6 +191,112 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/01/string/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/01/string/" class="post-title-link" itemprop="url">string</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-01 21:25:39" itemprop="dateCreated datePublished" datetime="2021-06-01T21:25:39+08:00">2021-06-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-02 08:14:46" itemprop="dateModified" datetime="2021-06-02T08:14:46+08:00">2021-06-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="string类型的问题"><a href="#string类型的问题" class="headerlink" title="string类型的问题"></a>string类型的问题</h2><ul>
+<li>当使用string保存大量数据时，例如保存图片id:存储id 时，1亿张图片用了6.4G 内存，会造成RDB生成相应变慢的问题</li>
+<li>就是它保存数据时所消耗的内存空间较多。</li>
+</ul>
+<h2 id="为什么-String-类型内存开销大-64K-整数"><a href="#为什么-String-类型内存开销大-64K-整数" class="headerlink" title="为什么 String 类型内存开销大(64K,整数)"></a>为什么 String 类型内存开销大(64K,整数)</h2><ul>
+<li>当你保存 64 位有符号整数时，String 类型会把它保存为一个 8 字节的 Long 类型整数，这种保存方式通常也叫作 int 编码方式。</li>
+<li>当你保存的数据中包含字符时，String 类型就会用简单动态字符串（Simple Dynamic String，SDS）结构体来保存 <img src="/2021/06/01/string/SDS.jpg" class="">
+<ul>
+<li>buf：字节数组，保存实际数据。为了表示字节数组的结束，Redis 会自动在数组最后加一个“\0”，这就会额外占用 1 个字节的开销。</li>
+<li>len：占 4 个字节，表示 buf 的已用长度。</li>
+<li>alloc：也占个 4 字节，表示 buf 的实际分配长度，一般大于 len。</li>
+</ul>
+</li>
+<li>因为 Redis 的数据类型有很多，而且，不同数据类型都有些相同的元数据要记录（比如最后一次访问的时间、被引用的次数等），所以，Redis 会用一个 RedisObject 结构体来统一记录这些元数据，同时指向实际数据。一个 RedisObject 包含了 8 字节的元数据和一个 8 字节指针 <img src="/2021/06/01/string/redisobj.jpg" class="">
+ <img src="/2021/06/01/string/quan.jpg" class=""></li>
+<li>6.4g 中4.8g保存了元数据</li>
+</ul>
+<h2 id="用什么数据结构可以节省内存"><a href="#用什么数据结构可以节省内存" class="headerlink" title="用什么数据结构可以节省内存"></a>用什么数据结构可以节省内存</h2><p>Redis 有一种底层数据结构，叫压缩列表（ziplist），这是一种非常节省内存的结构。</p>
+<img src="/2021/06/01/string/%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8.jpg" class="">
+
+<ul>
+<li>表头有三个字段 zlbytes、zltail 和 zllen，分别表示列表长度、列表尾的偏移量，以及列表中的 entry 个数。压缩列表尾还有一个 zlend，表示列表结束。</li>
+<li>减少dictEntry的个数来进行压缩</li>
+</ul>
+<h2 id="如何用集合类型保存单值的键值对"><a href="#如何用集合类型保存单值的键值对" class="headerlink" title="如何用集合类型保存单值的键值对"></a>如何用集合类型保存单值的键值对</h2><p>可以采用基于 Hash 类型的二级编码方法。这里说的二级编码，就是把一个单值的数据拆分成两部分，前一部分作为 Hash 集合的 key，后一部分作为 Hash 集合的 value，这样一来，我们就可以把单值数据保存到 Hash 集合中了。</p>
+<ul>
+<li>以图片 ID 1101000060 和图片存储对象 ID 3302000080 为例，我们可以把图片 ID 的前 7 位（1101000）作为 Hash 类型的键，把图片 ID 的最后 3 位（060）和图片存储对象 ID 分别作为 Hash 类型值中的 key 和 value。  </li>
+<li>Redis Hash 类型的两种底层实现结构，分别是压缩列表和哈希表。一旦超过了阈值，Hash 类型就会用哈希表来保存数据了。<ul>
+<li>hash-max-ziplist-entries：表示用压缩列表保存时哈希集合中的最大元素个数。</li>
+<li>hash-max-ziplist-value：表示用压缩列表保存时哈希集合中单个元素的最大长度。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/01/%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1092,80 +1198,6 @@
 <li>Redis 的持久化模块能支持两种方式：日志（AOF）和快照（RDB），这两种持久化方式具有不同的优劣势，影响到 Redis 的访问性能和可靠性。</li>
 <li>Redis 支持高可靠集群和高可扩展集群，因此，Redis 中包含了相应的集群功能支撑模块。</li>
 </ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/05/29/%E6%80%BB%E8%A7%88/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/05/29/%E6%80%BB%E8%A7%88/" class="post-title-link" itemprop="url">总览</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-05-29 21:45:40" itemprop="dateCreated datePublished" datetime="2021-05-29T21:45:40+08:00">2021-05-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-31 08:14:31" itemprop="dateModified" datetime="2021-05-31T08:14:31+08:00">2021-05-31</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="协议"><a href="#协议" class="headerlink" title="协议"></a>协议</h2>
 
       
     </div>

@@ -191,6 +191,225 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/" class="post-title-link" itemprop="url">2.生产者</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-22 11:34:09" itemprop="dateCreated datePublished" datetime="2021-06-22T11:34:09+08:00">2021-06-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-23 07:13:18" itemprop="dateModified" datetime="2021-06-23T07:13:18+08:00">2021-06-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="客户端开发"><a href="#客户端开发" class="headerlink" title="客户端开发"></a>客户端开发</h2><ul>
+<li>配置生产者客户端参数及创建相应的生产者实例。</li>
+<li>构建待发送的消息。</li>
+<li>发送消息。</li>
+<li>关闭生产者实例。<img src="/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/%E7%94%9F%E4%BA%A7%E8%80%85%E4%BB%A3%E7%A0%81.png" class=""></li>
+</ul>
+<h3 id="ProducerRecord"><a href="#ProducerRecord" class="headerlink" title="ProducerRecord"></a>ProducerRecord</h3><img src="/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/ProducerRecord.png" class="">
+
+<ul>
+<li><strong>topic</strong> 主题必填</li>
+<li>key 用来分区使用，二次分类（主题分为一次分类），相同key 放到相同分区，而且拥有key的值还支持压缩功能。</li>
+<li><strong>value</strong> 为消息体，必填，一般不为空，如果为空则表示特定的消息–墓碑消息</li>
+<li>timestamp 是指消息的时间戳，它有CreateTime和LogAppendTime两种类型，前者表示消息创建的时间，后者表示消息追加到日志文件的时间</li>
+</ul>
+<h3 id="必要的参数配置"><a href="#必要的参数配置" class="headerlink" title="必要的参数配置"></a>必要的参数配置</h3><h4 id="initConfig（）方法"><a href="#initConfig（）方法" class="headerlink" title="initConfig（）方法"></a>initConfig（）方法</h4><ul>
+<li>bootstrap.servers：该参数用来指定生产者客户端连接Kafka集群所需的broker地址清单</li>
+<li>key.serializer 和 value.serializer：broker 端接收的消息必须以字节数组（byte[]）的形式存在</li>
+<li>client.id：这个参数用来设定KafkaProducer对应的客户端id，默认值为“”。如果客户端不设置，则KafkaProducer会自动生成一个非空字符串，内容形式如“producer-1”“producer-2”</li>
+</ul>
+<h3 id="KafkaProducer"><a href="#KafkaProducer" class="headerlink" title="KafkaProducer"></a>KafkaProducer</h3><ul>
+<li>线程安全的，可以在多个线程中共享单个KafkaProducer实例，也可以将其进行池化供其他线程调用</li>
+<li>其内部原理和无序列化器的构造方法一样，不过就实际应用而言，一般都选用 public KafkaProducer（Properties properties）这个构造方法来创建KafkaProducer实例。</li>
+</ul>
+<h4 id="异常类型"><a href="#异常类型" class="headerlink" title="异常类型"></a>异常类型</h4><ul>
+<li>可重试异常：NetworkException、LeaderNotAvailableException、UnknownTopicOrPartitionException、NotEnoughReplicasException、NotCoordinatorException等<ul>
+<li>props.put(ProducerConfig.RETRIES_CONFIG,10) 出现异常后重试10次，在不行就抛出异常</li>
+</ul>
+</li>
+<li>不可重试异常：RecordTooLargeException异常等</li>
+</ul>
+<h3 id="send-在KafkaProducer中"><a href="#send-在KafkaProducer中" class="headerlink" title="send (在KafkaProducer中)"></a>send (在KafkaProducer中)</h3><ul>
+<li>发后即忘（fire-and-forget）</li>
+<li>同步（sync）</li>
+<li>异步（async）</li>
+<li>send 方法可以通过返回Future &lt; RecordMetadata &gt;对象，调用 get 来阻塞kafka的相应，直到消息发送成功，当然也提供了超时阻塞的方法</li>
+</ul>
+<p>回调函数也是保证顺序性的</p>
+<p>经过拦截器（Interceptor）、序列化器（Serializer）和分区器（Partitioner）</p>
+<h4 id="序列化器"><a href="#序列化器" class="headerlink" title="序列化器"></a>序列化器</h4><p>生产者需要用序列化器（Serializer）把对象转换成字节数组才能通过网络发送给Kafka。而在对侧，消费者需要用反序列化器（Deserializer）把从 Kafka 中收到的字节数组转换成相应的对象。</p>
+<h4 id="分区器"><a href="#分区器" class="headerlink" title="分区器"></a>分区器</h4><p>拦截器（下一章会详细介绍）一般不是必需的，而序列化器是必需的。消息经过序列化之后就需要确定它发往的分区，如果消息ProducerRecord中指定了partition字段，那么就不需要分区器的作用，因为partition代表的就是所要发往的分区号。</p>
+<p>其中包含两个方法</p>
+<ul>
+<li>Kafka中提供的默认分区器是org.apache.kafka.clients.producer.internals.DefaultPartitioner，它实现了org.apache.kafka.clients.producer.Partitioner接口</li>
+<li>其中partition（）方法用来计算分区号，返回值为int类型。partition（）方法中的参数分别表示主题、键、序列化后的键、值、序列化后的值，以及集群的元数据信息，通过这些信息可以实现功能丰富的分区器。close（）方法在关闭分区器的时候用来回收一些资源。</li>
+<li>分区方式：<ul>
+<li>key 不为null,通过key计算哈希值，（采用MurmurHash2算法，具备高运算性能及低碰撞率）</li>
+<li>如果key为null，那么消息将会以轮询的方式发往主题内的各个可用分区。</li>
+</ul>
+</li>
+</ul>
+<h4 id="拦截器"><a href="#拦截器" class="headerlink" title="拦截器"></a>拦截器</h4><p>在序列化器和分区器之前调用拦截器的onSend()方法</p>
+<h2 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h2><p>有可能需要经历拦截器（Interceptor）、序列化器（Serializer）和分区器（Partitioner）等一系列的作用</p>
+<img src="/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84.png" class="">
+
+<ul>
+<li>整体分为2个线程，主线程和sender线程</li>
+<li>在主线程中由KafkaProducer创建消息，然后通过可能的拦截器、序列化器和分区器的作用之后缓存到消息累加器（RecordAccumulator，也称为消息收集器）中。Sender 线程负责从RecordAccumulator中获取消息并将其发送到Kafka中。</li>
+<li>RecordAccumulator 主要用来缓存消息以便 Sender 线程可以批量发送，进而减少网络传输的资源消耗以提升性能。<ul>
+<li>RecordAccumulator 缓存的大小可以通过生产者客户端参数buffer.memory 配置，默认值为 33554432B，即 32MB</li>
+<li>在 RecordAccumulator 的内部为每个分区都维护了一个双端队列，队列中的内容就是ProducerBatch</li>
+<li>消息写入缓存时，追加到双端队列的尾部；Sender读取消息时，从双端队列的头部读取。</li>
+<li>注意ProducerBatch不是ProducerRecord，ProducerBatch中可以包含一至多个 ProducerRecord。</li>
+<li>ProducerBatch的大小和batch.size参数也有着密切的关系</li>
+<li>当一条消息（ProducerRecord）流入RecordAccumulator时，会先寻找与消息分区所对应的双端队列（如果没有则新建），再从这个双端队列的尾部获取一个 ProducerBatch（如果没有则新建），查看 ProducerBatch 中是否还可以写入这个 ProducerRecord，如果可以则写入，如果不可以则需要创建一个新的ProducerBatch。在新建ProducerBatch时评估这条消息的大小是否超过batch.size参数的大小，如果不超过，那么就以 batch.size 参数的大小来创建 ProducerBatch，这样在使用完这段内存区域之后，可以通过BufferPool 的管理来进行复用；如果超过，那么就以评估的大小来创建ProducerBatch，这段内存区域不会被复用。</li>
+</ul>
+</li>
+<li>Sender<ul>
+<li>Sender 从 RecordAccumulator 中获取缓存的消息之后，会进一步将原本＜分区，Deque＜ProducerBatch＞＞的保存形式转变成＜Node，List＜ ProducerBatch＞的形式，其中Node表示Kafka集群的broker节点。</li>
+<li>在转换成＜Node，List＜ProducerBatch＞＞的形式之后，Sender 还会进一步封装成＜Node，Request＞的形式</li>
+<li>请求在从Sender线程发往Kafka之前还会保存到InFlightRequests中，InFlightRequests保存对象的具体形式为 Map＜NodeId，Deque＜Request＞＞，它的主要作用是缓存了已经发出去但还没有收到响应的请求（NodeId 是一个 String 类型，表示节点的 id 编号）。</li>
+<li>InFlightRequests还可以获得leastLoadedNode，即负载最小的node</li>
+</ul>
+</li>
+<li>发送之前要获取元数据信息<a target="_blank" rel="noopener" href="https://blog.csdn.net/yuanshangshenghuo/article/details/112625489">https://blog.csdn.net/yuanshangshenghuo/article/details/112625489</a><ul>
+<li>KafkaProducer要将此消息追加到指定主题的某个分区所对应的leader副本之前，首先需要知道主题的分区数量，然后经过计算得出（或者直接指定）目标分区，之后KafkaProducer需要知道目标分区的leader副本所在的broker 节点的地址、端口等信息才能建立连接，最终才能将消息发送到 Kafka，在这一过程中所需要的信息都属于元数据信息。</li>
+<li>这些元数据具体记录了集群中有哪些主题，这些主题有哪些分区，每个分区的leader副本分配在哪个节点上，follower副本分配在哪些节点上，哪些副本在AR、ISR等集合中，集群中有哪些节点，控制器节点又是哪一个等信息。</li>
+<li>时机<ol>
+<li>一个是业务线程获取topic分区信息元数据的时候发现没有，就会立马唤醒sender线程去拉取元数据</li>
+<li>sender线程检查已经准备好的batch的时候，发现没有partition 没有leader副本的信息</li>
+<li>一个是距离上次更新元数据已经过了5分钟了，这个时候就会去更新下，这个参数配置metadata.max.age.ms，默认是5分钟</li>
+<li>broker 响应发送消息结果里面带着异常，InvalidMetadataException，就是元数据异常。</li>
+</ol>
+</li>
+<li>业务线程等待元数据<ol>
+<li>long waitedOnMetadataMs = waitOnMetadata(record.topic(), this.maxBlockTimeMs);</li>
+<li>这行代码就是检查消息对应topic 的partition元数据信息是不是存在，如果不存在的话，就会不断尝试获取并且 “通知”sender线程去更新这个元数据信息。</li>
+</ol>
+</li>
+<li>sender线程拉取元数据</li>
+</ul>
+</li>
+</ul>
+<h2 id="重要的生产者参数"><a href="#重要的生产者参数" class="headerlink" title="重要的生产者参数"></a>重要的生产者参数</h2><ol>
+<li>acks<ul>
+<li>acks=1。默认值即为1。生产者发送消息之后，只要分区的leader副本成功写入消息，那么它就会收到来自服务端的成功响应。</li>
+<li>acks=0。生产者发送消息之后不需要等待任何服务端的响应。</li>
+<li>acks=-1或acks=all。生产者在消息发送之后，需要等待ISR中的所有副本都成功写入消息之后才能够收到来自服务端的成功响应。<ul>
+<li>不一定可靠，因为isr中可能只有leader副本，需要配合参数min.insync.replicas</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>max.request.size<ul>
+<li>这个参数用来限制生产者客户端能发送的消息的最大值，默认值为 1048576B，即 1MB。、</li>
+<li>不建议设置过大，因为这个参数还涉及一些其他参数的联动，比如broker端的message.max.bytes参数</li>
+</ul>
+</li>
+<li>retries和retry.backoff.ms<ul>
+<li>retries参数用来配置生产者重试的次数，默认值为0，即在发生异常的时候不进行任何重试动作。</li>
+<li>重试还和另一个参数retry.backoff.ms有关，这个参数的默认值为100，它用来设定两次重试之间的时间间隔，避免无效的频繁重试。</li>
+<li>顺序保证：max.in.flight.requests.per.connection配置为1，而不是把acks配置为0，不过这样也会影响整体的吞吐。</li>
+</ul>
+</li>
+<li>compression.type<ul>
+<li>这个参数用来指定消息的压缩方式，默认值为“none”，即默认情况下，消息不会被压缩。该参数还可以配置为“gzip”“snappy”和“lz4”。</li>
+<li>消息压缩是一种使用时间换空间的优化方式，如果对时延有一定的要求，则不推荐对消息进行压缩。</li>
+</ul>
+</li>
+<li>connections.max.idle.ms<ul>
+<li>这个参数用来指定在多久之后关闭限制的连接，默认值是540000（ms），即9分钟。</li>
+</ul>
+</li>
+<li>linger.ms<ul>
+<li>这个参数用来指定生产者发送 ProducerBatch 之前等待更多消息（ProducerRecord）加入ProducerBatch 的时间，默认值为 0。</li>
+<li>增加会提升系统的吞吐，但是会有时延</li>
+</ul>
+</li>
+<li>receive.buffer.bytes<ul>
+<li>这个参数用来设置Socket接收消息缓冲区（SO_RECBUF）的大小，默认值为32768（B），即32KB。如果设置为-1，则使用操作系统的默认值。如果Producer与Kafka处于不同的机房，则可以适地调大这个参数值。</li>
+</ul>
+</li>
+<li>send.buffer.bytes<ul>
+<li>这个参数用来设置Socket发送消息缓冲区（SO_SNDBUF）的大小，默认值为131072（B），即128KB。与receive.buffer.bytes参数一样，如果设置为-1，则使用操作系统的默认值。</li>
+</ul>
+</li>
+<li>request.timeout.ms<ul>
+<li>这个参数用来配置Producer等待请求响应的最长时间，默认值为30000（ms）。请求超时之后可以选择进行重试。注意这个参数需要比broker端参数replica.lag.time.max.ms的值要大，这样可以减少因客户端重试而引起的消息重复的概率。<img src="/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/%E9%BB%98%E8%AE%A4%E5%8F%82%E6%95%B0.png" class=""></li>
+</ul>
+</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>本章主要讲述了生产者客户端的具体用法及其整体架构，主要内容包括配置参数的详解、消息的发送方式、序列化器、分区器、拦截器等。</li>
+<li>在实际应用中，一套封装良好的且灵活易用的客户端可以避免开发人员重复劳动，也提高了开发效率，还可以提高程序的健壮性和可靠性，而Kafka的客户端正好包含了这些特质。</li>
+<li>对于KafkaProducer而言，它是线程安全的，我们可以在多线程的环境中复用它，</li>
+<li>而对于下一章的消费者客户端KafkaConsumer而言，它是非线程安全的，因为它具备了状态，具体怎么使用我们不妨继续来了解下一章的内容。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/22/%E5%B8%B8%E8%A7%81%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2520,98 +2739,6 @@
 <ul>
 <li>Online DDL 的方式是可以考虑在业务低峰期使用的，而 MySQL 5.5 及之前的版本，这个命令是会阻塞 DML 的，这个你需要特别小心。<br>alter table t engine=innodb,ALGORITHM=inplace;</li>
 <li>inplace</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/15/5sql%E5%8F%98%E6%85%A2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/06/15/5sql%E5%8F%98%E6%85%A2/" class="post-title-link" itemprop="url">5sql变慢</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-06-15 10:08:37 / 修改时间：21:39:48" itemprop="dateCreated datePublished" datetime="2021-06-15T10:08:37+08:00">2021-06-15</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="你的-SQL-语句为什么变“慢”了"><a href="#你的-SQL-语句为什么变“慢”了" class="headerlink" title="你的 SQL 语句为什么变“慢”了"></a>你的 SQL 语句为什么变“慢”了</h2><ul>
-<li>当内存数据页跟磁盘数据页内容不一致的时候，我们称这个内存页为“脏页”。</li>
-<li>内存数据写入到磁盘后，内存和磁盘上的数据页的内容就一致了，称为“干净页”。</li>
-<li>利用 WAL 技术，数据库将随机写转换成了顺序写，大大提升了数据库的性能。</li>
-<li>但是，由此也带来了内存脏页的问题。脏页会被后台线程自动 flush，也会由于数据页淘汰而触发 flush，而刷脏页的过程由于会占用资源，可能会让你的更新和查询语句的响应时间长一些。</li>
-</ul>
-<h3 id="InnoDB-刷脏页的控制策略"><a href="#InnoDB-刷脏页的控制策略" class="headerlink" title="InnoDB 刷脏页的控制策略"></a>InnoDB 刷脏页的控制策略</h3><ul>
-<li>innodb_io_capacity 告诉innoDB 磁盘能力，建议设置成IOPS (通过fio测试<br>fio -filename=$filename -direct=1 -iodepth 1 -thread -rw=randrw -ioengine=psync -bs=16k -size=500M -numjobs=10 -runtime=10 -group_reporting -name=mytest )</li>
-<li>innodb_max_dirty_pages_pct 脏页比例上限，默认为75%。</li>
-<li>innodb_flush_neighbors 值为 1 的时候会有上述的“连坐”机制，值为 0 时表示不找邻居，自己刷自己的。在 MySQL 8.0 中，innodb_flush_neighbors 参数的默认值已经是 0 了。</li>
-</ul>
-<h2 id="短连接风暴"><a href="#短连接风暴" class="headerlink" title="短连接风暴"></a>短连接风暴</h2><p>max_connections 最大连接参数，当超过这个参数，就会报Too many connections，连接拒绝。</p>
-<ul>
-<li>第一种方法：先处理掉那些占着连接但是不工作的线程。</li>
-<li>第二种方法：减少连接过程的消耗。<ul>
-<li>跳过权限验证的方法是：重启数据库，并使用–skip-grant-tables 参数启动。这样，整个 MySQL 会跳过所有的权限验证阶段，包括连接过程和语句执行过程在内。</li>
-<li>MySQL 8.0 版本里，如果你启用–skip-grant-tables 参数，MySQL 会默认把 –skip-networking 参数打开，表示这时候数据库只能被本地的客户端连接。</li>
-</ul>
-</li>
-</ul>
-<h2 id="慢查询性能问题"><a href="#慢查询性能问题" class="headerlink" title="慢查询性能问题"></a>慢查询性能问题</h2><ul>
-<li>索引没有设计好；</li>
-<li>SQL 语句没写好；</li>
-<li>MySQL 选错了索引。</li>
 </ul>
 
       

@@ -191,6 +191,256 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/30/3-%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/30/3-%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F/" class="post-title-link" itemprop="url">3.深入理解容器镜像</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-30 09:44:21" itemprop="dateCreated datePublished" datetime="2021-06-30T09:44:21+08:00">2021-06-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-01 20:45:07" itemprop="dateModified" datetime="2021-07-01T20:45:07+08:00">2021-07-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>Namespace 的作用是“隔离”，它让应用进程只能看到该 Namespace 内的“世界”；而 Cgroups 的作用是“限制”，它给这个“世界”围上了一圈看不见的墙。</p>
+<h2 id="容器里的进程看到的文件系统又是什么样子的呢"><a href="#容器里的进程看到的文件系统又是什么样子的呢" class="headerlink" title="容器里的进程看到的文件系统又是什么样子的呢"></a>容器里的进程看到的文件系统又是什么样子的呢</h2><h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><ul>
+<li>Mount Namespace 修改的，是容器进程对文件系统“挂载点”的认知。</li>
+<li>这也就意味着，只有在“挂载”这个操作发生之后，进程的视图才会被改变。</li>
+<li>而在此之前，新创建的容器会直接继承宿主机的各个挂载点。</li>
+</ul>
+<p>这就是 Mount Namespace 跟其他 Namespace 的使用略有不同的地方：<strong>它对容器进程视图的改变，一定是伴随着挂载操作（mount）才能生效。</strong></p>
+<p>挂载“/”目录，使容器内的文件系统单一</p>
+<ul>
+<li><p>在 Linux 操作系统里，有一个名为 chroot 的命令change root file system 即改变进程的根目录到你指定的位置。</p>
+<ul>
+<li><p>假设，我们现在有一个 $HOME/test 目录，想要把它作为一个 /bin/bash 进程的根目录。</p>
+</li>
+<li><p>首先，创建一个 test 目录和几个 lib 文件夹：</p>
+<pre><code><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> mkdir -p <span class="variable">$HOME</span>/<span class="built_in">test</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> mkdir -p <span class="variable">$HOME</span>/<span class="built_in">test</span>/&#123;bin,lib64,lib&#125;</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> <span class="variable">$T</span></span></span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+<li><p>然后，把 bash 命令拷贝到 test 目录对应的 bin 路径下：</p>
+<pre><code><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cp -v /bin/&#123;bash,ls&#125; <span class="variable">$HOME</span>/<span class="built_in">test</span>/bin</span></span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+<li><p>接下来，把 bash 命令需要的所有 so 文件，也拷贝到 test 目录对应的 lib 路径下。找到 so 文件可以用 ldd 命令：</p>
+<pre><code><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> T=<span class="variable">$HOME</span>/<span class="built_in">test</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> list=<span class="string">&quot;<span class="subst">$(ldd /bin/ls | egrep -o &#x27;/lib.*\.[0-9]&#x27;)</span>&quot;</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="variable">$list</span>; <span class="keyword">do</span> cp -v <span class="string">&quot;<span class="variable">$i</span>&quot;</span> <span class="string">&quot;<span class="variable">$&#123;T&#125;</span><span class="variable">$&#123;i&#125;</span>&quot;</span>; <span class="keyword">done</span></span></span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+<li><p>最后，执行 chroot 命令，告诉操作系统，我们将使用 $HOME/test 目录作为 /bin/bash 进程的根目录：</p>
+<pre><code><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> chroot <span class="variable">$HOME</span>/<span class="built_in">test</span> /bin/bash</span></span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+<li><p>这时，你如果执行 “ls /“，就会看到，它返回的都是 $HOME/test 目录下面的内容，而不是宿主机的内容。</p>
+</li>
+</ul>
+</li>
+<li><p>实际上，Mount Namespace 正是基于对 chroot 的不断改良才被发明出来的，它也是 Linux 操作系统里的第一个 Namespace。</p>
+</li>
+<li><p>我们一般会在这个容器的根目录下挂载一个完整操作系统的文件系统，比如 Ubuntu16.04 的 ISO。这样，在容器启动之后，我们在容器里通过执行 “ls /“ 查看根目录下的内容，就是 Ubuntu 16.04 的所有目录和文件。</p>
+</li>
+<li><p>而这个挂载在容器根目录上、用来为容器进程提供隔离后执行环境的文件系统，就是所谓的“容器镜像”。它还有一个更为专业的名字，叫作：rootfs（根文件系统）。</p>
+</li>
+</ul>
+<p>对 Docker 项目来说，它最核心的原理实际上就是为待创建的用户进程：</p>
+<ul>
+<li>启用 Linux Namespace 配置；</li>
+<li>设置指定的 Cgroups 参数；</li>
+<li>切换进程的根目录（Change Root）。</li>
+<li>不过，Docker 项目在最后一步的切换上会优先使用 pivot_root 系统调用，如果系统不支持，才会使用 chroot。</li>
+</ul>
+<p>需要明确的是，rootfs 只是一个操作系统所包含的文件、配置和目录，并不包括操作系统内核。在 Linux 操作系统中，这两部分是分开存放的，操作系统只有在开机启动时才会加载指定版本的内核镜像。</p>
+<ul>
+<li>/usr/src/一般用于存放内核源代码</li>
+<li>/boot一般用于存放可引导内核</li>
+<li>/usr/lib/modules/kernel/存放内核内置的已编译好的驱动程序</li>
+<li>所以说，rootfs 只包括了操作系统的“躯壳”，并没有包括操作系统的“灵魂”。</li>
+</ul>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><p>容器相比于虚拟机的主要缺陷之一：毕竟后者不仅有模拟出来的硬件机器充当沙盒，而且每个沙盒里还运行着一个完整的 Guest OS 给应用随便折腾。</p>
+<ul>
+<li>由于 rootfs 里打包的不只是应用，而是整个操作系统的文件和目录，也就意味着，应用以及它运行所需要的所有依赖，都被封装在了一起。</li>
+<li>对一个应用来说，操作系统本身才是它运行所需要的最完整的“依赖库”。</li>
+</ul>
+<h3 id="联合文件系统（Union-File-System）"><a href="#联合文件系统（Union-File-System）" class="headerlink" title="联合文件系统（Union File System）"></a>联合文件系统（Union File System）</h3><pre><code>  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> tree</span></span><br><span class="line">.</span><br><span class="line">├── A</span><br><span class="line">│  ├── a</span><br><span class="line">│  └── x</span><br><span class="line">└── B</span><br><span class="line">├── b</span><br><span class="line">└── x</span><br><span class="line"><span class="meta">$</span><span class="bash"> mkdir C</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> mount -t aufs -o <span class="built_in">dirs</span>=./A:./B none ./C</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tree ./C</span></span><br><span class="line">./C</span><br><span class="line">├── a</span><br><span class="line">├── b</span><br><span class="line">└── x</span><br></pre></td></tr></table></figure>
+</code></pre>
+<p>层的概念就是在联合操作系统中</p>
+<ul>
+<li>镜像的层都放置在 /var/lib/docker/image/overlay2 目录下，然后被联合挂载在 /var/lib/docker/aufs/mnt 里面。</li>
+<li>在/sys/fs/aufs 有个si=972c6d361e6b32ba。</li>
+<li>然后使用这个 ID，你就可以在 /sys/fs/aufs 下查看被联合挂载在一起的各个层的信息：</li>
+</ul>
+<h3 id="分层"><a href="#分层" class="headerlink" title="分层"></a>分层</h3><ul>
+<li>第一部分，只读层。<ul>
+<li>它是这个容器的 rootfs 最下面的五层，对应的正是 ubuntu:latest 镜像的五层。可以看到，它们的挂载方式都是只读的（ro+wh，即 readonly+whiteout，至于什么是 whiteout，我下面马上会讲到）。</li>
+<li>为了实现这样的删除操作，AuFS 会在可读写层创建一个 whiteout 文件，把只读层里的文件“遮挡”起来。</li>
+</ul>
+</li>
+<li>第二部分，可读写层。<ul>
+<li>它是这个容器的 rootfs 最上面的一层（6e3be5d2ecccae7cc），它的挂载方式为：rw，即 read write。在没有写入文件之前，这个目录是空的。而一旦在容器里做了写操作，你修改产生的内容就会以增量的方式出现在这个层中。</li>
+</ul>
+</li>
+<li>第三部分，Init 层。<ul>
+<li>它是一个以“-init”结尾的层，夹在只读层和读写层之间。Init 层是 Docker 项目单独生成的一个内部层，专门用来存放 /etc/hosts、/etc/resolv.conf 等信息。</li>
+</ul>
+</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li>rootfs。它只是一个操作系统的所有文件和目录，并不包含内核，最多也就几百兆。而相比之下，传统虚拟机的镜像大多是一个磁盘的“快照”，磁盘有多大，镜像就至少有多大。</li>
+<li>通过结合使用 Mount Namespace 和 rootfs，容器就能够为进程构建出一个完善的文件系统隔离环境。当然，这个功能的实现还必须感谢 chroot 和 pivot_root 这两个系统调用切换进程根目录的能力。</li>
+<li>而在 rootfs 的基础上，Docker 公司创新性地提出了使用多个增量 rootfs 联合挂载一个完整 rootfs 的方案，这就是容器镜像中“层”的概念。</li>
+<li>通过“分层镜像”的设计，以 Docker 镜像为核心，来自不同公司、不同团队的技术人员被紧密地联系在了一起。而且，由于容器镜像的操作是增量式的，这样每次镜像拉取、推送的内容，比原本多个完整的操作系统的大小要小得多；而共享层的存在，可以使得所有这些容器镜像需要的总空间，也比每个镜像的总和要小。这样就使得基于容器镜像的团队协作，要比基于动则几个 GB 的虚拟机磁盘镜像的协作要敏捷得多。</li>
+<li>更重要的是，一旦这个镜像被发布，那么你在全世界的任何一个地方下载这个镜像，得到的内容都完全一致，可以完全复现这个镜像制作者当初的完整环境。这，就是容器技术“强一致性”的重要体现。</li>
+</ul>
+<h2 id="制作"><a href="#制作" class="headerlink" title="制作"></a>制作</h2><ul>
+<li><p>安装docker</p>
+<pre><code><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -sSL https://get.daocloud.io/docker | sh</span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+<li><p>用 Docker 部署一个用 Python 编写的 Web 应用</p>
+<ul>
+<li><p>app.py</p>
+<pre><code>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span></span><br><span class="line">html = <span class="string">&quot;&lt;h3&gt;Hello &#123;name&#125;!&lt;/h3&gt;&quot;</span> \</span><br><span class="line">      <span class="string">&quot;&lt;b&gt;Hostname:&lt;/b&gt; &#123;hostname&#125;&lt;br/&gt;&quot;</span></span><br><span class="line"><span class="keyword">return</span> html.<span class="built_in">format</span>(name=os.getenv(<span class="string">&quot;NAME&quot;</span>, <span class="string">&quot;world&quot;</span>), hostname=socket.gethostname())</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>, port=<span class="number">80</span>)</span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+<li><p>requirements</p>
+<pre><code>    <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat requirements.txt Flask</span></span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+<li><p>制作容器镜像</p>
+<pre><code>    <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 使用官方提供的 Python 开发镜像作为基础镜像</span></span><br><span class="line">FROM python:2.7-slim</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将工作目录切换为 /app</span></span><br><span class="line">WORKDIR /app</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将当前目录下的所有内容复制到 /app 下</span></span><br><span class="line">ADD . /app</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用 pip 命令安装这个应用所需要的依赖</span></span><br><span class="line">RUN pip install --trusted-host pypi.python.org -r requirements.txt</span><br><span class="line"><span class="meta">#</span><span class="bash"> 允许外界访问容器的 80 端口</span></span><br><span class="line">EXPOSE 80</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置环境变量</span></span><br><span class="line">ENV NAME World</span><br><span class="line"><span class="meta">#</span><span class="bash"> 设置容器进程为：python app.py，即：这个 Python 应用的启动命令</span></span><br><span class="line">CMD [&quot;python&quot;, &quot;app.py&quot;]</span><br></pre></td></tr></table></figure>
+</code></pre>
+<ul>
+<li><p>这里，app.py 的实际路径是 /app/app.py。所以，CMD [“python”, “app.py”] 等价于 “docker run python app.py”。</p>
+</li>
+<li><p>另外，在使用 Dockerfile 时，你可能还会看到一个叫作 ENTRYPOINT 的原语。实际上，它和 CMD 都是 Docker 容器进程启动所必需的参数，完整执行格式是：“ENTRYPOINT CMD”。</p>
+</li>
+<li><p>默认情况下，Docker 会为你提供一个隐含的 ENTRYPOINT，即：/bin/sh -c。所以，在不指定 ENTRYPOINT 时，比如在我们这个例子里，实际上运行在容器里的完整进程是：/bin/sh -c “python app.py”，即 CMD 的内容就是 ENTRYPOINT 的参数。</p>
+</li>
+<li><p>Dockerfile 里的原语并不都是指对容器内部的操作。就比如 ADD，它指的是把当前目录（即 Dockerfile 所在的目录）里的文件，复制到指定容器内的目录当中。</p>
+</li>
+<li><p>读懂这个 Dockerfile 之后，我再把上述内容，保存到当前目录里一个名叫“Dockerfile”的文件中：$ ls  Dockerfile  app.py   requirements.txt</p>
+</li>
+<li><p>接下来，我就可以让 Docker 制作这个镜像了，在当前目录执行：$ docker build -t helloworld .</p>
+</li>
+<li><p>其中，-t 的作用是给这个镜像加一个 Tag，即：起一个好听的名字。docker build 会自动加载当前目录下的 Dockerfile 文件，然后按照顺序，执行文件中的原语。</p>
+</li>
+<li><p>需要注意的是，Dockerfile 中的每个原语执行后，都会生成一个对应的镜像层。即使原语本身并没有明显地修改文件的操作（比如，ENV 原语），它对应的层也会存在。只不过在外界看来，这个层是空的。</p>
+</li>
+<li><p>接下来，我使用这个镜像，通过 docker run 命令启动容器：$ docker run -p 4000:80 helloworld</p>
+</li>
+<li><p>在这一句命令中，镜像名 helloworld 后面，我什么都不用写，因为在 Dockerfile 中已经指定了 CMD。</p>
+</li>
+<li><p>我已经通过 -p 4000:80 告诉了 Docker，请把容器内的 80 端口映射在宿主机的 4000 端口上。</p>
+</li>
+<li><p>用 docker tag 命令给容器镜像起一个完整的名字：$ docker tag helloworld geektime/helloworld:v1</p>
+</li>
+<li><p>然后，我执行 docker push：$ docker push geektime/helloworld:v1</p>
+</li>
+<li><p>我还可以使用 docker commit 指令，把一个正在运行的容器，直接提交为一个镜像。</p>
+</li>
+<li><p>$ docker push geektime/helloworld:v2</p>
+<pre><code>  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker <span class="built_in">exec</span> -it 4ddf4638572d /bin/sh</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 在容器内部新建了一个文件</span></span><br><span class="line">root@4ddf4638572d:/app# touch test.txt</span><br><span class="line">root@4ddf4638572d:/app# exit</span><br><span class="line"><span class="meta">#</span><span class="bash"> 将这个新建的文件提交到镜像中保存</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker commit 4ddf4638572d geektime/helloworld:v2</span></span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="docker-exec-是怎么做到进入容器里的呢"><a href="#docker-exec-是怎么做到进入容器里的呢" class="headerlink" title="docker exec 是怎么做到进入容器里的呢"></a>docker exec 是怎么做到进入容器里的呢</h3><ul>
+<li><p>实际上，Linux Namespace 创建的隔离空间虽然看不见摸不着，但一个进程的 Namespace 信息在宿主机上是确确实实存在的，并且是以一个文件的方式存在。</p>
+</li>
+<li><p>通过如下指令，你可以看到当前正在运行的 Docker 容器的进程号（PID）是 25686：</p>
+<pre><code><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker inspect --format <span class="string">&#x27;&#123;&#123; .State.Pid &#125;&#125;&#x27;</span>  4ddf4638572d</span></span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+<li><p>这时，你可以通过查看宿主机的 proc 文件，看到这个 25686 进程的所有 Namespace 对应的文件 $ ls -l  /proc/25686/ns</p>
+</li>
+<li><p>这也就意味着：一个进程，可以选择加入到某个进程已有的 Namespace 当中，从而达到“进入”这个进程所在容器的目的，这正是 docker exec 的实现原理。</p>
+</li>
+<li><p>而这个操作所依赖的，乃是一个名叫 setns() 的 Linux 系统调用。</p>
+</li>
+<li><p>$ docker run -it –net container:4ddf4638572d busybox ifconfig  共享network namespace</p>
+</li>
+<li><p>而如果我指定–net=host，就意味着这个容器不会为进程启用 Network Namespace。共享主机网络</p>
+</li>
+</ul>
+<h3 id="docker-commit"><a href="#docker-commit" class="headerlink" title="docker commit"></a>docker commit</h3><ul>
+<li>docker commit，实际上就是在容器运行起来后，把最上层的“可读写层”，加上原先容器镜像的只读层，打包组成了一个新的镜像。当然，下面这些只读层在宿主机上是共享的，不会占用额外的空间。</li>
+<li>而由于使用了联合文件系统，你在容器里对镜像 rootfs 所做的任何修改，都会被操作系统先复制到这个可读写层，然后再修改。这就是所谓的：Copy-on-Write。</li>
+<li>而正如前所说，Init 层的存在，就是为了避免你执行 docker commit 时，把 Docker 自己对 /etc/hosts 等文件做的修改，也一起提交掉。</li>
+</ul>
+<h3 id="Volume（数据卷）"><a href="#Volume（数据卷）" class="headerlink" title="Volume（数据卷）"></a>Volume（数据卷）</h3><ul>
+<li>Volume 机制，允许你将宿主机上指定的目录或者文件，挂载到容器里面进行读取和修改操作。</li>
+<li>宿主机文件映射到容器中 $ docker run -v /test …   $ docker run -v /home:/test …<ul>
+<li>在第一种情况下，由于你并没有显示声明宿主机目录，那么 Docker 就会默认在宿主机上创建一个临时目录 /var/lib/docker/volumes/[VOLUME_ID]/_data，然后把它挂载到容器的 /test 目录上。</li>
+<li>而在第二种情况下，Docker 就直接把宿主机的 /home 目录挂载到容器的 /test 目录上。</li>
+</ul>
+</li>
+</ul>
+<h3 id="总结2"><a href="#总结2" class="headerlink" title="总结2"></a>总结2</h3><img src="/2021/06/30/3-%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F/%E5%AE%B9%E5%99%A8%E6%80%BB%E8%A7%88.png" class="">
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/29/2-%E9%99%90%E5%88%B6%E4%B8%8E%E9%9A%94%E7%A6%BB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1876,225 +2126,6 @@ memory，为进程设定内存使用的限制。
 </ol>
 <img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E5%85%B6%E4%BB%96%E5%8F%82%E6%95%B01.png" class="">
 <img src="/2021/06/22/3-%E6%B6%88%E8%B4%B9%E8%80%85/%E5%85%B6%E4%BB%96%E5%8F%82%E6%95%B02.png" class="">
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/" class="post-title-link" itemprop="url">2.生产者</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-06-22 11:34:09" itemprop="dateCreated datePublished" datetime="2021-06-22T11:34:09+08:00">2021-06-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-06-23 07:13:18" itemprop="dateModified" datetime="2021-06-23T07:13:18+08:00">2021-06-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="客户端开发"><a href="#客户端开发" class="headerlink" title="客户端开发"></a>客户端开发</h2><ul>
-<li>配置生产者客户端参数及创建相应的生产者实例。</li>
-<li>构建待发送的消息。</li>
-<li>发送消息。</li>
-<li>关闭生产者实例。<img src="/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/%E7%94%9F%E4%BA%A7%E8%80%85%E4%BB%A3%E7%A0%81.png" class=""></li>
-</ul>
-<h3 id="ProducerRecord"><a href="#ProducerRecord" class="headerlink" title="ProducerRecord"></a>ProducerRecord</h3><img src="/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/ProducerRecord.png" class="">
-
-<ul>
-<li><strong>topic</strong> 主题必填</li>
-<li>key 用来分区使用，二次分类（主题分为一次分类），相同key 放到相同分区，而且拥有key的值还支持压缩功能。</li>
-<li><strong>value</strong> 为消息体，必填，一般不为空，如果为空则表示特定的消息–墓碑消息</li>
-<li>timestamp 是指消息的时间戳，它有CreateTime和LogAppendTime两种类型，前者表示消息创建的时间，后者表示消息追加到日志文件的时间</li>
-</ul>
-<h3 id="必要的参数配置"><a href="#必要的参数配置" class="headerlink" title="必要的参数配置"></a>必要的参数配置</h3><h4 id="initConfig（）方法"><a href="#initConfig（）方法" class="headerlink" title="initConfig（）方法"></a>initConfig（）方法</h4><ul>
-<li>bootstrap.servers：该参数用来指定生产者客户端连接Kafka集群所需的broker地址清单</li>
-<li>key.serializer 和 value.serializer：broker 端接收的消息必须以字节数组（byte[]）的形式存在</li>
-<li>client.id：这个参数用来设定KafkaProducer对应的客户端id，默认值为“”。如果客户端不设置，则KafkaProducer会自动生成一个非空字符串，内容形式如“producer-1”“producer-2”</li>
-</ul>
-<h3 id="KafkaProducer"><a href="#KafkaProducer" class="headerlink" title="KafkaProducer"></a>KafkaProducer</h3><ul>
-<li>线程安全的，可以在多个线程中共享单个KafkaProducer实例，也可以将其进行池化供其他线程调用</li>
-<li>其内部原理和无序列化器的构造方法一样，不过就实际应用而言，一般都选用 public KafkaProducer（Properties properties）这个构造方法来创建KafkaProducer实例。</li>
-</ul>
-<h4 id="异常类型"><a href="#异常类型" class="headerlink" title="异常类型"></a>异常类型</h4><ul>
-<li>可重试异常：NetworkException、LeaderNotAvailableException、UnknownTopicOrPartitionException、NotEnoughReplicasException、NotCoordinatorException等<ul>
-<li>props.put(ProducerConfig.RETRIES_CONFIG,10) 出现异常后重试10次，在不行就抛出异常</li>
-</ul>
-</li>
-<li>不可重试异常：RecordTooLargeException异常等</li>
-</ul>
-<h3 id="send-在KafkaProducer中"><a href="#send-在KafkaProducer中" class="headerlink" title="send (在KafkaProducer中)"></a>send (在KafkaProducer中)</h3><ul>
-<li>发后即忘（fire-and-forget）</li>
-<li>同步（sync）</li>
-<li>异步（async）</li>
-<li>send 方法可以通过返回Future &lt; RecordMetadata &gt;对象，调用 get 来阻塞kafka的相应，直到消息发送成功，当然也提供了超时阻塞的方法</li>
-</ul>
-<p>回调函数也是保证顺序性的</p>
-<p>经过拦截器（Interceptor）、序列化器（Serializer）和分区器（Partitioner）</p>
-<h4 id="序列化器"><a href="#序列化器" class="headerlink" title="序列化器"></a>序列化器</h4><p>生产者需要用序列化器（Serializer）把对象转换成字节数组才能通过网络发送给Kafka。而在对侧，消费者需要用反序列化器（Deserializer）把从 Kafka 中收到的字节数组转换成相应的对象。</p>
-<h4 id="分区器"><a href="#分区器" class="headerlink" title="分区器"></a>分区器</h4><p>拦截器（下一章会详细介绍）一般不是必需的，而序列化器是必需的。消息经过序列化之后就需要确定它发往的分区，如果消息ProducerRecord中指定了partition字段，那么就不需要分区器的作用，因为partition代表的就是所要发往的分区号。</p>
-<p>其中包含两个方法</p>
-<ul>
-<li>Kafka中提供的默认分区器是org.apache.kafka.clients.producer.internals.DefaultPartitioner，它实现了org.apache.kafka.clients.producer.Partitioner接口</li>
-<li>其中partition（）方法用来计算分区号，返回值为int类型。partition（）方法中的参数分别表示主题、键、序列化后的键、值、序列化后的值，以及集群的元数据信息，通过这些信息可以实现功能丰富的分区器。close（）方法在关闭分区器的时候用来回收一些资源。</li>
-<li>分区方式：<ul>
-<li>key 不为null,通过key计算哈希值，（采用MurmurHash2算法，具备高运算性能及低碰撞率）</li>
-<li>如果key为null，那么消息将会以轮询的方式发往主题内的各个可用分区。</li>
-</ul>
-</li>
-</ul>
-<h4 id="拦截器"><a href="#拦截器" class="headerlink" title="拦截器"></a>拦截器</h4><p>在序列化器和分区器之前调用拦截器的onSend()方法</p>
-<h2 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h2><p>有可能需要经历拦截器（Interceptor）、序列化器（Serializer）和分区器（Partitioner）等一系列的作用</p>
-<img src="/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84.png" class="">
-
-<ul>
-<li>整体分为2个线程，主线程和sender线程</li>
-<li>在主线程中由KafkaProducer创建消息，然后通过可能的拦截器、序列化器和分区器的作用之后缓存到消息累加器（RecordAccumulator，也称为消息收集器）中。Sender 线程负责从RecordAccumulator中获取消息并将其发送到Kafka中。</li>
-<li>RecordAccumulator 主要用来缓存消息以便 Sender 线程可以批量发送，进而减少网络传输的资源消耗以提升性能。<ul>
-<li>RecordAccumulator 缓存的大小可以通过生产者客户端参数buffer.memory 配置，默认值为 33554432B，即 32MB</li>
-<li>在 RecordAccumulator 的内部为每个分区都维护了一个双端队列，队列中的内容就是ProducerBatch</li>
-<li>消息写入缓存时，追加到双端队列的尾部；Sender读取消息时，从双端队列的头部读取。</li>
-<li>注意ProducerBatch不是ProducerRecord，ProducerBatch中可以包含一至多个 ProducerRecord。</li>
-<li>ProducerBatch的大小和batch.size参数也有着密切的关系</li>
-<li>当一条消息（ProducerRecord）流入RecordAccumulator时，会先寻找与消息分区所对应的双端队列（如果没有则新建），再从这个双端队列的尾部获取一个 ProducerBatch（如果没有则新建），查看 ProducerBatch 中是否还可以写入这个 ProducerRecord，如果可以则写入，如果不可以则需要创建一个新的ProducerBatch。在新建ProducerBatch时评估这条消息的大小是否超过batch.size参数的大小，如果不超过，那么就以 batch.size 参数的大小来创建 ProducerBatch，这样在使用完这段内存区域之后，可以通过BufferPool 的管理来进行复用；如果超过，那么就以评估的大小来创建ProducerBatch，这段内存区域不会被复用。</li>
-</ul>
-</li>
-<li>Sender<ul>
-<li>Sender 从 RecordAccumulator 中获取缓存的消息之后，会进一步将原本＜分区，Deque＜ProducerBatch＞＞的保存形式转变成＜Node，List＜ ProducerBatch＞的形式，其中Node表示Kafka集群的broker节点。</li>
-<li>在转换成＜Node，List＜ProducerBatch＞＞的形式之后，Sender 还会进一步封装成＜Node，Request＞的形式</li>
-<li>请求在从Sender线程发往Kafka之前还会保存到InFlightRequests中，InFlightRequests保存对象的具体形式为 Map＜NodeId，Deque＜Request＞＞，它的主要作用是缓存了已经发出去但还没有收到响应的请求（NodeId 是一个 String 类型，表示节点的 id 编号）。</li>
-<li>InFlightRequests还可以获得leastLoadedNode，即负载最小的node</li>
-</ul>
-</li>
-<li>发送之前要获取元数据信息<a target="_blank" rel="noopener" href="https://blog.csdn.net/yuanshangshenghuo/article/details/112625489">https://blog.csdn.net/yuanshangshenghuo/article/details/112625489</a><ul>
-<li>KafkaProducer要将此消息追加到指定主题的某个分区所对应的leader副本之前，首先需要知道主题的分区数量，然后经过计算得出（或者直接指定）目标分区，之后KafkaProducer需要知道目标分区的leader副本所在的broker 节点的地址、端口等信息才能建立连接，最终才能将消息发送到 Kafka，在这一过程中所需要的信息都属于元数据信息。</li>
-<li>这些元数据具体记录了集群中有哪些主题，这些主题有哪些分区，每个分区的leader副本分配在哪个节点上，follower副本分配在哪些节点上，哪些副本在AR、ISR等集合中，集群中有哪些节点，控制器节点又是哪一个等信息。</li>
-<li>时机<ol>
-<li>一个是业务线程获取topic分区信息元数据的时候发现没有，就会立马唤醒sender线程去拉取元数据</li>
-<li>sender线程检查已经准备好的batch的时候，发现没有partition 没有leader副本的信息</li>
-<li>一个是距离上次更新元数据已经过了5分钟了，这个时候就会去更新下，这个参数配置metadata.max.age.ms，默认是5分钟</li>
-<li>broker 响应发送消息结果里面带着异常，InvalidMetadataException，就是元数据异常。</li>
-</ol>
-</li>
-<li>业务线程等待元数据<ol>
-<li>long waitedOnMetadataMs = waitOnMetadata(record.topic(), this.maxBlockTimeMs);</li>
-<li>这行代码就是检查消息对应topic 的partition元数据信息是不是存在，如果不存在的话，就会不断尝试获取并且 “通知”sender线程去更新这个元数据信息。</li>
-</ol>
-</li>
-<li>sender线程拉取元数据</li>
-</ul>
-</li>
-</ul>
-<h2 id="重要的生产者参数"><a href="#重要的生产者参数" class="headerlink" title="重要的生产者参数"></a>重要的生产者参数</h2><ol>
-<li>acks<ul>
-<li>acks=1。默认值即为1。生产者发送消息之后，只要分区的leader副本成功写入消息，那么它就会收到来自服务端的成功响应。</li>
-<li>acks=0。生产者发送消息之后不需要等待任何服务端的响应。</li>
-<li>acks=-1或acks=all。生产者在消息发送之后，需要等待ISR中的所有副本都成功写入消息之后才能够收到来自服务端的成功响应。<ul>
-<li>不一定可靠，因为isr中可能只有leader副本，需要配合参数min.insync.replicas</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>max.request.size<ul>
-<li>这个参数用来限制生产者客户端能发送的消息的最大值，默认值为 1048576B，即 1MB。、</li>
-<li>不建议设置过大，因为这个参数还涉及一些其他参数的联动，比如broker端的message.max.bytes参数</li>
-</ul>
-</li>
-<li>retries和retry.backoff.ms<ul>
-<li>retries参数用来配置生产者重试的次数，默认值为0，即在发生异常的时候不进行任何重试动作。</li>
-<li>重试还和另一个参数retry.backoff.ms有关，这个参数的默认值为100，它用来设定两次重试之间的时间间隔，避免无效的频繁重试。</li>
-<li>顺序保证：max.in.flight.requests.per.connection配置为1，而不是把acks配置为0，不过这样也会影响整体的吞吐。</li>
-</ul>
-</li>
-<li>compression.type<ul>
-<li>这个参数用来指定消息的压缩方式，默认值为“none”，即默认情况下，消息不会被压缩。该参数还可以配置为“gzip”“snappy”和“lz4”。</li>
-<li>消息压缩是一种使用时间换空间的优化方式，如果对时延有一定的要求，则不推荐对消息进行压缩。</li>
-</ul>
-</li>
-<li>connections.max.idle.ms<ul>
-<li>这个参数用来指定在多久之后关闭限制的连接，默认值是540000（ms），即9分钟。</li>
-</ul>
-</li>
-<li>linger.ms<ul>
-<li>这个参数用来指定生产者发送 ProducerBatch 之前等待更多消息（ProducerRecord）加入ProducerBatch 的时间，默认值为 0。</li>
-<li>增加会提升系统的吞吐，但是会有时延</li>
-</ul>
-</li>
-<li>receive.buffer.bytes<ul>
-<li>这个参数用来设置Socket接收消息缓冲区（SO_RECBUF）的大小，默认值为32768（B），即32KB。如果设置为-1，则使用操作系统的默认值。如果Producer与Kafka处于不同的机房，则可以适地调大这个参数值。</li>
-</ul>
-</li>
-<li>send.buffer.bytes<ul>
-<li>这个参数用来设置Socket发送消息缓冲区（SO_SNDBUF）的大小，默认值为131072（B），即128KB。与receive.buffer.bytes参数一样，如果设置为-1，则使用操作系统的默认值。</li>
-</ul>
-</li>
-<li>request.timeout.ms<ul>
-<li>这个参数用来配置Producer等待请求响应的最长时间，默认值为30000（ms）。请求超时之后可以选择进行重试。注意这个参数需要比broker端参数replica.lag.time.max.ms的值要大，这样可以减少因客户端重试而引起的消息重复的概率。<img src="/2021/06/22/2-%E7%94%9F%E4%BA%A7%E8%80%85/%E9%BB%98%E8%AE%A4%E5%8F%82%E6%95%B0.png" class=""></li>
-</ul>
-</li>
-</ol>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
-<li>本章主要讲述了生产者客户端的具体用法及其整体架构，主要内容包括配置参数的详解、消息的发送方式、序列化器、分区器、拦截器等。</li>
-<li>在实际应用中，一套封装良好的且灵活易用的客户端可以避免开发人员重复劳动，也提高了开发效率，还可以提高程序的健壮性和可靠性，而Kafka的客户端正好包含了这些特质。</li>
-<li>对于KafkaProducer而言，它是线程安全的，我们可以在多线程的环境中复用它，</li>
-<li>而对于下一章的消费者客户端KafkaConsumer而言，它是非线程安全的，因为它具备了状态，具体怎么使用我们不妨继续来了解下一章的内容。</li>
-</ul>
 
       
     </div>

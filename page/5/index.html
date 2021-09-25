@@ -191,6 +191,98 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/15/5sql%E5%8F%98%E6%85%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/06/15/5sql%E5%8F%98%E6%85%A2/" class="post-title-link" itemprop="url">5sql变慢</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-06-15 10:08:37 / 修改时间：21:39:48" itemprop="dateCreated datePublished" datetime="2021-06-15T10:08:37+08:00">2021-06-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="你的-SQL-语句为什么变“慢”了"><a href="#你的-SQL-语句为什么变“慢”了" class="headerlink" title="你的 SQL 语句为什么变“慢”了"></a>你的 SQL 语句为什么变“慢”了</h2><ul>
+<li>当内存数据页跟磁盘数据页内容不一致的时候，我们称这个内存页为“脏页”。</li>
+<li>内存数据写入到磁盘后，内存和磁盘上的数据页的内容就一致了，称为“干净页”。</li>
+<li>利用 WAL 技术，数据库将随机写转换成了顺序写，大大提升了数据库的性能。</li>
+<li>但是，由此也带来了内存脏页的问题。脏页会被后台线程自动 flush，也会由于数据页淘汰而触发 flush，而刷脏页的过程由于会占用资源，可能会让你的更新和查询语句的响应时间长一些。</li>
+</ul>
+<h3 id="InnoDB-刷脏页的控制策略"><a href="#InnoDB-刷脏页的控制策略" class="headerlink" title="InnoDB 刷脏页的控制策略"></a>InnoDB 刷脏页的控制策略</h3><ul>
+<li>innodb_io_capacity 告诉innoDB 磁盘能力，建议设置成IOPS (通过fio测试<br>fio -filename=$filename -direct=1 -iodepth 1 -thread -rw=randrw -ioengine=psync -bs=16k -size=500M -numjobs=10 -runtime=10 -group_reporting -name=mytest )</li>
+<li>innodb_max_dirty_pages_pct 脏页比例上限，默认为75%。</li>
+<li>innodb_flush_neighbors 值为 1 的时候会有上述的“连坐”机制，值为 0 时表示不找邻居，自己刷自己的。在 MySQL 8.0 中，innodb_flush_neighbors 参数的默认值已经是 0 了。</li>
+</ul>
+<h2 id="短连接风暴"><a href="#短连接风暴" class="headerlink" title="短连接风暴"></a>短连接风暴</h2><p>max_connections 最大连接参数，当超过这个参数，就会报Too many connections，连接拒绝。</p>
+<ul>
+<li>第一种方法：先处理掉那些占着连接但是不工作的线程。</li>
+<li>第二种方法：减少连接过程的消耗。<ul>
+<li>跳过权限验证的方法是：重启数据库，并使用–skip-grant-tables 参数启动。这样，整个 MySQL 会跳过所有的权限验证阶段，包括连接过程和语句执行过程在内。</li>
+<li>MySQL 8.0 版本里，如果你启用–skip-grant-tables 参数，MySQL 会默认把 –skip-networking 参数打开，表示这时候数据库只能被本地的客户端连接。</li>
+</ul>
+</li>
+</ul>
+<h2 id="慢查询性能问题"><a href="#慢查询性能问题" class="headerlink" title="慢查询性能问题"></a>慢查询性能问题</h2><ul>
+<li>索引没有设计好；</li>
+<li>SQL 语句没写好；</li>
+<li>MySQL 选错了索引。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/11/tcp-ip/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1245,112 +1337,6 @@
 </li>
 <li><p>用 TS.RANGE 支持聚合计算的范围查询。</p>
 </li>
-</ul>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/06/01/string/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="sk-xinye">
-      <meta itemprop="description" content="愿所有努力都不被辜负">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="sk-xinyeの博客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/06/01/string/" class="post-title-link" itemprop="url">string</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-06-01 21:25:39" itemprop="dateCreated datePublished" datetime="2021-06-01T21:25:39+08:00">2021-06-01</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-06-02 08:14:46" itemprop="dateModified" datetime="2021-06-02T08:14:46+08:00">2021-06-02</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="string类型的问题"><a href="#string类型的问题" class="headerlink" title="string类型的问题"></a>string类型的问题</h2><ul>
-<li>当使用string保存大量数据时，例如保存图片id:存储id 时，1亿张图片用了6.4G 内存，会造成RDB生成相应变慢的问题</li>
-<li>就是它保存数据时所消耗的内存空间较多。</li>
-</ul>
-<h2 id="为什么-String-类型内存开销大-64K-整数"><a href="#为什么-String-类型内存开销大-64K-整数" class="headerlink" title="为什么 String 类型内存开销大(64K,整数)"></a>为什么 String 类型内存开销大(64K,整数)</h2><ul>
-<li>当你保存 64 位有符号整数时，String 类型会把它保存为一个 8 字节的 Long 类型整数，这种保存方式通常也叫作 int 编码方式。</li>
-<li>当你保存的数据中包含字符时，String 类型就会用简单动态字符串（Simple Dynamic String，SDS）结构体来保存 <img src="/2021/06/01/string/SDS.jpg" class="">
-<ul>
-<li>buf：字节数组，保存实际数据。为了表示字节数组的结束，Redis 会自动在数组最后加一个“\0”，这就会额外占用 1 个字节的开销。</li>
-<li>len：占 4 个字节，表示 buf 的已用长度。</li>
-<li>alloc：也占个 4 字节，表示 buf 的实际分配长度，一般大于 len。</li>
-</ul>
-</li>
-<li>因为 Redis 的数据类型有很多，而且，不同数据类型都有些相同的元数据要记录（比如最后一次访问的时间、被引用的次数等），所以，Redis 会用一个 RedisObject 结构体来统一记录这些元数据，同时指向实际数据。一个 RedisObject 包含了 8 字节的元数据和一个 8 字节指针 <img src="/2021/06/01/string/redisobj.jpg" class="">
- <img src="/2021/06/01/string/quan.jpg" class=""></li>
-<li>6.4g 中4.8g保存了元数据</li>
-</ul>
-<h2 id="用什么数据结构可以节省内存"><a href="#用什么数据结构可以节省内存" class="headerlink" title="用什么数据结构可以节省内存"></a>用什么数据结构可以节省内存</h2><p>Redis 有一种底层数据结构，叫压缩列表（ziplist），这是一种非常节省内存的结构。</p>
-<img src="/2021/06/01/string/%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8.jpg" class="">
-
-<ul>
-<li>表头有三个字段 zlbytes、zltail 和 zllen，分别表示列表长度、列表尾的偏移量，以及列表中的 entry 个数。压缩列表尾还有一个 zlend，表示列表结束。</li>
-<li>减少dictEntry的个数来进行压缩</li>
-</ul>
-<h2 id="如何用集合类型保存单值的键值对"><a href="#如何用集合类型保存单值的键值对" class="headerlink" title="如何用集合类型保存单值的键值对"></a>如何用集合类型保存单值的键值对</h2><p>可以采用基于 Hash 类型的二级编码方法。这里说的二级编码，就是把一个单值的数据拆分成两部分，前一部分作为 Hash 集合的 key，后一部分作为 Hash 集合的 value，这样一来，我们就可以把单值数据保存到 Hash 集合中了。</p>
-<ul>
-<li>以图片 ID 1101000060 和图片存储对象 ID 3302000080 为例，我们可以把图片 ID 的前 7 位（1101000）作为 Hash 类型的键，把图片 ID 的最后 3 位（060）和图片存储对象 ID 分别作为 Hash 类型值中的 key 和 value。  </li>
-<li>Redis Hash 类型的两种底层实现结构，分别是压缩列表和哈希表。一旦超过了阈值，Hash 类型就会用哈希表来保存数据了。<ul>
-<li>hash-max-ziplist-entries：表示用压缩列表保存时哈希集合中的最大元素个数。</li>
-<li>hash-max-ziplist-value：表示用压缩列表保存时哈希集合中单个元素的最大长度。</li>
 </ul>
 </li>
 </ul>
