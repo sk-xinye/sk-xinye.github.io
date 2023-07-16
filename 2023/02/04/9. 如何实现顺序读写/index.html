@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="如何实现顺序读写1. 为什么顺序读写更快顺序读写快的原因主要有俩：  顺序写比随机写更节约磁盘指针的移动总长度； 顺序写最大化利用到了文件系统的缓存机制，提高了缓存命中率；  下面我们说一说原因 2 的由来：  如上图所示，以顺序读为例，当用户发起一个 fileChannel.read(4kb) 之后，实际发生了两件事：  操作系统从磁盘加载了 16kb 进入 PageCache，这被称为预读 操">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sk-xinyeの博客">
+<meta property="og:url" content="https://sk-xinye.github.io/2023/02/04/9.%20%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%A1%BA%E5%BA%8F%E8%AF%BB%E5%86%99/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="如何实现顺序读写1. 为什么顺序读写更快顺序读写快的原因主要有俩：  顺序写比随机写更节约磁盘指针的移动总长度； 顺序写最大化利用到了文件系统的缓存机制，提高了缓存命中率；  下面我们说一说原因 2 的由来：  如上图所示，以顺序读为例，当用户发起一个 fileChannel.read(4kb) 之后，实际发生了两件事：  操作系统从磁盘加载了 16kb 进入 PageCache，这被称为预读 操">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/9.%20%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%A1%BA%E5%BA%8F%E8%AF%BB%E5%86%99/images/1364556742_9652.gif">
+<meta property="article:published_time" content="2023-02-04T02:34:09.237Z">
+<meta property="article:modified_time" content="2023-02-04T02:33:07.978Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sk-xinye.github.io/2023/02/04/9.%20%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%A1%BA%E5%BA%8F%E8%AF%BB%E5%86%99/images/1364556742_9652.gif">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2023/02/04/9.%20%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%A1%BA%E5%BA%8F%E8%AF%BB%E5%86%99/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title> | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">142</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2023/02/04/9.%20%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%A1%BA%E5%BA%8F%E8%AF%BB%E5%86%99/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-02-04 10:34:09 / 修改时间：10:33:07" itemprop="dateCreated datePublished" datetime="2023-02-04T10:34:09+08:00">2023-02-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="如何实现顺序读写"><a href="#如何实现顺序读写" class="headerlink" title="如何实现顺序读写"></a>如何实现顺序读写</h1><h2 id="1-为什么顺序读写更快"><a href="#1-为什么顺序读写更快" class="headerlink" title="1. 为什么顺序读写更快"></a>1. 为什么顺序读写更快</h2><p>顺序读写快的原因主要有俩：</p>
+<ol>
+<li>顺序写比随机写更节约磁盘指针的移动总长度；</li>
+<li>顺序写最大化利用到了文件系统的缓存机制，提高了缓存命中率；</li>
+</ol>
+<p>下面我们说一说原因 2 的由来：</p>
+<p><img src="./images/1364556742_9652.gif" alt="PageCache"></p>
+<p>如上图所示，以顺序读为例，当用户发起一个 fileChannel.read(4kb) 之后，实际发生了两件事：</p>
+<ol>
+<li>操作系统从磁盘加载了 16kb 进入 PageCache，这被称为预读</li>
+<li>操作通从 PageCache 拷贝 4kb 进入用户内存；</li>
+</ol>
+<p>最终我们在用户内存访问到了 4kb，为什么顺序读快？很容量想到，当用户继续访问接下来的 [4kb,16kb] 的磁盘内容时，便是直接从 PageCache 去访问了。试想一下，当需要访问 16kb 的磁盘内容时，是发生 4 次磁盘 I/O 快，还是发生 1 次磁盘 I/O+4 次内存 I/O 快呢？答案是显而易见的，这一切都是 PageCache 带来的优化。</p>
+<p>深度思考：当内存吃紧时，PageCache 的分配会受影响吗？PageCache 的大小如何确定，是固定的 16kb 吗？我可以监控 PageCache 的命中情况吗？ PageCache 会在哪些场景失效，如果失效了，我们又要哪些补救方式呢？</p>
+<p>我进行简单的自问自答，背后的逻辑还需要读者去推敲：</p>
+<ul>
+<li>当内存吃紧时，PageCache 的预读会受到影响，实测，并没有搜到到文献支持</li>
+<li>PageCache 是动态调整的，可以通过 linux 的系统参数进行调整，默认是占据总内存的 20%</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/brendangregg/perf-tools">https://github.com/brendangregg/perf-tools</a> github 上一款工具可以监控 PageCache</li>
+<li>如果用 PageCache 做缓存不可控，不妨自己做预读。</li>
+</ul>
+<p>顺序写的原理和顺序读一致，都是收到了 PageCache 的影响，留给读者自己推敲一下。</p>
+<h2 id="2-Java-上利用锁实现顺序读写"><a href="#2-Java-上利用锁实现顺序读写" class="headerlink" title="2. Java 上利用锁实现顺序读写"></a>2. Java 上利用锁实现顺序读写</h2><p>一个公认的事实是：无论是传统机械磁盘，还是固体硬盘，顺序读写比随机读写效率更高，那么<strong>如何实现顺序读写呢？</strong></p>
+<p>为了说明这个问题，我们首先需要分清读写过程涉及的两种顺序（以写操作为例）：</p>
+<ol>
+<li>应用层的顺序性：接收端先后接收到两个消息：消息A、消息B，我们要求磁盘最终落盘时，消息就是以 A、B 次序保存的；</li>
+<li>磁盘指针的顺序性：如果有两个线程负责写入 I/O 操作，线程 1 负责写消息 B，线程 2 负责写消息 A，但如果要确保磁盘指针的顺序移动，在消息 A 必须先于消息 B 落盘的大前提下，必然要求线程 2 先写，线程 B 后写。</li>
+</ol>
+<p>我们再举一个代码上的例子，这里没有应用层的顺序要求，只有磁盘指针的顺序要求。</p>
+<p>写入方式一：64 个线程，用户自己使用一个 atomic 变量记录写入指针的位置，并发写入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ExecutorService executor &#x3D; Executors.newFixedThreadPool(64);&#x2F;&#x2F;64 大小的线程池</span><br><span class="line">AtomicLong wrotePosition &#x3D; new AtomicLong(0);&#x2F;&#x2F;指针</span><br><span class="line">for(int i&#x3D;0;i&lt;1024;i++)&#123;</span><br><span class="line">    final int index &#x3D; i;</span><br><span class="line">    executor.execute(()-&gt;&#123;</span><br><span class="line">        fileChannel.write(ByteBuffer.wrap(new byte[4*1024]),wrote.getAndAdd(4*1024));</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>写入方式二：给 write 加了锁，保证了同步：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">ExecutorService executor = Executors.newFixedThreadPool(<span class="number">64</span>);</span><br><span class="line">AtomicLong wrotePosition = <span class="keyword">new</span> AtomicLong(<span class="number">0</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">1024</span>;i++)&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> index = i;</span><br><span class="line">    executor.execute(()-&gt;&#123;</span><br><span class="line">        write(<span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">4</span>*<span class="number">1024</span>]);</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">write</span><span class="params">(<span class="keyword">byte</span>[] data)</span></span>&#123;</span><br><span class="line">    fileChannel.write(ByteBuffer.wrap(<span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">4</span>*<span class="number">1024</span>]),wrote.getAndAdd(<span class="number">4</span>*<span class="number">1024</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只有方式二才算顺序写，顺序读也是同理。在方式 1 中，可能有如下顺序的写入：</p>
+<ul>
+<li>时序 1：thread1 write position[0~4096)；</li>
+<li>时序 2：thread3 write position[8194~12288)；</li>
+<li>时序 3：thread2 write position[4096~8194)；</li>
+</ul>
+<p>所以，方式一并不是完全的“顺序写”。</p>
+<p><strong>对于文件操作，加锁并不是一件非常可怕的事，不敢同步 write/read 才可怕！</strong></p>
+<blockquote>
+<p>读时加锁 —&gt; 读的阻塞耗时期间锁会迟迟不释放。但是即使如此，为了顺序 I/O，我们还是要使用锁机制。</p>
+</blockquote>
+<p><strong>有人会问：FileChannel 内部不是已经有 positionLock 保证写入的线程安全了吗，为什么还要自己加同步？</strong></p>
+<p>确实如此，但是 FileChannel#write 方法入口处的 position 生成（即<code>wrotePosition.getAndAdd(4*1024)</code>）与 FileChannel#write 方法内部的上锁不是原子操作，此时如果不粗粒度地上锁，就会导致顺序写失效。</p>
+<h2 id="3-扩展-锁"><a href="#3-扩展-锁" class="headerlink" title="3. 扩展-锁"></a>3. 扩展-锁</h2><p>操作系统提供的 write 系统调用并没有确保原子语义，这意味着如果多个线程同时执行多个 write 操作来对同一个文件的同一个部分进行修改操作，那么最终执行结果取决于实际的执行逻辑顺序（这是无法预计的）。这种写场景类似于多线程访问共享变量，都是线程不安全的操作。</p>
+<p>不过，文件系统提供两个操作的原子性，即当 open 系统调用以 flag 为 O_CREAT 或 O_APPEND 打开文件时。</p>
+<ul>
+<li>O_CREAT：文件不存在就创建；</li>
+<li>O_APPEND：每次写文件时把文件游标移动到文件最后追加写；Java 中使用追加式文件写的例子为 <a target="_blank" rel="noopener" href="https://github.com/Spongecaptain/testAppendIoInJava">testAppendIoInJava</a>（NFS等文件系统不保证这个flag）；</li>
+</ul>
+<p>不过，即使确保原子操作，也无法确保并发安全性，因为原子性只是并发安全的一个条件。</p>
+<p>我们通常使用锁来实现并发安全性，例如 Linux 有提供两种类型的文件锁：</p>
+<ul>
+<li>flock：只能对整个文件上锁，而不能对文件的某一部分上锁；</li>
+<li>fcntl：即可以锁住整个文件，又能只锁文件的某一部分；</li>
+</ul>
+<p>但在事实上，我们通常会避免使用操作系统提供的文件锁，而是要么选择避免多线程同时写一个文件的情况，要么在应用层上实现锁，比如 Java 代码中的 synchronized 关键字。</p>
+<h2 id="REFERENCE"><a href="#REFERENCE" class="headerlink" title="REFERENCE"></a>REFERENCE</h2><ul>
+<li><p><a target="_blank" rel="noopener" href="https://www.cnkirito.moe/file-io-best-practise/">文件 IO 操作的一些最佳实践</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/charlesblc/p/6287631.html">Linux文件锁学习-flock, lockf, fcntl</a></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/02/04/8.%20Java%20ByteBuffer%20%E6%B5%8B%E8%AF%95/" rel="prev" title="">
+      <i class="fa fa-chevron-left"></i> 
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/02/04/README/" rel="next" title="">
+       <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%A1%BA%E5%BA%8F%E8%AF%BB%E5%86%99"><span class="nav-number">1.</span> <span class="nav-text">如何实现顺序读写</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%A1%BA%E5%BA%8F%E8%AF%BB%E5%86%99%E6%9B%B4%E5%BF%AB"><span class="nav-number">1.1.</span> <span class="nav-text">1. 为什么顺序读写更快</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Java-%E4%B8%8A%E5%88%A9%E7%94%A8%E9%94%81%E5%AE%9E%E7%8E%B0%E9%A1%BA%E5%BA%8F%E8%AF%BB%E5%86%99"><span class="nav-number">1.2.</span> <span class="nav-text">2. Java 上利用锁实现顺序读写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%89%A9%E5%B1%95-%E9%94%81"><span class="nav-number">1.3.</span> <span class="nav-text">3. 扩展-锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#REFERENCE"><span class="nav-number">1.4.</span> <span class="nav-text">REFERENCE</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">142</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

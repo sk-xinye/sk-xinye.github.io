@@ -36,7 +36,7 @@
 <meta property="og:image" content="https://sk-xinye.github.io/2021/07/03/8-%E7%BD%91%E7%BB%9C/vxlan%E5%8E%9F%E7%90%86.png">
 <meta property="og:image" content="https://sk-xinye.github.io/2021/07/03/8-%E7%BD%91%E7%BB%9C/vxlan%E5%86%85%E9%83%A8%E5%B8%A7.png">
 <meta property="article:published_time" content="2021-07-03T08:52:50.000Z">
-<meta property="article:modified_time" content="2021-07-04T03:35:39.687Z">
+<meta property="article:modified_time" content="2023-02-04T02:33:07.825Z">
 <meta property="article:author" content="sk-xinye">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://sk-xinye.github.io/2021/07/03/8-%E7%BD%91%E7%BB%9C/%E5%AE%B9%E5%99%A8%E9%80%9A%E4%BF%A1.png">
@@ -125,7 +125,7 @@
   <ul id="menu" class="menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
 
   </li>
         <li class="menu-item menu-item-about">
@@ -140,12 +140,12 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">15</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">111</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">142</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -233,17 +233,8 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-07-04 11:35:39" itemprop="dateModified" datetime="2021-07-04T11:35:39+08:00">2021-07-04</time>
+                <time title="修改时间：2023-02-04 10:33:07" itemprop="dateModified" datetime="2023-02-04T10:33:07+08:00">2023-02-04</time>
               </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
-                </span>
-            </span>
 
           
 
@@ -442,6 +433,42 @@
 </ul>
 <p><strong>不难看到，上面的例子有一个共性，那就是用户的容器都连接在 docker0 网桥上。而网络插件则在宿主机上创建了一个特殊的设备（UDP 模式创建的是 TUN 设备，VXLAN 模式创建的则是 VTEP 设备），docker0 与这个设备之间，通过 IP 转发（路由表）进行协作。<br>然后，网络插件真正要做的事情，则是通过某种方法，把不同宿主机上的特殊设备连通，从而达到容器跨主机通信的目的。</strong></p>
 <p>实际上，上面这个流程，也正是 Kubernetes 对容器网络的主要处理方法。只不过，Kubernetes 是通过一个叫作 CNI 的接口，维护了一个单独的网桥来代替 docker0。这个网桥的名字就叫作：CNI 网桥，它在宿主机上的设备名称默认是：cni0。</p>
+<hr>
+<p><a target="_blank" rel="noopener" href="https://blog.opskumu.com/kubernetes-ext-service.html">https://blog.opskumu.com/kubernetes-ext-service.html</a><br>Kubernetes 外部服务映射<br>Table of Contents</p>
+<ol>
+<li>外部域名映射到内部 Service -&gt; ExternalName</li>
+<li>外部 IP 映射到内部 Service<br> 2.1. IP 映射<br> 2.2. IP + 端口映射</li>
+<li>小结<br>集群内的应用有时候需要调用外部的服务，我们知道集群内部服务调用都是通过 Service 互相访问，那么针对外部的服务是否也可以保持统一使用 Service 呢？答案是肯定的，通过 Service 访问外部服务，除了方式统一以外，还能带来其他好处。如配置统一，不同环境（空间）相同应用访问外部不同环境的数据库，可以通过 Service 映射保持两边配置统一，达到不同空间应用通过相同 Service Name 访问不同的外部数据库。如图 test-1 和 test-2 两个空间为两个不同的业务环境，通过服务映射，不同空间相同的 Service 访问到对应外部不同环境的数据库：</li>
+</ol>
+<p>external-service.png</p>
+<p>另外，还可以保证最小化变更，如果外部数据库 IP 之类的变动，只需要修改 Service 对应映射即可，服务本身配置无需变动。具体场景如下：</p>
+<p>1 外部域名映射到内部 Service -&gt; ExternalName<br>apiVersion: v1<br>kind: Service<br>metadata:<br>  name: mysql<br>spec:<br>  externalName: mysql.example.com<br>  type: ExternalName<br>创建之后，同一空间 Pod 就可以通过 mysql:3306 访问外部的 MySQL 服务。</p>
+<p>需要注意的是，虽然 externalName 也支持填写 IP，但是并不会被 Ingress 和 CoreDNS 解析（KubeDNS 支持）。如果有 IP 相关的需求，则可以使用 Headless Service -&gt; Type ExternalName 。另外一个需要注意的是，因为 CNAME 的缘故，如果外部的服务又经过一层代理转发，如 Nginx，除非配置对应的 server_name ，否则映射无效。</p>
+<p>2 外部 IP 映射到内部 Service<br>2.1 IP 映射<br>前文提过，虽然 externalName 字段可以配置为 IP 地址，但是 Ingress 和 CoreDNS 并不会解析，如果外部服务为 IP 提供，那么可以使用 Headless Service 实现映射。</p>
+<p>apiVersion: v1<br>kind: Service<br>metadata:<br>  name: mysql<br>spec:<br>  clusterIP: None<br>  type: ClusterIP</p>
+<hr>
+<p>apiVersion: v1<br>kind: Endpoints<br>metadata:<br> name: mysql<br>subsets:</p>
+<ul>
+<li>addresses:<ul>
+<li>ip: 192.168.1.10<br>service 不指定 selector，手动维护创建 endpoint，创建之后就可以通过 mysql:3306 访问 192.168.1.10:3306 服务的目的。Headless Service 不能修改端口相关，如果要修改访问端口，则需要进一步操作。</li>
+</ul>
+</li>
+</ul>
+<p>2.2 IP + 端口映射<br>如果外部的端口不是标准的端口，想通过 Service 访问时候使用标准端口，如外部 MySQL 提供端口为 3307，内部想通过 Service 3306 访问，这个时候则可以通过如下方式实现：</p>
+<p>apiVersion: v1<br>kind: Service<br>metadata:<br> name: mysql<br>spec:<br> type: ClusterIP<br> ports:</p>
+<ul>
+<li>port: 3306<br>targetPort: 3307</li>
+</ul>
+<hr>
+<p>apiVersion: v1<br>kind: Endpoints<br>metadata:<br> name: mysql<br>subsets:</p>
+<ul>
+<li>addresses:<ul>
+<li>ip: 192.168.1.10<br>ports:</li>
+<li>port: 3307<br>service 不指定 selector，手动维护创建 endpoint，创建之后就可以通过 mysql:3306 达到访问外部 192.168.1.10:3307 服务的目的。</li>
+</ul>
+</li>
+</ul>
+<p>参考 Kubernetes best practices: mapping external services<br>3 小结<br>我们可以看出以上外部服务映射，externalName 和 Headless Service 方式映射外部服务是没有经过中间层代理的，都是通过 DNS 劫持实现。而有端口变更需求的时候，则要经过内部 kube-proxy 层转发。正常情况下，能尽可能少的引入中间层就少引用，特别是数据库类的应用，因为引入中间层虽然带来了便利，但也意味着可能会带来性能损耗，特别是那些对延迟比较敏感的服务。</p>
 
     </div>
 
@@ -536,15 +563,9 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">111</span>
+          <span class="site-state-item-count">142</span>
           <span class="site-state-item-name">日志</span>
         </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">15</span>
-        <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
 </div>
@@ -570,7 +591,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

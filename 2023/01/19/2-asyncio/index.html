@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="asyncio异步编程python异步库https:&#x2F;&#x2F;github.com&#x2F;aio-libs 迭代器是一个实现了迭代器协议的对象，python的一些内置数据类型（列表，数组，字符串，字典等）都可以通过for语句进行迭代，我们也可以自己创建一个容器，实现了迭代器协议，可以通过for，next方法进行迭代，在迭代的末尾，会引发stopIteration异常。实现了__iter__和__next__方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1.并发使用">
+<meta property="og:url" content="https://sk-xinye.github.io/2023/01/19/2-asyncio/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="asyncio异步编程python异步库https:&#x2F;&#x2F;github.com&#x2F;aio-libs 迭代器是一个实现了迭代器协议的对象，python的一些内置数据类型（列表，数组，字符串，字典等）都可以通过for语句进行迭代，我们也可以自己创建一个容器，实现了迭代器协议，可以通过for，next方法进行迭代，在迭代的末尾，会引发stopIteration异常。实现了__iter__和__next__方">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-01-19T02:30:53.000Z">
+<meta property="article:modified_time" content="2023-07-16T13:14:55.049Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2023/01/19/2-asyncio/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>1.并发使用 | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">142</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2023/01/19/2-asyncio/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          1.并发使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-01-19 10:30:53" itemprop="dateCreated datePublished" datetime="2023-01-19T10:30:53+08:00">2023-01-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-16 21:14:55" itemprop="dateModified" datetime="2023-07-16T21:14:55+08:00">2023-07-16</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="asyncio异步编程"><a href="#asyncio异步编程" class="headerlink" title="asyncio异步编程"></a>asyncio异步编程</h2><h3 id="python异步库"><a href="#python异步库" class="headerlink" title="python异步库"></a>python异步库</h3><p><a target="_blank" rel="noopener" href="https://github.com/aio-libs">https://github.com/aio-libs</a></p>
+<h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3><p>是一个实现了迭代器协议的对象，python的一些内置数据类型（列表，数组，字符串，字典等）都可以通过for语句进行迭代，我们也可以自己创建一个容器，实现了迭代器协议，可以通过for，next方法进行迭代，在迭代的末尾，会引发stopIteration异常。实现了__iter__和__next__方法</p>
+<h3 id="生成器（generator）【一种特殊迭代器】"><a href="#生成器（generator）【一种特殊迭代器】" class="headerlink" title="生成器（generator）【一种特殊迭代器】"></a>生成器（generator）【一种特殊迭代器】</h3><ol>
+<li>是通过yield语句快速生成迭代器，可以不用iter和next方法</li>
+<li>yield可以使一个普通函数变成一个生成器，并且相应的next()方法返回是yield后的值。一种更直观的解释是：程序执行到yield时会返回结果并暂停，再次调用next时会从上次暂停的地方继续开始执行。</li>
+<li>生成器自身有构成一个迭代器，每次迭代时使用一个yield返回 的值，一个生成器中可以有多个yield的值</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fibonacci</span>(<span class="params">n</span>):</span> <span class="comment"># 生成器函数 - 斐波那契</span></span><br><span class="line">    a, b, counter = <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="keyword">if</span> (counter &gt; n):</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        <span class="keyword">yield</span> a</span><br><span class="line">        a, b = b, a + b</span><br><span class="line">        counter += <span class="number">1</span></span><br><span class="line">f = fibonacci(<span class="number">10</span>) <span class="comment"># f 是一个迭代器，由生成器返回生成</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="built_in">print</span> (<span class="built_in">next</span>(f), end=<span class="string">&quot; &quot;</span>)</span><br><span class="line">    <span class="keyword">except</span> StopIteration:</span><br><span class="line">        sys.exit()</span><br><span class="line"><span class="string">&quot;&quot;&quot;结果0 1 1 2 3 5 8 13 21 34 55&quot;&quot;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="python异步编程原理"><a href="#python异步编程原理" class="headerlink" title="python异步编程原理"></a>python异步编程原理</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">1.遍历url 生成对应的协程对象，并将该对象协程fetch方法，放入task中</span></span><br><span class="line"><span class="string">2.task 初始化future 开启协程，并将step函数（协程触发函数放到future的回调属性中），并将socker 注册对应future的set_result 该方法会设置结果，并且触发回调</span></span><br><span class="line"><span class="string">3.开启ioloop 当发现了事件之后，调用事件的回调函数，通过set_result 完成，向下执行程序</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">为了节省网络IO时间，通过5种IO模型中的io多路复用，达到节省网络IO到达的时间的目的，其实根本目的是为了节省等待数据准备 (Waiting for the data to be ready)的时间，但是从内核写到用户进程的时间还是会阻塞的</span></span><br><span class="line"><span class="string">loop 不断轮训发生的事件，并且执行注册在selector上的回调函数</span></span><br><span class="line"><span class="string">        这里的回调函数一方面为Future 对象的result赋值，另一方面执行Task中的step 函数用于驱动协程的执行</span></span><br><span class="line"><span class="string">Future 保存将来的执行结果，配合Task ，协程函数完成回调的执行</span></span><br><span class="line"><span class="string">Task 触发器</span></span><br><span class="line"><span class="string">协程函数： 执行注册监听到selector上，并配合事件回调循环</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"><span class="keyword">from</span> selectors <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">selector = DefaultSelector</span><br><span class="line">stopped = <span class="literal">False</span></span><br><span class="line">urls_todo = &#123;<span class="string">&#x27;www.baidu.com&#x27;</span>, <span class="string">&#x27;www.baidu.com/1&#x27;</span>, <span class="string">&#x27;/2&#x27;</span>, <span class="string">&#x27;/3&#x27;</span>, <span class="string">&#x27;/4&#x27;</span>, <span class="string">&#x27;/5&#x27;</span>, <span class="string">&#x27;/6&#x27;</span>, <span class="string">&#x27;/7&#x27;</span>, <span class="string">&#x27;/8&#x27;</span>, <span class="string">&#x27;/9&#x27;</span>&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Future</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.result = <span class="literal">None</span></span><br><span class="line">        self._callbacks = []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add_done_callback</span>(<span class="params">self, fn</span>):</span></span><br><span class="line">        self._callbacks.append(fn)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_result</span>(<span class="params">self, result</span>):</span></span><br><span class="line">        self.result = result</span><br><span class="line">        <span class="keyword">for</span> fn <span class="keyword">in</span> self._callbacks:</span><br><span class="line">            fn(self)</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Crawler</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, url</span>):</span></span><br><span class="line">        self.url = url</span><br><span class="line">        self.response = <span class="string">b&#x27;&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">fetch</span>(<span class="params">self</span>):</span></span><br><span class="line">        sock = socket.socket()</span><br><span class="line">        sock.setblocking(<span class="literal">False</span>)</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&#x27;****&#x27;</span>*<span class="number">50</span>)</span><br><span class="line">            sock.connect((<span class="string">&#x27;220.181.111.148&#x27;</span>, <span class="number">80</span>))</span><br><span class="line">        <span class="keyword">except</span> BlockingIOError:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line">        f = Future()</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;++++&quot;</span>*<span class="number">50</span>)</span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">on_connected</span>():</span></span><br><span class="line">            f.set_result(<span class="literal">None</span>)</span><br><span class="line">        <span class="built_in">print</span>(sock.fileno())</span><br><span class="line">        selector.register(sock.fileno(), EVENT_WRITE, on_connected)</span><br><span class="line">        <span class="keyword">yield</span> f</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;yield 之后了&quot;</span>)</span><br><span class="line">        selector.unregister(sock.fileno())</span><br><span class="line">        get = <span class="string">&#x27;GET &#123;0&#125; HTTP/1.0\r\nHost: 220.181.111.148\r\n\r\n&#x27;</span>.<span class="built_in">format</span>(self.url)</span><br><span class="line">        sock.send(get.encode(<span class="string">&#x27;ascii&#x27;</span>))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">global</span> stopped</span><br><span class="line">        <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">            f = Future()</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="keyword">def</span> <span class="title">on_readable</span>():</span></span><br><span class="line">                f.set_result(sock.recv(<span class="number">4096</span>))</span><br><span class="line"></span><br><span class="line">            selector.register(sock.fileno(), EVENT_READ, on_readable)</span><br><span class="line">            chunk = <span class="keyword">yield</span> f</span><br><span class="line">            selector.unregister(sock.fileno())</span><br><span class="line">            <span class="keyword">if</span> chunk:</span><br><span class="line">                self.response += chunk</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                urls_todo.remove(self.url)</span><br><span class="line">                <span class="keyword">if</span> <span class="keyword">not</span> urls_todo:</span><br><span class="line">                    stopped = <span class="literal">True</span></span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Task</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, coro</span>):</span></span><br><span class="line">        self.coro = coro</span><br><span class="line">        f = Future()</span><br><span class="line">        f.set_result(<span class="literal">None</span>)</span><br><span class="line">        self.step(f)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">step</span>(<span class="params">self, future</span>):</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            next_future = self.coro.send(future.result)</span><br><span class="line">        <span class="keyword">except</span> StopIteration:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;停止task&quot;</span>)</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        next_future.add_done_callback(self.step)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loop</span>():</span></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">not</span> stopped:</span><br><span class="line">        events = selector.select()</span><br><span class="line">        <span class="keyword">for</span> event_key, event_mask <span class="keyword">in</span> events:</span><br><span class="line">            callback = event_key.data</span><br><span class="line">            callback()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    <span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">    start = time.time()</span><br><span class="line">    <span class="keyword">for</span> url <span class="keyword">in</span> urls_todo:</span><br><span class="line">        crawler = Crawler(url)</span><br><span class="line">        Task(crawler.fetch())</span><br><span class="line">    loop()</span><br><span class="line">    <span class="built_in">print</span>(time.time() - start)</span><br></pre></td></tr></table></figure>
+
+<h3 id="asyncio-使用讲解"><a href="#asyncio-使用讲解" class="headerlink" title="asyncio 使用讲解"></a>asyncio 使用讲解</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> uvloop <span class="comment"># 这个效率更高</span></span><br><span class="line">asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">testa</span>(<span class="params">x</span>):</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;in test a&quot;</span>)</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">3</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;a 又开始了&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">testb</span>(<span class="params">x</span>):</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;in test b&quot;</span>)</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">1</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;b 又开始了&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">callbackfunc</span>(<span class="params">task</span>):</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;回调函数，运行结果为&#123;&#125;&quot;</span>.<span class="built_in">format</span>(task.result()))</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">main1</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;顺序执行，串行</span></span><br><span class="line"><span class="string">    in test a</span></span><br><span class="line"><span class="string">    a 又开始了</span></span><br><span class="line"><span class="string">    in test b</span></span><br><span class="line"><span class="string">    b 又开始了</span></span><br><span class="line"><span class="string">    test a result is a</span></span><br><span class="line"><span class="string">    test b result is b</span></span><br><span class="line"><span class="string">    一共耗时为：4.002900838851929</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    start =time.time()</span><br><span class="line">    a_result = <span class="keyword">await</span> testa(<span class="string">&quot;a&quot;</span>)</span><br><span class="line">    b_result = <span class="keyword">await</span> testb(<span class="string">&quot;b&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;test a result is &#123;&#125;&quot;</span>.<span class="built_in">format</span>(a_result))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;test b result is &#123;&#125;&quot;</span>.<span class="built_in">format</span>(b_result))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;一共耗时为：&#123;&#125;&quot;</span>.<span class="built_in">format</span>(time.time()-start))</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">main2</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;并行执行</span></span><br><span class="line"><span class="string">    in test a</span></span><br><span class="line"><span class="string">    in test b</span></span><br><span class="line"><span class="string">    b 又开始了</span></span><br><span class="line"><span class="string">    a 又开始了</span></span><br><span class="line"><span class="string">    test a result is a</span></span><br><span class="line"><span class="string">    test b result is b</span></span><br><span class="line"><span class="string">    一共耗时为：3.0003840923309326</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    start = time.time()</span><br><span class="line">    a_result,b_result = <span class="keyword">await</span> asyncio.gather(testa(<span class="string">&quot;a&quot;</span>),testb(<span class="string">&quot;b&quot;</span>))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;test a result is &#123;&#125;&quot;</span>.<span class="built_in">format</span>(a_result))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;test b result is &#123;&#125;&quot;</span>.<span class="built_in">format</span>(b_result))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;一共耗时为：&#123;&#125;&quot;</span>.<span class="built_in">format</span>(time.time()-start))</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">main3</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;通过创建task来进行并行执行</span></span><br><span class="line"><span class="string">    &lt;Task pending name=&#x27;Task-2&#x27; coro=&lt;testa() running at C:/Users/zx-176/PycharmProjects/untitled/2020/async/asyncio_test.py:4&gt;&gt;</span></span><br><span class="line"><span class="string">    &lt;Task pending name=&#x27;Task-3&#x27; coro=&lt;testb() running at C:/Users/zx-176/PycharmProjects/untitled/2020/async/asyncio_test.py:10&gt;&gt;</span></span><br><span class="line"><span class="string">    False False</span></span><br><span class="line"><span class="string">    in test a</span></span><br><span class="line"><span class="string">    in test b</span></span><br><span class="line"><span class="string">    b 又开始了</span></span><br><span class="line"><span class="string">    a 又开始了</span></span><br><span class="line"><span class="string">    True True</span></span><br><span class="line"><span class="string">    a</span></span><br><span class="line"><span class="string">    b</span></span><br><span class="line"><span class="string">    一共耗时为：3.000962257385254</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    start = time.time()</span><br><span class="line"></span><br><span class="line">    taska = asyncio.ensure_future(testa(<span class="string">&quot;a&quot;</span>))  <span class="comment"># 返回的是task对象</span></span><br><span class="line">    taskb = asyncio.ensure_future(testb(<span class="string">&quot;b&quot;</span>))</span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(taska)</span><br><span class="line">    <span class="built_in">print</span>(taskb)</span><br><span class="line">    <span class="built_in">print</span>(taska.done(),taskb.done())</span><br><span class="line">    <span class="keyword">await</span> taska</span><br><span class="line">    <span class="keyword">await</span> taskb</span><br><span class="line">    <span class="built_in">print</span>(taska.done(),taskb.done())</span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(taska.result())</span><br><span class="line">    <span class="built_in">print</span>(taskb.result())</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;一共耗时为：&#123;&#125;&quot;</span>.<span class="built_in">format</span>(time.time() - start))</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">main4</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;结果同3&quot;&quot;&quot;</span></span><br><span class="line">    start = time.time()</span><br><span class="line"></span><br><span class="line">    taska = asyncio.create_task(testa(<span class="string">&quot;a&quot;</span>))  <span class="comment"># 返回task对象</span></span><br><span class="line">    <span class="comment"># task对象可以增加回调函数</span></span><br><span class="line">    taska.add_done_callback(callbackfunc)</span><br><span class="line">    taskb = asyncio.create_task(testb(<span class="string">&quot;b&quot;</span>))</span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(taska)</span><br><span class="line">    <span class="built_in">print</span>(taskb)</span><br><span class="line">    <span class="built_in">print</span>(taska.done(),taskb.done())</span><br><span class="line">    <span class="keyword">await</span> taska</span><br><span class="line">    <span class="keyword">await</span> taskb</span><br><span class="line">    <span class="built_in">print</span>(taska.done(),taskb.done())</span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(taska.result())</span><br><span class="line">    <span class="built_in">print</span>(taskb.result())</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;一共耗时为：&#123;&#125;&quot;</span>.<span class="built_in">format</span>(time.time() - start))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    asyncio.run(main4())</span><br><span class="line">    <span class="comment"># loop = asyncio.get_event_loop()</span></span><br><span class="line">    <span class="comment"># loop.run_until_complete(main1())</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="wait和gather区别"><a href="#wait和gather区别" class="headerlink" title="wait和gather区别"></a>wait和gather区别</h3><ol>
+<li>首先，gather是需要所有任务都执行结束，如果某一个协程函数崩溃了，则会抛异常，都不会有结果。</li>
+<li>wait可以定义函数返回的时机，可以是FIRST_COMPLETED(第一个结束的)，FIRST_EXCEPTION(第一个出现异常的)，ALL_COMPLETED(全部执行完，默认的)</li>
+</ol>
+<h3 id="如何使用线程池进程池对无法使用异步库的函数进行并发"><a href="#如何使用线程池进程池对无法使用异步库的函数进行并发" class="headerlink" title="如何使用线程池进程池对无法使用异步库的函数进行并发"></a>如何使用线程池进程池对无法使用异步库的函数进行并发</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">import</span> multiprocessing</span><br><span class="line"><span class="keyword">from</span> concurrent.futures <span class="keyword">import</span> ThreadPoolExecutor,ProcessPoolExecutor</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="comment">#定义阻塞函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ping</span>(<span class="params">url</span>):</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;阻塞函数开始执行，当前进程ID为：&#123;&#125;，线程ID为：&#123;&#125;&quot;</span>.<span class="built_in">format</span>(os.getpid(),threading.current_thread()))</span><br><span class="line">    time.sleep(<span class="number">2</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;模拟ping 输出:&#123;&#125;&quot;</span>.<span class="built_in">format</span>(url))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;阻塞函数结束执行，当前进程ID为：&#123;&#125;，线程ID为：&#123;&#125;&quot;</span>.<span class="built_in">format</span>(os.getpid(),threading.current_thread()))</span><br><span class="line"></span><br><span class="line"><span class="comment">#定义阻塞函数</span></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">ping2</span>(<span class="params">url</span>):</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;阻塞函数开始执行，当前进程ID为：&#123;&#125;，线程ID为：&#123;&#125;&quot;</span>.<span class="built_in">format</span>(os.getpid(),threading.current_thread()))</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">2</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;模拟ping 输出:&#123;&#125;&quot;</span>.<span class="built_in">format</span>(url))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;阻塞函数结束执行，当前进程ID为：&#123;&#125;，线程ID为：&#123;&#125;&quot;</span>.<span class="built_in">format</span>(os.getpid(),threading.current_thread()))</span><br><span class="line"><span class="comment">#定义一个跑事件循环的线程函数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">start_thread_loop</span>(<span class="params">loop</span>):</span></span><br><span class="line">    asyncio.set_event_loop(loop)</span><br><span class="line">    loop.run_forever()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main0</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;没并发&quot;&quot;&quot;</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;in main 当前进程ID为：&#123;&#125;，线程ID为：&#123;&#125;&quot;</span>.<span class="built_in">format</span>(os.getpid(),threading.current_thread()))</span><br><span class="line">    loop = asyncio.get_event_loop()</span><br><span class="line">    t = threading.Thread(target=start_thread_loop,args=(loop,))</span><br><span class="line">    t.start()</span><br><span class="line"></span><br><span class="line">    loop.call_soon_threadsafe(ping,<span class="string">&quot;www.baidu.com&quot;</span>)</span><br><span class="line">    loop.call_soon_threadsafe(ping, <span class="string">&quot;www.qq.com&quot;</span>)</span><br><span class="line">    loop.call_soon_threadsafe(ping, <span class="string">&quot;www.weixin.com&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;主线程不阻塞&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main1</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;均在不同线程中跑&quot;&quot;&quot;</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;in main 当前进程ID为：&#123;&#125;，线程ID为：&#123;&#125;&quot;</span>.<span class="built_in">format</span>(os.getpid(),threading.current_thread()))</span><br><span class="line">    loop = asyncio.get_event_loop()</span><br><span class="line">    t = threading.Thread(target=start_thread_loop,args=(loop,))</span><br><span class="line">    t.start()</span><br><span class="line"></span><br><span class="line">    loop.run_in_executor(<span class="literal">None</span>,ping,<span class="string">&quot;www.baidu.com&quot;</span>)</span><br><span class="line">    loop.run_in_executor(<span class="literal">None</span>, ping, <span class="string">&quot;www.qq.com&quot;</span>)</span><br><span class="line">    loop.run_in_executor(<span class="literal">None</span>, ping, <span class="string">&quot;www.weixin.com&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;主线程不阻塞&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main2</span>():</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;in main 当前进程ID为：&#123;&#125;，线程ID为：&#123;&#125;&quot;</span>.<span class="built_in">format</span>(os.getpid(),threading.current_thread()))</span><br><span class="line">    loop = asyncio.get_event_loop()</span><br><span class="line">    t = threading.Thread(target=start_thread_loop,args=(loop,))</span><br><span class="line">    t.start()</span><br><span class="line">    thread_executor = ThreadPoolExecutor(<span class="number">3</span>)</span><br><span class="line">    process_executor= ProcessPoolExecutor(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">    loop.run_in_executor(process_executor,ping,<span class="string">&quot;www.baidu.com&quot;</span>)</span><br><span class="line">    loop.run_in_executor(process_executor, ping, <span class="string">&quot;www.qq.com&quot;</span>)</span><br><span class="line">    loop.run_in_executor(process_executor, ping, <span class="string">&quot;www.weixin.com&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;主线程不阻塞&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main3</span>():</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;同进程同线程&quot;&quot;&quot;</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;in main 当前进程ID为：&#123;&#125;，线程ID为：&#123;&#125;&quot;</span>.<span class="built_in">format</span>(os.getpid(),threading.current_thread()))</span><br><span class="line">    loop = asyncio.get_event_loop()</span><br><span class="line">    t = threading.Thread(target=start_thread_loop,args=(loop,))</span><br><span class="line">    t.start()</span><br><span class="line"></span><br><span class="line">    asyncio.run_coroutine_threadsafe(ping2(<span class="string">&quot;www.baidu.com&quot;</span>),loop)</span><br><span class="line">    asyncio.run_coroutine_threadsafe(ping2(<span class="string">&quot;www.qq.com&quot;</span>), loop)</span><br><span class="line">    asyncio.run_coroutine_threadsafe(ping2(<span class="string">&quot;www.weixin.com&quot;</span>), loop)</span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;主线程不阻塞&quot;</span>)</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    main3()</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/08/16/5-iptables/" rel="prev" title="5.iptables">
+      <i class="fa fa-chevron-left"></i> 5.iptables
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/02/04/10.%20RDMA/" rel="next" title="">
+       <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#asyncio%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">asyncio异步编程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#python%E5%BC%82%E6%AD%A5%E5%BA%93"><span class="nav-number">1.1.</span> <span class="nav-text">python异步库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%AD%E4%BB%A3%E5%99%A8"><span class="nav-number">1.2.</span> <span class="nav-text">迭代器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E5%99%A8%EF%BC%88generator%EF%BC%89%E3%80%90%E4%B8%80%E7%A7%8D%E7%89%B9%E6%AE%8A%E8%BF%AD%E4%BB%A3%E5%99%A8%E3%80%91"><span class="nav-number">1.3.</span> <span class="nav-text">生成器（generator）【一种特殊迭代器】</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#python%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B%E5%8E%9F%E7%90%86"><span class="nav-number">1.4.</span> <span class="nav-text">python异步编程原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#asyncio-%E4%BD%BF%E7%94%A8%E8%AE%B2%E8%A7%A3"><span class="nav-number">1.5.</span> <span class="nav-text">asyncio 使用讲解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wait%E5%92%8Cgather%E5%8C%BA%E5%88%AB"><span class="nav-number">1.6.</span> <span class="nav-text">wait和gather区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8%E7%BA%BF%E7%A8%8B%E6%B1%A0%E8%BF%9B%E7%A8%8B%E6%B1%A0%E5%AF%B9%E6%97%A0%E6%B3%95%E4%BD%BF%E7%94%A8%E5%BC%82%E6%AD%A5%E5%BA%93%E7%9A%84%E5%87%BD%E6%95%B0%E8%BF%9B%E8%A1%8C%E5%B9%B6%E5%8F%91"><span class="nav-number">1.7.</span> <span class="nav-text">如何使用线程池进程池对无法使用异步库的函数进行并发</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">142</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

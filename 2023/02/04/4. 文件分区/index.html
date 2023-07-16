@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="文件分区1. 文件分区是指什么？文件分区很少有资料介绍，但是在众多数据库组件的最佳实践中通常会以 benchmark 告诉我们这一个建议。 文件分区包括两件事：  将原本一个大文件分为多个小文件。例如，将一个大数据量的文件分为多个小文件进行存储。例如 Kafka 中为避免 WAL Log 过大，使用了 LogSegment 概念，当某一个 LogSegment 足够大时，就创建一个新的 LogSe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sk-xinyeの博客">
+<meta property="og:url" content="https://sk-xinye.github.io/2023/02/04/4.%20%E6%96%87%E4%BB%B6%E5%88%86%E5%8C%BA/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="文件分区1. 文件分区是指什么？文件分区很少有资料介绍，但是在众多数据库组件的最佳实践中通常会以 benchmark 告诉我们这一个建议。 文件分区包括两件事：  将原本一个大文件分为多个小文件。例如，将一个大数据量的文件分为多个小文件进行存储。例如 Kafka 中为避免 WAL Log 过大，使用了 LogSegment 概念，当某一个 LogSegment 足够大时，就创建一个新的 LogSe">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-02-04T02:34:09.216Z">
+<meta property="article:modified_time" content="2023-02-04T02:33:07.975Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2023/02/04/4.%20%E6%96%87%E4%BB%B6%E5%88%86%E5%8C%BA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title> | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">142</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2023/02/04/4.%20%E6%96%87%E4%BB%B6%E5%88%86%E5%8C%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-02-04 10:34:09 / 修改时间：10:33:07" itemprop="dateCreated datePublished" datetime="2023-02-04T10:34:09+08:00">2023-02-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="文件分区"><a href="#文件分区" class="headerlink" title="文件分区"></a>文件分区</h1><h2 id="1-文件分区是指什么？"><a href="#1-文件分区是指什么？" class="headerlink" title="1. 文件分区是指什么？"></a>1. 文件分区是指什么？</h2><p>文件分区很少有资料介绍，但是在众多数据库组件的最佳实践中通常会以 benchmark 告诉我们这一个建议。</p>
+<p>文件分区包括两件事：</p>
+<ol>
+<li><strong>将原本一个大文件分为多个小文件</strong>。例如，将一个大数据量的文件分为多个小文件进行存储。例如 Kafka 中为避免 WAL Log 过大，使用了 LogSegment 概念，当某一个 LogSegment 足够大时，就创建一个新的 LogSegment，用于后续的日志写入；</li>
+<li><strong>将用途不同的文件存储于不同的磁盘上</strong>。例如，MySQL 通常推荐将事务日志文件与数据文件分别存储于本机挂载的不同磁盘上。</li>
+</ol>
+<p>下面我们分析一下文件分区的意义。</p>
+<h2 id="2-文件分区的意义"><a href="#2-文件分区的意义" class="headerlink" title="2. 文件分区的意义"></a>2. 文件分区的意义</h2><h3 id="2-1-减少文件锁粒度，提高并发-I-O-潜力"><a href="#2-1-减少文件锁粒度，提高并发-I-O-潜力" class="headerlink" title="2.1 减少文件锁粒度，提高并发 I/O 潜力"></a>2.1 减少文件锁粒度，提高并发 I/O 潜力</h3><p>正如<a target="_blank" rel="noopener" href="https://spongecaptain.cool/SimpleClearFileIO/9.%20%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E9%A1%BA%E5%BA%8F%E8%AF%BB%E5%86%99.html"> 如何实现顺序读写</a>中指出，为了确保实现物理上真正的顺序 I/O，在涉及多线并发读写时，我们必须使用锁机制。这里的锁通常是文件锁，一个文件一把锁。锁可以由操作系统提供，但更常见的是在用户应用中额外使用一把锁。</p>
+<p>依赖于锁机制的线程并发能力提高可以通过细化锁粒度实现。一个大文件分为多个小文件，意味着将一个大锁分为多个小锁，这样一来，锁粒度细化，线程冲突可能性降低，系统的整体 I/O 能力得到提高。</p>
+<h3 id="2-2-简化索引实现"><a href="#2-2-简化索引实现" class="headerlink" title="2.2 简化索引实现"></a>2.2 简化索引实现</h3><p>一般的日志存储系统有如下特点：</p>
+<ul>
+<li>每一条日志所占数据长度不一致（你无法事先确认用户试图写入 “Hello World” 还是 “Hi Spongecaptain”）；</li>
+<li>日志顺序存储，例如在磁盘上编号 101 的日志顺序存储于编号 100 的日志之后；</li>
+</ul>
+<p>为了提高日志存储系统的查询效率，我们必然需要实现索引。</p>
+<p>在不进行日志文件分区的情况下，即只有一个日志文件，那么如果要提供随机日志查询与范围查询的能力，那么索引系统必须为每一条日志设计一个 Tree 上的节点。但是如果日志非常多，那么索引 Tree 将拥有非常多的节点，存在查询效率降低的问题。</p>
+<p>如果进行日志分区，大日志文件分为多个小日志文件进行存储，那么如果要提供随机日志查询与范围查询能力，那么我们可以为每一个小日志文件分别设计一个索引文件，由于每一个索引 Tree 的节点数不会特别多，因此我们总是能够确保较好的查询效率。</p>
+<p>Kafka 的日志索引就基于此思想实现。</p>
+<h3 id="2-3-分磁盘存储文件提高磁盘-I-O-效率"><a href="#2-3-分磁盘存储文件提高磁盘-I-O-效率" class="headerlink" title="2.3 分磁盘存储文件提高磁盘 I/O 效率"></a>2.3 分磁盘存储文件提高磁盘 I/O 效率</h3><p>文件分区的另一个含义是将不同文件存储于不同磁盘上，不过前提自然是你拥有多个磁盘与需要多个文件。正如前文所属，MySQL 通常推荐将事务日志文件（WAL）与数据文件（B+Tree）分别存储于本机上挂载的不同磁盘上。</p>
+<p>分磁盘存储文件的优势主要有如下：</p>
+<ol>
+<li>实现并行磁盘 I/O；</li>
+<li>不同文件的 I/O 模式特质不同（顺序 or 随机）；</li>
+<li>更可靠的持久化保证；</li>
+</ol>
+<p><strong>1.并行磁盘 I/O</strong></p>
+<p>多个磁盘具备属于各自的驱动，因此可以进行并行的磁盘 I/O（你可以想象多个磁盘的磁头在并行移动），比单磁盘的操作系统在磁盘 I/O 具备更好的性能。</p>
+<p><strong>2.屏蔽不同磁盘 I/O 方式之间的干扰</strong></p>
+<p>另一方面，不同文件的 I/O 模式特性不同。例如，MySQL 中的事务日志文件主要进行顺序 I/O 读写，而数据文件（B+Tree）主要进行随机 I/O 读写。如果随机 I/O 与顺序 I/O 共用一块磁盘，那么随机 I/O 会影响顺序 I/O 的磁盘调度，导致磁盘吞吐量下降。</p>
+<p><strong>3.更可靠的持久化保证</strong></p>
+<p>如果数据本身所在的磁盘损坏了，但是你有在另一个磁盘上存储着 <a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/sql/relational-databases/backup-restore/tail-log-backups-sql-server">tail-of-the-log backup</a>，那么重新执行一遍写日志那么就能够得到完全一样的数据。这种情况下，持久化机制更可靠了。例如假设一个磁盘一年内发生损坏的概率为 2%，那么持久化的可靠性可以通过双磁盘提高至 1-2%*2% =99.96%。</p>
+<h2 id="REFERENCE"><a href="#REFERENCE" class="headerlink" title="REFERENCE"></a>REFERENCE</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnkirito.moe/file-io-best-practise/">文件 IO 操作的一些最佳实践</a></li>
+<li><a target="_blank" rel="noopener" href="https://dba.stackexchange.com/questions/15827/is-there-a-performance-benefit-to-placing-transaction-log-files-on-a-separate-dr">Is there a performance benefit to placing transaction log files on a separate drive?</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.brentozar.com/archive/2017/06/separating-data-log-files-make-server-reliable/">Does Separating Data and Log Files Make Your Server More Reliable?</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/02/04/3.%20mmap/" rel="prev" title="">
+      <i class="fa fa-chevron-left"></i> 
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/02/04/5.%20Java%20ByteBuffer%E4%B8%8E%20Channel/" rel="next" title="">
+       <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%88%86%E5%8C%BA"><span class="nav-number">1.</span> <span class="nav-text">文件分区</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%96%87%E4%BB%B6%E5%88%86%E5%8C%BA%E6%98%AF%E6%8C%87%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">1. 文件分区是指什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%96%87%E4%BB%B6%E5%88%86%E5%8C%BA%E7%9A%84%E6%84%8F%E4%B9%89"><span class="nav-number">1.2.</span> <span class="nav-text">2. 文件分区的意义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%87%8F%E5%B0%91%E6%96%87%E4%BB%B6%E9%94%81%E7%B2%92%E5%BA%A6%EF%BC%8C%E6%8F%90%E9%AB%98%E5%B9%B6%E5%8F%91-I-O-%E6%BD%9C%E5%8A%9B"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 减少文件锁粒度，提高并发 I&#x2F;O 潜力</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E7%AE%80%E5%8C%96%E7%B4%A2%E5%BC%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 简化索引实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E5%88%86%E7%A3%81%E7%9B%98%E5%AD%98%E5%82%A8%E6%96%87%E4%BB%B6%E6%8F%90%E9%AB%98%E7%A3%81%E7%9B%98-I-O-%E6%95%88%E7%8E%87"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 分磁盘存储文件提高磁盘 I&#x2F;O 效率</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#REFERENCE"><span class="nav-number">1.3.</span> <span class="nav-text">REFERENCE</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">142</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

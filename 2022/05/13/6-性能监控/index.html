@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="监控方式Diamond（Telegraf InfluxDB官方的數據採集） + InfluxDB + Grafana 运行InfluxDB及Grafana以下說明以docker運行InfluxDB及Grafana的程序，首先在系統上建立需要的directories: 1mkdir -p &#x2F;BGdata&#x2F;&amp;#123;influxdb,grafana&amp;#125; &#x2F;var&#x2F;log&#x2F;grafana  在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="6.性能监控">
+<meta property="og:url" content="https://sk-xinye.github.io/2022/05/13/6-%E6%80%A7%E8%83%BD%E7%9B%91%E6%8E%A7/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="监控方式Diamond（Telegraf InfluxDB官方的數據採集） + InfluxDB + Grafana 运行InfluxDB及Grafana以下說明以docker運行InfluxDB及Grafana的程序，首先在系統上建立需要的directories: 1mkdir -p &#x2F;BGdata&#x2F;&amp;#123;influxdb,grafana&amp;#125; &#x2F;var&#x2F;log&#x2F;grafana  在">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-05-13T09:43:42.000Z">
+<meta property="article:modified_time" content="2023-02-04T02:33:07.968Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2022/05/13/6-%E6%80%A7%E8%83%BD%E7%9B%91%E6%8E%A7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>6.性能监控 | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">142</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2022/05/13/6-%E6%80%A7%E8%83%BD%E7%9B%91%E6%8E%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          6.性能监控
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-13 17:43:42" itemprop="dateCreated datePublished" datetime="2022-05-13T17:43:42+08:00">2022-05-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-02-04 10:33:07" itemprop="dateModified" datetime="2023-02-04T10:33:07+08:00">2023-02-04</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="监控方式"><a href="#监控方式" class="headerlink" title="监控方式"></a>监控方式</h2><p>Diamond（Telegraf InfluxDB官方的數據採集） + InfluxDB + Grafana</p>
+<h3 id="运行InfluxDB及Grafana"><a href="#运行InfluxDB及Grafana" class="headerlink" title="运行InfluxDB及Grafana"></a>运行InfluxDB及Grafana</h3><p>以下說明以docker運行InfluxDB及Grafana的程序，首先在系統上建立需要的directories:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /BGdata/&#123;influxdb,grafana&#125; /var/log/grafana</span><br></pre></td></tr></table></figure>
+
+<p>在power.git中已有現成的docker-compose YML文件:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3&#x27;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">    <span class="attr">influxdb:</span></span><br><span class="line">        <span class="attr">image:</span> <span class="string">influxdb:1.8.3</span></span><br><span class="line">        <span class="attr">container_name:</span> <span class="string">influxdb</span></span><br><span class="line">        <span class="attr">network_mode:</span> <span class="string">host</span></span><br><span class="line">        <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">        <span class="attr">environment:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">INFLUXDB_HTTP_LOG_ENABLED=false</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">INFLUXDB_DATA_QUERY_LOG_ENABLED=false</span></span><br><span class="line">        <span class="attr">volumes:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">/BGdata/influxdb:/var/lib/influxdb</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">grafana:</span></span><br><span class="line">        <span class="attr">image:</span> <span class="string">grafana/grafana:7.3.1</span></span><br><span class="line">        <span class="attr">container_name:</span> <span class="string">grafana</span></span><br><span class="line">        <span class="attr">network_mode:</span> <span class="string">host</span></span><br><span class="line">        <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">        <span class="attr">user:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">volumes:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">/BGdata/grafana:/var/lib/grafana</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">/var/log/grafana:/var/log/grafana</span></span><br></pre></td></tr></table></figure>
+
+<p>上面定義了兩個docker containers，influxdb及grafana，並且設置需要的volume mapping等等。</p>
+<p>接下來使用docker-compose開啟這兩個containers:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@sj-node2 monitor]# /opt/py3.6/ve1/bin/docker-compose -f mon.yml up -d</span><br><span class="line">Creating influxdb ... done</span><br><span class="line">Creating grafana  ... done</span><br><span class="line">[root@sj-node2 monitor]# /opt/py3.6/ve1/bin/docker-compose -f mon.yml ps</span><br><span class="line">  Name            Command           State   Ports</span><br><span class="line">-------------------------------------------------</span><br><span class="line">grafana    /run.sh                  Up</span><br><span class="line">influxdb   /entrypoint.sh influxd   Up</span><br></pre></td></tr></table></figure>
+
+<p>開始使用之前還需要在InfluxDB中建立一個database用來儲存採集的數據，這個可以直接在運行中的influxdb container中使用”influx”工具完成:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@sj-node2 monitor]# docker exec -it influxdb /bin/bash</span><br><span class="line">root@sj-node2:/#</span><br><span class="line">root@sj-node2:/# influx</span><br><span class="line">Connected to http://localhost:8086 version 1.8.3</span><br><span class="line">InfluxDB shell version: 1.8.3</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> show databases</span></span><br><span class="line">name: databases</span><br><span class="line">name</span><br><span class="line">----</span><br><span class="line">_internal</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> create database grafana</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> show databases</span></span><br><span class="line">name: databases</span><br><span class="line">name</span><br><span class="line">----</span><br><span class="line">_internal</span><br><span class="line">grafana</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>以上步驟在InfluxDB中建立一個”grafana” database，完成後，就可以開始將監控採集數據寫入這個database中</p>
+<h3 id="Diamond-build-install"><a href="#Diamond-build-install" class="headerlink" title="Diamond build/install"></a>Diamond build/install</h3><p>目前已經在公司內部bitbucket建立了一個Diamond的git repo:</p>
+<p>ssh://git@192.168.1.139:7999/analytics/diamond.git</p>
+<p>Production版本位於”4.0”分支上，是基於4.0.515版本(最近的一個release)，再加上了兩個小改動:</p>
+<ul>
+<li>支持與較新版本InfluxDB的相容性</li>
+<li>支持配置InfluxDB server的base URL</li>
+</ul>
+<p>除了上面這兩個改動，另外也從master分支合併了關於Elasticsearch collector的幾個小改動，包括支持配置指定username/password (ES開啟authentication的場景)</p>
+<p>注意Diamond用的是CentOS 7上default的Python 2.7，因此build環境中需要:</p>
+<ul>
+<li>Python 2.7: CentOS 7已經default安裝</li>
+<li>pip: 可用”yum install python2-pip”安裝</li>
+<li>Python的”setuptools”模塊: 可用”pip install setuptools”安裝</li>
+<li>Python的”wheel”模塊: 可用”pip install wheel”安裝</li>
+</ul>
+<p>在準備好的build環境中，如下build出一個wheel包:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[ahuang@sj-node1 tmp]$ git clone ssh://git@192.168.1.139:7999/analytics/diamond.git</span><br><span class="line">...</span><br><span class="line">[ahuang@sj-node1 tmp]$ cd diamond/</span><br><span class="line">[ahuang@sj-node1 diamond]$ git checkout 4.0</span><br><span class="line">Branch 4.0 set up to track remote branch 4.0 from origin.</span><br><span class="line">Switched to a new branch &#x27;4.0&#x27;</span><br><span class="line">[ahuang@sj-node1 diamond]$ make bdist_wheel</span><br><span class="line">...</span><br><span class="line">[ahuang@sj-node1 diamond]$ ls -l dist/</span><br><span class="line">total 316</span><br><span class="line">-rw-rw-r--. 1 ahuang ahuang 322632 Nov 13  2020 diamond-4.0.531_zs4-py2.py3-none-any.whl</span><br><span class="line">[ahuang@sj-node1 diamond]$</span><br></pre></td></tr></table></figure>
+
+<p>這個wheel包可以直接用pip安裝在目標系統上，另外目標系統上也須要Python的”influxdb”模塊，例如使用以下命令同時安裝:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install influxdb dist/diamond-4.0.531_zs4-py2.py3-none-any.whl</span><br></pre></td></tr></table></figure>
+
+<p>運行Diamond及config</p>
+<p>如 上安裝diamond後，運行config的位置為”/etc/diamond/diamond.conf”，可先將diamond config的例子copy一份，再基於此做修改，另外，diamond本身運行的日志位於”/var/log/diamond” directory，第一次運行前需要建立此directory:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cp /usr/lib/python2.7/site-packages/etc/diamond/diamond.conf.example /etc/diamond/diamond.conf</span><br><span class="line">mkdir /var/log/diamond</span><br></pre></td></tr></table></figure>
+
+<p>使用以下命令運行diamond</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/diamond</span><br></pre></td></tr></table></figure>
+
+<p>如果需要troubleshoot運行問題(例如config格式錯誤)，可以用debug模式:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/diamond -f -l</span><br></pre></td></tr></table></figure>
+
+<p>Diamond支持非常多的輸入數據源(collectors)及輸出目的地(handlers)，上面的config example中有一些基本的選項，詳細文件可參考:<br><a target="_blank" rel="noopener" href="https://diamond.readthedocs.io/en/latest/">https://diamond.readthedocs.io/en/latest/</a></p>
+<p>以下以SJ office用於ES節點監控的例子，說明一些需要的config選項</p>
+<p>輸出(handlers)選項<br>這裡要使用的輸出目的地是InfluxDB，因此首先需要在diamond.conf中設定handlers (位於”[server]”下):</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[server]</span><br><span class="line">...</span><br><span class="line">handlers = diamond.handler.influxdbHandler.InfluxdbHandler</span><br></pre></td></tr></table></figure>
+
+<p>InfluxdbHandler本身也需要一些選項，因此在”[handlers]”下加上以下這段:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[handlers]</span><br><span class="line">...</span><br><span class="line">[[InfluxdbHandler]]</span><br><span class="line">hostname = 192.168.200.19</span><br><span class="line">batch_size = 100</span><br><span class="line">database = grafana</span><br><span class="line">username = grafana</span><br><span class="line">password = grafana</span><br><span class="line">base_url = /example/proxy/path</span><br></pre></td></tr></table></figure>
+
+<p>這裡的hostname是InfluxDB的位置，database、username、password根據在InfluxDB server上建立的database來設定，base_url則是InfluxDB server的base URL，可供proxy使用(如果不設定則default是””，也就是沒有)，例如，上面在InfluxDB中建立一個名為”grafana”的database，username、password、base_url都不用設定</p>
+<p>輸入(collectors)選項<br>Diamond中的各種collectors支持監控不同的metrics，所有collectors共用的選項中有兩個較重要:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[collectors]</span><br><span class="line">[[default]]</span><br><span class="line">hostname = ...</span><br><span class="line">interval = ...</span><br></pre></td></tr></table></figure>
+
+<p>以下說明:</p>
+<ul>
+<li>hostname: 指定用來標記採集到數據的名字，如果不設定，自動使用系統OS設定的hostname (一般不需要設定)<br>interval: 多久採集一次數據，default是300秒，可視需要調整。(除了這個共用的選項，每個collector也可以指定該collector本身的interval)</li>
+<li>這裡的config例子中已經開啟了幾個基本的collectors (例如CPU、memory、disk等等)，我們再加上一個採集Elasticsearch狀況的collector:</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[collectors]</span><br><span class="line">...</span><br><span class="line">[[ElasticSearchCollector]]</span><br><span class="line">enabled = True</span><br></pre></td></tr></table></figure>
+
+<p>除了主要的diamond.conf之外，每個collector也可以有自己的config file，例如這裡我們再給兩個collectors加上config files指定一些針對個別collector的選項:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/etc/diamond/collectors/ElasticSearchCollector.conf</span><br><span class="line">enabled = True</span><br><span class="line">interval = 120</span><br><span class="line">cluster = True</span><br><span class="line"></span><br><span class="line">/etc/diamond/collectors/DiskUsageCollector.conf</span><br><span class="line">enabled = True</span><br><span class="line">interval = 120</span><br></pre></td></tr></table></figure>
+
+<p>數據寫入InfluxDB<br>以上面描述的方式配置、運行Diamond後，假設配置正確，Diamond會開始將監控數據寫入InfluxDB中的database，這裡以上面建立的”grafana” database為例，我們可以在InfluxDB的docker container中，使用”influx”工具來確認數據是否寫入:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@sj-node2 ~]# docker exec -it influxdb /bin/bash</span><br><span class="line">root@sj-node2:/#</span><br><span class="line">root@sj-node2:/# influx</span><br><span class="line">Connected to http://localhost:8086 version 1.8.3</span><br><span class="line">InfluxDB shell version: 1.8.3</span><br><span class="line"><span class="meta">&gt;</span></span><br><span class="line"><span class="bash">&gt; show databases</span></span><br><span class="line">name: databases</span><br><span class="line">name</span><br><span class="line">----</span><br><span class="line">_internal</span><br><span class="line">grafana</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> use grafana</span></span><br><span class="line">Using database grafana</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上面使用influx工具連接上InfluxDB並選擇”grafana”這個database</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> show measurements</span></span><br><span class="line">...</span><br><span class="line">servers.sj-node2.memory.MemAvailable</span><br><span class="line">servers.sj-node2.memory.MemFree</span><br><span class="line">servers.sj-node2.memory.MemTotal</span><br><span class="line">servers.sj-node2.memory.Shmem</span><br><span class="line">servers.sj-node2.memory.SwapCached</span><br><span class="line">servers.sj-node2.memory.SwapFree</span><br><span class="line">servers.sj-node2.memory.SwapTotal</span><br><span class="line">servers.sj-node2.memory.VmallocChunk</span><br><span class="line">servers.sj-node2.memory.VmallocTotal</span><br><span class="line">servers.sj-node2.memory.VmallocUsed</span><br><span class="line">servers.sj-node2.vmstat.pgfault</span><br><span class="line">servers.sj-node2.vmstat.pgmajfault</span><br><span class="line">servers.sj-node2.vmstat.pgpgin</span><br><span class="line">servers.sj-node2.vmstat.pgpgout</span><br><span class="line">servers.sj-node2.vmstat.pswpin</span><br><span class="line">servers.sj-node2.vmstat.pswpout</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>這裡”show measurements”命令顯示了此database中包括的監控metrics，因為包括ES中所有indices的metrics，數量很多，這裡只顯示少數為例。</p>
+<p>在InfluxDB中，每個measurement類似於一個傳統database中的table，InfluxDB提供一個類似於傳統SQL的”InfluxQL”語言，可用於對InfluxDB databases做查詢等等，例如:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> select * from <span class="string">&quot;servers.sj-node2.memory.MemAvailable&quot;</span></span></span><br><span class="line">name: servers.sj-node2.memory.MemAvailable</span><br><span class="line">time                value</span><br><span class="line">----                -----</span><br><span class="line">...</span><br><span class="line">1605652120000000000 33875619840</span><br><span class="line">1605652150000000000 33873670144</span><br><span class="line">1605652180000000000 33927344128</span><br><span class="line">1605652210000000000 33900642304</span><br><span class="line">1605652240000000000 33892270080</span><br><span class="line">1605652270000000000 33880412160</span><br><span class="line">1605652300000000000 33892970496</span><br><span class="line">1605652330000000000 33865535488</span><br><span class="line">1605652360000000000 33865523200</span><br><span class="line">1605652390000000000 33871003648</span><br><span class="line">1605652420000000000 33889140736</span><br><span class="line">1605652450000000000 33888215040</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>這裡的”select …”命令顯示此measurement中目前為止已經寫入的數據，每筆數據包括一個timestamp及value</p>
+<p>關於”influx”工具、InfluxQL語言等等的詳細文件可參見: <a target="_blank" rel="noopener" href="https://docs.influxdata.com/influxdb/v1.8/">https://docs.influxdata.com/influxdb/v1.8/</a></p>
+<p>使用Grafana<br>上面使用docker-compose已經開啟了Grafana，使用browser連接URL “https://<IP>:3000”，首先使用以下步驟添加data source:</p>
+<ul>
+<li><p>使用default的username/password “admin”/“admin”登入</p>
+</li>
+<li><p>選擇左側的”Configuration”-&gt;”Data Sources”</p>
+</li>
+<li><p>選擇”Add data source”</p>
+</li>
+<li><p>Data source type選擇InfluxDB</p>
+</li>
+<li><p>細節配置的部分，如果根據以上的測試程序，這裡大部分可以不填，只需改動以下配置:</p>
+<ul>
+<li>“HTTP”-&gt;”URL”: “http://<IP>:8086”</li>
+<li>“InfluxDB Details”-&gt;”Database”: “grafana”</li>
+</ul>
+</li>
+<li><p>選擇”Save &amp; Test”，Grafana根據配置測試後顯示”Data source is working”，並且儲存data source的配置</p>
+</li>
+<li><p>再選擇左側的”Configuration”-&gt;”Data Sources”，可看到上面配置的data source，名為”InfluxDB”(這個是default name，如果需要可以在上面配置時改名)<br>配置好data source後，就可以將監控數據做可視化，在power.git中已經有一個Grafana dashboard的基本例子”src/monitor/grafana-dash-diamond.json”，可以使用以下步驟import這個例子:</p>
+</li>
+<li><p>選擇左側的”Dashboards”→”Manage”</p>
+</li>
+<li><p>選擇”Import”</p>
+</li>
+<li><p>選擇”Upload JSON file”</p>
+</li>
+<li><p>選擇上面提到的”grafana-dash-diamond.json”</p>
+</li>
+<li><p>Options可以保留defaults不需改動，選擇”Import”<br>完成import後即可看到dashboard顯示目前有的監控數據:</p>
+</li>
+</ul>
+<p>注意這裡上方的”src”選項顯示的是之前建立的data source，而”node”選項則會自動列出data source中所有存在的hosts</p>
+<h3 id="influxdb的快照和还原"><a href="#influxdb的快照和还原" class="headerlink" title="influxdb的快照和还原"></a>influxdb的快照和还原</h3><h4 id="快照"><a href="#快照" class="headerlink" title="快照"></a>快照</h4><p>在influxdb容器所在的节点上进行以下操作：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it influxdb bash</span><br><span class="line">influxd backup -portable -database grafana -start 2022-01-17T02:00:00Z -end 2022-01-18T13:00:00Z /tmp/data/grafana （此命令中的时间为UTC时间，需要在实际时间上减8小时）</span><br><span class="line">cd /tmp</span><br><span class="line">tar cvf ./data.tar ./data/*</span><br><span class="line">rm -rf data/</span><br><span class="line">exit</span><br><span class="line">docker cp influxdb:/tmp/data.tar /home/zshield/data.tar</span><br></pre></td></tr></table></figure>
+
+<h4 id="还原"><a href="#还原" class="headerlink" title="还原"></a>还原</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker cp data.tar influxdb:/</span><br><span class="line">docker exec -it influxdb /bin/bash</span><br><span class="line">tar -xvf data.tar</span><br><span class="line">influxd restore -portable -db grafana  -newdb  anhui_527 /data/grafana    (这样就将原来库grafana还原成 anhui_527)</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/02/18/2-%E7%8E%AF%E5%A2%83%E5%8C%85/" rel="prev" title="2.环境包">
+      <i class="fa fa-chevron-left"></i> 2.环境包
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/05/18/3-%E5%B8%B8%E8%A7%84%E4%BD%BF%E7%94%A8/" rel="next" title="3.常规使用">
+      3.常规使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%91%E6%8E%A7%E6%96%B9%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">监控方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E8%A1%8CInfluxDB%E5%8F%8AGrafana"><span class="nav-number">1.1.</span> <span class="nav-text">运行InfluxDB及Grafana</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Diamond-build-install"><span class="nav-number">1.2.</span> <span class="nav-text">Diamond build&#x2F;install</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#influxdb%E7%9A%84%E5%BF%AB%E7%85%A7%E5%92%8C%E8%BF%98%E5%8E%9F"><span class="nav-number">1.3.</span> <span class="nav-text">influxdb的快照和还原</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BF%AB%E7%85%A7"><span class="nav-number">1.3.1.</span> <span class="nav-text">快照</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%98%E5%8E%9F"><span class="nav-number">1.3.2.</span> <span class="nav-text">还原</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">142</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

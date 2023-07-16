@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="k8s搭建搭建 关闭防火墙  $ systemctl stop firewalld $ systemctl disable firewalld  由于 CentOS8 防火墙使用了 nftables，但 Docker 尚未支持 nftables， 我们可以使用如下设置使用 iptables： 更改 &#x2F;etc&#x2F;firewalld&#x2F;firewalld.conf #FirewallBackend&#x3D;nft">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2.k8s部署">
+<meta property="og:url" content="https://sk-xinye.github.io/2023/04/25/2-k8s%E9%83%A8%E7%BD%B2/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="k8s搭建搭建 关闭防火墙  $ systemctl stop firewalld $ systemctl disable firewalld  由于 CentOS8 防火墙使用了 nftables，但 Docker 尚未支持 nftables， 我们可以使用如下设置使用 iptables： 更改 &#x2F;etc&#x2F;firewalld&#x2F;firewalld.conf #FirewallBackend&#x3D;nft">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-04-25T06:15:33.000Z">
+<meta property="article:modified_time" content="2023-07-16T13:14:55.062Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2023/04/25/2-k8s%E9%83%A8%E7%BD%B2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>2.k8s部署 | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">142</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2023/04/25/2-k8s%E9%83%A8%E7%BD%B2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          2.k8s部署
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-25 14:15:33" itemprop="dateCreated datePublished" datetime="2023-04-25T14:15:33+08:00">2023-04-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-07-16 21:14:55" itemprop="dateModified" datetime="2023-07-16T21:14:55+08:00">2023-07-16</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="k8s搭建"><a href="#k8s搭建" class="headerlink" title="k8s搭建"></a>k8s搭建</h2><h3 id="搭建"><a href="#搭建" class="headerlink" title="搭建"></a>搭建</h3><ol>
+<li><p>关闭防火墙</p>
+<p> $ systemctl stop firewalld<br> $ systemctl disable firewalld</p>
+<p> 由于 CentOS8 防火墙使用了 nftables，但 Docker 尚未支持 nftables， 我们可以使用如下设置使用 iptables：<br> 更改 /etc/firewalld/firewalld.conf<br> #FirewallBackend=nftables<br> FirewallBackend=iptables</p>
+</li>
+<li><p>关闭selinux</p>
+<p> $ sed -i ‘s/enforcing/disabled/‘ /etc/selinux/config  # 永久<br> $ setenforce 0  # 临时</p>
+</li>
+<li><p>关闭swap<br> $ swapoff -a  # 临时<br> $ vim /etc/fstab  注释掉 swap行挂载 # 永久  </p>
+</li>
+<li><p>设置主机名：<br> $ hostnamectl set-hostname <hostname></p>
+</li>
+<li><p>在master添加hosts：<br> $ cat &gt;&gt; /etc/hosts &lt;&lt; EOF<br> 192.168.81.192 node-192<br> 192.168.81.193 node-193<br> 192.168.81.194 node-194<br> EOF</p>
+</li>
+<li><p>将桥接的IPv4流量传递到iptables的链：<br> $ cat &gt; /etc/sysctl.d/k8s.conf &lt;&lt; EOF<br> net.bridge.bridge-nf-call-ip6tables = 1<br> net.bridge.bridge-nf-call-iptables = 1<br> EOF<br> $ sysctl –system  # 生效</p>
+</li>
+<li><p>时间同步：<br> $ yum install ntpdate -y<br> $ ntpdate time.windows.com</p>
+</li>
+<li><p>安装docker<br>yum install -y yum-utils<br>yum-config-manager     –add-repo     <a target="_blank" rel="noopener" href="https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo">https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo</a><br>sed -i ‘s/download.docker.com/mirrors.aliyun.com/docker-ce/g’ /etc/yum.repos.d/docker-ce.repo<br>yum-config-manager –enable docker-ce-test<br>yum install docker-ce docker-ce-cli containerd.io<br>systemctl enable docker<br>systemctl start docker<br>systemctl enable docker.service</p>
+<p>问题发生时，清理镜像：</p>
+<pre><code> docker system prune
+ systemctl stop kubelet
+ systemctl stop docker
+ systemctl start docker
+ systemctl start kubelet
+</code></pre>
+</li>
+<li><p>配置镜像仓库</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> cat &gt; /etc/docker/daemon.json &lt;&lt; <span class="string">EOF</span></span></span><br><span class="line">&#123;</span><br><span class="line">&quot;registry-mirrors&quot;: [&quot;https://b9pmyelo.mirror.aliyuncs.com&quot;]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure></li>
+<li><p>添加k8s yum源</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> cat &gt; /etc/yum.repos.d/kubernetes.repo &lt;&lt; <span class="string">EOF</span></span></span><br><span class="line">[kubernetes]</span><br><span class="line">name=Kubernetes</span><br><span class="line">baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=0</span><br><span class="line">repo_gpgcheck=0</span><br><span class="line">gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure></li>
+<li><p>安装kubeadm，kubelet和kubectl</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum install -y kubelet-1.18.0 kubeadm-1.18.0 kubectl-1.18.0</span><br><span class="line">systemctl enable kubelet</span><br><span class="line">kubeadm version #查看版本</span><br></pre></td></tr></table></figure></li>
+<li><p>加载镜像</p>
+<p>kubeadm config images list  查看需要的镜像列表<br>./load-images.sh</p>
+</li>
+<li><p>部署 K8S master</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">kubeadm init \</span><br><span class="line">    --apiserver-advertise-address=192.168.81.192 \</span><br><span class="line">    --image-repository registry.aliyuncs.com/google_containers \  内网需要去掉这行</span><br><span class="line">    --kubernetes-version v1.18.0 \</span><br><span class="line">    --service-cidr=10.92.0.0/12 \</span><br><span class="line">    --pod-network-cidr=10.220.0.0/16 \</span><br><span class="line">    --ignore-preflight-errors=all</span><br><span class="line"></span><br><span class="line">kubeadm join 192.168.81.192:6443 --token xivvbs.rdmeg2w6g8i0m1ww --discovery-token-ca-cert-hash sha256:3f475490aaf5a86a4d0a83e40579b73b5ac4debf17dece0300e910fc542c2b70</span><br><span class="line"></span><br><span class="line">mkdir -p $HOME/.kube</span><br><span class="line">sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config   # 如果需要node节点使用kubectl ，可以将该文件复制到对应的node 节点位置</span><br><span class="line">sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br><span class="line"><span class="meta">$</span><span class="bash"> kubectl get nodes</span></span><br><span class="line"></span><br><span class="line">kubectl get pods -n kube-system  查看状态</span><br><span class="line">kubeadm token create --print-join-command 查看加入集群命令</span><br><span class="line">kubectl taint nodes --all node-role.kubernetes.io/master-  容忍master部署服务</span><br></pre></td></tr></table></figure></li>
+<li><p>node节点加入集群</p>
+<p>kubeadm join 192.168.81.192:6443 –token xivvbs.rdmeg2w6g8i0m1ww –discovery-token-ca-cert-hash sha256:3f475490aaf5a86a4d0a83e40579b73b5ac4debf17dece0300e910fc542c2b70<br>kubectl label node node-193 node-role.kubernetes.io/worker=worker 打标签 可做可不做<br>kubectl label node node-194 node-role.kubernetes.io/worker=worker</p>
+</li>
+<li><p>安装网络插件</p>
+<p>docker load -i mirrored-flannelcni-flannel-cni-plugin.xz<br>docker load -i flannel.xz</p>
+<p>docker apply -f kubectl apply -f kube-flannel.yml<br>问题：open /etc/resolv.conf: no such file or directory  随意添加一个dns文件即可 nameserver 8.8.8.8</p>
+</li>
+<li><p>helm安装</p>
+</li>
+</ol>
+<ol start="17">
+<li>问题</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">解决 Error: cannot re-use a name that is still in use</span><br><span class="line">解决方案如下：</span><br><span class="line">helm ls --all-namespaces</span><br><span class="line">kubectl delete namespace kuberhealthy</span><br><span class="line">kubectl create namespace kuberhealthy</span><br></pre></td></tr></table></figure>
+
+
+<p>python -m zbuild.command.cloud_pkg pkg.include=[‘zs_power’] cache=/home/zshield/zhaoyu/v3 pkg.name=test_0506 pkg.zip=true server.zs_power.git.branch=feature/feature/PBUZZSHYY-2854-tmp-0506 server.zs_power.git.tag=null server.zs_power.git.build_shell=container/aliyun_zs_power_3.6/build.sh server.zs_power.version=test0506-3 extra_vars=qa</p>
+<p>kubectl delete –all pods –namespace=foo<br>kubectl delete po <code>kubectl get po -n spark-sk | grep test | awk &#39;&#123;print $1&#125;&#39;</code>  –grace-period=0 –force -n spark-sk 批量删除pod<br>kubectl delete pods <pod> –grace-period=0 –force</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/25/1-cdh%E6%90%AD%E5%BB%BA/" rel="prev" title="1.cdh搭建">
+      <i class="fa fa-chevron-left"></i> 1.cdh搭建
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/06/02/3-operator%E6%B5%8B%E8%AF%95/" rel="next" title="3.operator测试">
+      3.operator测试 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#k8s%E6%90%AD%E5%BB%BA"><span class="nav-number">1.</span> <span class="nav-text">k8s搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA"><span class="nav-number">1.1.</span> <span class="nav-text">搭建</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">142</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

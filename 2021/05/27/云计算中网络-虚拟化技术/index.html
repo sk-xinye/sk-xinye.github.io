@@ -27,10 +27,18 @@
 <meta property="og:site_name" content="sk-xinyeの博客">
 <meta property="og:description" content="概念 我们常把物理机比喻为自己拿地盖房子，而虚拟机则相当于购买公寓，更加灵活方面，随时可买可卖。 qemu-kvm。从名字上来讲，emu 就是 Emulator（模拟器）的意思，主要会模拟 CPU、内存、网络、硬盘，使得虚拟机感觉自己在使用独立的设备，但是真正使用的时候，当然还是使用物理的设备。 KVM（Kernel Virtual Machine）是Linux的一个内核驱动模块，它能够让Linu">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1%E5%8E%9F%E7%90%86.jpeg">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/%E7%BD%91%E6%A1%A5.jpeg">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/%E6%A1%A5%E6%8E%A5.jpeg">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/net.jpeg">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/net_all.jpeg">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/vlan.jpg">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/vlan.jpg">
 <meta property="article:published_time" content="2021-05-27T01:58:48.000Z">
-<meta property="article:modified_time" content="2021-05-29T13:45:31.835Z">
+<meta property="article:modified_time" content="2023-02-04T02:33:07.941Z">
 <meta property="article:author" content="sk-xinye">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sk-xinye.github.io/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1%E5%8E%9F%E7%90%86.jpeg">
 
 <link rel="canonical" href="https://sk-xinye.github.io/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/">
 
@@ -116,7 +124,7 @@
   <ul id="menu" class="menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
 
   </li>
         <li class="menu-item menu-item-about">
@@ -131,12 +139,12 @@
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">15</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">111</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">142</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -224,17 +232,8 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-29 21:45:31" itemprop="dateModified" datetime="2021-05-29T21:45:31+08:00">2021-05-29</time>
+                <time title="修改时间：2023-02-04 10:33:07" itemprop="dateModified" datetime="2023-02-04T10:33:07+08:00">2023-02-04</time>
               </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
-                </span>
-            </span>
 
           
 
@@ -271,7 +270,7 @@
 </ul>
 </li>
 </ul>
-<h2 id="虚拟网卡原理"><a href="#虚拟网卡原理" class="headerlink" title="虚拟网卡原理"></a>虚拟网卡原理</h2>
+<h2 id="虚拟网卡原理"><a href="#虚拟网卡原理" class="headerlink" title="虚拟网卡原理"></a>虚拟网卡原理</h2><img src="/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1%E5%8E%9F%E7%90%86.jpeg" class="">
 
 <ul>
 <li>虚拟机是物理机上跑着的一个软件。这个软件可以像其他应用打开文件一样，打开一个称为 TUN/TAP 的 Char Dev（字符设备文件）。打开了这个字符设备文件之后，在物理机上就能看到一张虚拟 TAP 网卡。</li>
@@ -283,22 +282,23 @@
 <li>互通：分两个方面，一个是如果同一台机器上的两个虚拟机，属于同一个用户的话，这两个如何相互通信？另一个是如果不同物理机上的两个虚拟机，属于同一个用户的话，这两个如何相互通信？</li>
 <li>灵活：虚拟机和物理不同，会经常创建、删除，从一个机器漂移到另一台机器，有的互通、有的不通等等，灵活性比物理网络要好得多，需要能够灵活配置。</li>
 </ul>
-<h4 id="共享与互通问题"><a href="#共享与互通问题" class="headerlink" title="共享与互通问题"></a>共享与互通问题</h4>
+<h4 id="共享与互通问题"><a href="#共享与互通问题" class="headerlink" title="共享与互通问题"></a>共享与互通问题</h4><img src="/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/%E7%BD%91%E6%A1%A5.jpeg" class="">
 
 <ul>
 <li><p>一台物理机上的多个虚拟机，通过虚拟交换机（网桥），linux上命令brctl,可以创建虚拟的网桥brctl addbr br0。这样多台虚拟机配置相同的子网网段就可以相互通信了。</p>
 </li>
 <li><p>如何与外界通信呢？</p>
 <ul>
-<li>桥接（如果使用桥接网络，当你登录虚拟机里看 IP 地址的时候会发现，你的虚拟机的地址和你的笔记本电脑的，以及你旁边的同事的电脑的网段是一个网段）</li>
-<li>Net(虚拟机的网络是虚拟机的，物理机的网络是物理机的，两个不相同。虚拟机要想访问物理机的时候，需要将地址 NAT 成为物理机的地址)
-</li>
+<li>桥接（如果使用桥接网络，当你登录虚拟机里看 IP 地址的时候会发现，你的虚拟机的地址和你的笔记本电脑的，以及你旁边的同事的电脑的网段是一个网段）<img src="/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/%E6%A1%A5%E6%8E%A5.jpeg" class=""></li>
+<li>Net(虚拟机的网络是虚拟机的，物理机的网络是物理机的，两个不相同。虚拟机要想访问物理机的时候，需要将地址 NAT 成为物理机的地址)<img src="/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/net.jpeg" class="">
+<img src="/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/net_all.jpeg" class=""></li>
 </ul>
 </li>
 </ul>
 <h4 id="隔离问题"><a href="#隔离问题" class="headerlink" title="隔离问题"></a>隔离问题</h4><ul>
 <li>brctl 创建的网桥也是支持 VLAN 功能的，可以设置两个虚拟机的 tag，这样在这个虚拟网桥上，两个虚拟机是不互通的。</li>
-<li>外界互通（由于 brctl 创建的网桥上面的 tag 是没办法在网桥之外的范围内起作用的，因此我们需要使用命令 vconfig）。通过使用<strong>vconfig</strong>，可以基于物理网卡 eth0 创建带 VLAN 的虚拟网卡，所有从这个虚拟网卡出去的包，都带这个 VLAN，如果这样，跨物理机的互通和隔离就可以通过这个网卡来实现。</li>
+<li>外界互通（由于 brctl 创建的网桥上面的 tag 是没办法在网桥之外的范围内起作用的，因此我们需要使用命令 vconfig）。通过使用<strong>vconfig</strong>，可以基于物理网卡 eth0 创建带 VLAN 的虚拟网卡，所有从这个虚拟网卡出去的包，都带这个 VLAN，如果这样，跨物理机的互通和隔离就可以通过这个网卡来实现。<img src="/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/vlan.jpg" class="">
+<img src="/2021/05/27/%E4%BA%91%E8%AE%A1%E7%AE%97%E4%B8%AD%E7%BD%91%E7%BB%9C-%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF/vlan.jpg" class=""></li>
 </ul>
 
     </div>
@@ -394,15 +394,9 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">111</span>
+          <span class="site-state-item-count">142</span>
           <span class="site-state-item-name">日志</span>
         </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">15</span>
-        <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
 </div>
@@ -428,7 +422,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

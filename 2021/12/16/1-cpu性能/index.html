@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="性能工具uptime123$ uptime02:34:03 up 2 days, 20:14,  1 user,  load average: 0.63, 0.83, 0.88当前时间     系统运行时间  正在登陆用户      1分钟 5分钟  15分钟平均负载（load average）  stress mpstat pidstat12345678910111213141516171819">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1.cpu性能">
+<meta property="og:url" content="https://sk-xinye.github.io/2021/12/16/1-cpu%E6%80%A7%E8%83%BD/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="性能工具uptime123$ uptime02:34:03 up 2 days, 20:14,  1 user,  load average: 0.63, 0.83, 0.88当前时间     系统运行时间  正在登陆用户      1分钟 5分钟  15分钟平均负载（load average）  stress mpstat pidstat12345678910111213141516171819">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/12/16/1-cpu%E6%80%A7%E8%83%BD/cpu%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87.webp">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/12/16/1-cpu%E6%80%A7%E8%83%BD/cpu%E6%80%A7%E8%83%BD%E5%B7%A5%E5%85%B7.webp">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/12/16/1-cpu%E6%80%A7%E8%83%BD/%E5%B7%A5%E5%85%B7%E6%8C%87%E6%A0%87.webp">
+<meta property="og:image" content="https://sk-xinye.github.io/2021/12/16/1-cpu%E6%80%A7%E8%83%BD/cpu%E5%88%86%E6%9E%90%E6%B5%81%E7%A8%8B.webp">
+<meta property="article:published_time" content="2021-12-16T09:00:46.000Z">
+<meta property="article:modified_time" content="2023-02-04T02:33:07.928Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sk-xinye.github.io/2021/12/16/1-cpu%E6%80%A7%E8%83%BD/cpu%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87.webp">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2021/12/16/1-cpu%E6%80%A7%E8%83%BD/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>1.cpu性能 | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">142</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2021/12/16/1-cpu%E6%80%A7%E8%83%BD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          1.cpu性能
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-16 17:00:46" itemprop="dateCreated datePublished" datetime="2021-12-16T17:00:46+08:00">2021-12-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-02-04 10:33:07" itemprop="dateModified" datetime="2023-02-04T10:33:07+08:00">2023-02-04</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="性能工具"><a href="#性能工具" class="headerlink" title="性能工具"></a>性能工具</h2><h3 id="uptime"><a href="#uptime" class="headerlink" title="uptime"></a>uptime</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> uptime</span></span><br><span class="line">02:34:03 up 2 days, 20:14,  1 user,  load average: 0.63, 0.83, 0.88</span><br><span class="line">当前时间     系统运行时间  正在登陆用户      1分钟 5分钟  15分钟平均负载（load average）</span><br></pre></td></tr></table></figure>
+
+<h3 id="stress-mpstat-pidstat"><a href="#stress-mpstat-pidstat" class="headerlink" title="stress mpstat pidstat"></a>stress mpstat pidstat</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">cpu 密集型排查</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> stress --cpu 1 --timeout 600</span></span><br><span class="line">stress 是一个 Linux 系统压力测试工具，这里我们用作异常进程模拟平均负载升高的场景。</span><br><span class="line">sysstat 包含了常用的 Linux 性能工具，用来监控和分析系统的性能。</span><br><span class="line">我们的案例会用到这个包的两个命令 mpstat 和 pidstat。</span><br><span class="line">mpstat 是一个常用的多核 CPU 性能分析工具，用来实时查看每个 CPU 的性能指标，以及所有 CPU 的平均指标。</span><br><span class="line">pidstat 是一个常用的进程性能分析工具，用来实时查看进程的 CPU、内存、I/O 以及上下文切换等性能指标。</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> -d 参数表示高亮显示变化的区域</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> watch -d uptime</span></span><br><span class="line">...,  load average: 1.00, 0.75, 0.39</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> -P ALL 表示监控所有CPU，后面数字5表示间隔5秒后输出一组数据</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> mpstat -P ALL 5</span></span><br><span class="line">Linux 4.15.0 (ubuntu) 09/22/18 _x86_64_ (2 CPU)</span><br><span class="line">13:30:06     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle</span><br><span class="line">13:30:11     all   50.05    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00   49.95</span><br><span class="line">13:30:11       0    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00</span><br><span class="line">13:30:11       1  100.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 间隔5秒后输出一组数据</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> pidstat -u 5 1</span></span><br><span class="line">13:37:07      UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command</span><br><span class="line">13:37:12        0      2962  100.00    0.00    0.00    0.00  100.00     1  stress</span><br><span class="line">从这里可以明显看到，stress 进程的 CPU 使用率为 100%</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">I/O密集型排查</span><br><span class="line"><span class="meta">$</span><span class="bash"> stress -i 1 --timeout 600</span></span><br><span class="line"></span><br><span class="line"><span class="meta">$</span><span class="bash"> watch -d uptime</span></span><br><span class="line">...,  load average: 1.06, 0.58, 0.37</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 显示所有CPU的指标，并在间隔5秒输出一组数据</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> mpstat -P ALL 5 1</span></span><br><span class="line">Linux 4.15.0 (ubuntu)     09/22/18     _x86_64_    (2 CPU)</span><br><span class="line">13:41:28     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle</span><br><span class="line">13:41:33     all    0.21    0.00   12.07   32.67    0.00    0.21    0.00    0.00    0.00   54.84</span><br><span class="line">13:41:33       0    0.43    0.00   23.87   67.53    0.00    0.43    0.00    0.00    0.00    7.74</span><br><span class="line">13:41:33       1    0.00    0.00    0.81    0.20    0.00    0.00    0.00    0.00    0.00   98.99</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 间隔5秒后输出一组数据，-u表示CPU指标</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> pidstat -u 5 1 -d</span></span><br><span class="line">Linux 4.15.0 (ubuntu)     09/22/18     _x86_64_    (2 CPU)</span><br><span class="line">13:42:08      UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command</span><br><span class="line">13:42:13        0       104    0.00    3.39    0.00    0.00    3.39     1  kworker/1:1H</span><br><span class="line">13:42:13        0       109    0.00    0.40    0.00    0.00    0.40     0  kworker/0:1H</span><br><span class="line">13:42:13        0      2997    2.00   35.53    0.00    3.99   37.52     1  stress</span><br><span class="line">13:42:13        0      3057    0.00    0.40    0.00    0.00    0.40     0  pidstat</span><br></pre></td></tr></table></figure>
+
+<h3 id="vmstat"><a href="#vmstat" class="headerlink" title="vmstat"></a>vmstat</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">vmstat 是一个常用的系统性能分析工具，主要用来分析系统的内存使用情况，也常用来分析 CPU 上下文切换和中断的次数。</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 每隔5秒输出1组数据</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> vmstat 5</span></span><br><span class="line">procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----</span><br><span class="line">r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st</span><br><span class="line">0  0      0 7005360  91564 818900    0    0     0     0   25   33  0  0 100  0  0</span><br><span class="line">cs（context switch）是每秒上下文切换的次数。</span><br><span class="line">in（interrupt）则是每秒中断的次数。</span><br><span class="line">r（Running or Runnable）是就绪队列的长度，也就是正在运行和等待 CPU 的进程数。</span><br><span class="line">b（Blocked）则是处于不可中断睡眠状态的进程数。</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 每隔5秒输出1组数据 加 -t显示线程</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> pidstat -w 5</span></span><br><span class="line">Linux 4.15.0 (ubuntu)  09/23/18  _x86_64_  (2 CPU)</span><br><span class="line"></span><br><span class="line">08:18:26      UID       PID   cswch/s nvcswch/s  Command</span><br><span class="line">08:18:31        0         1      0.20      0.00  systemd</span><br><span class="line">08:18:31        0         8      5.40      0.00  rcu_sched</span><br></pre></td></tr></table></figure>
+
+<h3 id="ab测试工具"><a href="#ab测试工具" class="headerlink" title="ab测试工具"></a>ab测试工具</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 并发100个请求测试Nginx性能，总共测试1000个请求</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ab -c 100 -n 1000 http://192.168.0.10:10000/</span></span><br><span class="line">This is ApacheBench, Version 2.3 &lt;$Revision: 1706008 $&gt;</span><br><span class="line">Copyright 1996 Adam Twiss, Zeus Technology Ltd,</span><br><span class="line">...</span><br><span class="line">Requests per second:    87.86 [#/sec] (mean)</span><br><span class="line">Time per request:       1138.229 [ms] (mean)</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h3 id="perf-工具"><a href="#perf-工具" class="headerlink" title="perf 工具"></a>perf 工具</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">perf 工具使用 见5 6</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> -g 开启调用关系，-p指定进程号</span></span><br><span class="line">pref top -g -p 1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看使用最多的函数</span></span><br><span class="line">perf top</span><br><span class="line"><span class="meta">#</span><span class="bash"> 记录性能事件，等待大约15秒后按 Ctrl+C 退出</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> perf record -g</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 查看报告</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> perf report</span></span><br><span class="line"></span><br><span class="line">短时进程</span><br><span class="line"><span class="meta">#</span><span class="bash"> 按 Ctrl+C 结束</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> execsnoop</span></span><br><span class="line">PCOMM            PID    PPID   RET ARGS</span><br><span class="line">sh               30394  30393    0</span><br><span class="line">stress           30396  30394    0 /usr/local/bin/stress -t 1 -d 1</span><br><span class="line">sh               30398  30393    0</span><br><span class="line">stress           30399  30398    0 /usr/local/bin/stress -t 1 -d 1</span><br><span class="line">sh               30402  30400    0</span><br><span class="line">stress           30403  30402    0 /usr/local/bin/stress -t 1 -d 1</span><br><span class="line">sh               30405  30393    0</span><br><span class="line">stress           30407  30405    0 /usr/local/bin/stress -t 1 -d 1</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h3 id="pidstat"><a href="#pidstat" class="headerlink" title="pidstat"></a>pidstat</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">IO wait 较高时</span><br><span class="line"><span class="meta">#</span><span class="bash"> -d 展示 I/O 统计数据，-p 指定进程号，间隔 1 秒输出 3 组数据</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> pidstat -d -p 4344 1 3</span></span><br><span class="line">06:38:50      UID       PID   kB_rd/s   kB_wr/s kB_ccwr/s iodelay  Command</span><br><span class="line">06:38:51        0      4344      0.00      0.00      0.00       0  app</span><br><span class="line">06:38:52        0      4344      0.00      0.00      0.00       0  app</span><br><span class="line">06:38:53        0      4344      0.00      0.00      0.00       0  app</span><br></pre></td></tr></table></figure>
+
+<h3 id="dstat"><a href="#dstat" class="headerlink" title="dstat"></a>dstat</h3><p>dstat ，它的好处是，可以同时查看 CPU 和 I/O 这两种资源的使用情况，便于对比分析。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 间隔1秒输出10组数据</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> dstat 1 10</span></span><br><span class="line">You did not select any stats, using -cdngy by default.</span><br><span class="line">--total-cpu-usage-- -dsk/total- -net/total- ---paging-- ---system--</span><br><span class="line">usr sys idl wai stl| read  writ| recv  send|  in   out | int   csw</span><br><span class="line">  0   0  96   4   0|1219k  408k|   0     0 |   0     0 |  42   885</span><br><span class="line">  0   0   2  98   0|  34M    0 | 198B  790B|   0     0 |  42   138</span><br><span class="line">  0   0   0 100   0|  34M    0 |  66B  342B|   0     0 |  42   135</span><br><span class="line">  0   0  84  16   0|5633k    0 |  66B  342B|   0     0 |  52   177</span><br><span class="line">  0   3  39  58   0|  22M    0 |  66B  342B|   0     0 |  43   144</span><br><span class="line">  0   0   0 100   0|  34M    0 | 200B  450B|   0     0 |  46   147</span><br><span class="line">  0   0   2  98   0|  34M    0 |  66B  342B|   0     0 |  45   134</span><br><span class="line">  0   0   0 100   0|  34M    0 |  66B  342B|   0     0 |  39   131</span><br><span class="line">  0   0  83  17   0|5633k    0 |  66B  342B|   0     0 |  46   168</span><br><span class="line">  0   3  39  59   0|  22M    0 |  66B  342B|   0     0 |  37   134</span><br><span class="line"></span><br><span class="line">  可以看到每当 iowait 升高（wai）时，磁盘的读请求（read）都会很大。这说明 iowait 的升高跟磁盘的读请求有关，很可能就是磁盘读导致的。</span><br></pre></td></tr></table></figure>
+
+<h3 id="sar-tcpdump"><a href="#sar-tcpdump" class="headerlink" title="sar tcpdump"></a>sar tcpdump</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sar 可以用来查看系统的网络收发情况，还有一个好处是，不仅可以观察网络收发的吞吐量（BPS，每秒收发的字节数），还可以观察网络收发的 PPS，即每秒收发的网络帧数。</span><br><span class="line"><span class="meta">#</span><span class="bash"> -n DEV 表示显示网络收发的报告，间隔1秒输出一组数据</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sar -n DEV 1</span></span><br><span class="line">15:03:46        IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil</span><br><span class="line">15:03:47         eth0  12607.00   6304.00    664.86    358.11      0.00      0.00      0.00      0.01</span><br><span class="line">15:03:47      docker0   6302.00  12604.00    270.79    664.66      0.00      0.00      0.00      0.00</span><br><span class="line">15:03:47           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">15:03:47    veth9f6bbcd   6302.00  12604.00    356.95    664.66      0.00      0.00      0.00      0.05、</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> -i eth0 只抓取eth0网卡，-n不解析协议名和主机名</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> tcp port 80表示只抓取tcp协议并且端口号为80的网络帧</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> tcpdump -i eth0 -n tcp port 80</span></span><br><span class="line">15:11:32.678966 IP 192.168.0.2.18238 &gt; 192.168.0.30.80: Flags [S], seq 458303614, win 512, length 0</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h2 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h2><p><strong>平均负载：</strong>是指单位时间内，系统处于可运行状态和不可中断状态的平均进程数，也就是平均活跃进程数，它和 CPU 使用率并没有直接关系。<br><strong>可运行状态进程：</strong>是指正在使用 CPU 或者正在等待 CPU 的进程，也就是我们常用 ps 命令看到的，处于 R 状态（Running 或 Runnable）的进程。<br><strong>不可中断状态进程：</strong>是指正处于内核态关键流程中的进程，并且这些流程是不可打断的，比如最常见的是等待硬件设备的 I/O 响应，也就是我们在 ps 命令中看到的 D 状态（Uninterruptible Sleep，也称为 Disk Sleep）的进程。<br><strong>cpu上下文：</strong>CPU 寄存器，是 CPU 内置的容量小、但速度极快的内存。而程序计数器，则是用来存储 CPU 正在执行的指令位置、或者即将执行的下一条指令位置。它们都是 CPU 在运行任何任务前，必须的依赖环境<br><strong>CPU 上下文切换：</strong>就是先把前一个任务的 CPU 上下文（也就是 CPU 寄存器和程序计数器）保存起来，然后加载新任务的上下文到这些寄存器和程序计数器，最后再跳转到程序计数器所指的新位置，运行新任务。包括<strong>进程上下文切换、线程上下文切换以及中断上下文切换。一次系统调用的过程，其实是发生了两次 CPU 上下文切换，用户态到内核态，内核态到用户态</strong></p>
+<p>一次系统调用的过程，其实是发生了两次 CPU 上下文切换</p>
+<h2 id="指标"><a href="#指标" class="headerlink" title="指标"></a>指标</h2><h3 id="平均负载"><a href="#平均负载" class="headerlink" title="平均负载"></a>平均负载</h3><p>对于应用负载最理想的，就是每个 CPU 上都刚好运行着一个进程  即对于2c的系统，load average 最好为2</p>
+<p>首先你要知道系统有几个 CPU，这可以通过 top 命令或者从文件 /proc/cpuinfo 中读取，如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 关于grep和wc的用法请查询它们的手册或者网络搜索</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> grep <span class="string">&#x27;model name&#x27;</span> /proc/cpuinfo | wc -l</span></span><br><span class="line">2</span><br></pre></td></tr></table></figure>
+
+<p><strong>当平均负载高于 CPU 数量 70% 的时候</strong>，你就应该分析排查负载高的问题了。一旦负载过高，就可能导致进程响应变慢，进而影响服务的正常功能。</p>
+<h3 id="平均负载与-CPU-使用率"><a href="#平均负载与-CPU-使用率" class="headerlink" title="平均负载与 CPU 使用率"></a>平均负载与 CPU 使用率</h3><p><strong>平均负载：</strong>不仅包括了正在使用 CPU 的进程，还包括等待 CPU 和等待 I/O 的进程。<br><strong>CPU 使用率:</strong> 是单位时间内 CPU 繁忙情况的统计，跟平均负载并不一定完全对应。比如:<br>    - CPU 密集型进程，使用大量 CPU 会导致平均负载升高，此时这两者是一致的；<br>    - I/O 密集型进程，等待 I/O 也会导致平均负载升高，但 CPU 使用率不一定很高；<br>    - 大量等待 CPU 的进程调度也会导致平均负载升高，此时的 CPU 使用率也会比较高。</p>
+<h3 id="进程上下文切换"><a href="#进程上下文切换" class="headerlink" title="进程上下文切换"></a>进程上下文切换</h3><p>无法获取资源而导致的自愿上下文切换；<br>被系统强制调度导致的非自愿上下文切换。</p>
+<h3 id="CPU-缓存的命中率"><a href="#CPU-缓存的命中率" class="headerlink" title="CPU 缓存的命中率"></a>CPU 缓存的命中率</h3><img src="/2021/12/16/1-cpu%E6%80%A7%E8%83%BD/cpu%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87.webp" class="">
+
+<h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><h3 id="根据指标找工具"><a href="#根据指标找工具" class="headerlink" title="根据指标找工具"></a>根据指标找工具</h3><img src="/2021/12/16/1-cpu%E6%80%A7%E8%83%BD/cpu%E6%80%A7%E8%83%BD%E5%B7%A5%E5%85%B7.webp" class="">
+
+<h3 id="根据工具查指标"><a href="#根据工具查指标" class="headerlink" title="根据工具查指标"></a>根据工具查指标</h3><img src="/2021/12/16/1-cpu%E6%80%A7%E8%83%BD/%E5%B7%A5%E5%85%B7%E6%8C%87%E6%A0%87.webp" class="">
+
+<h3 id="分析流程"><a href="#分析流程" class="headerlink" title="分析流程"></a>分析流程</h3><img src="/2021/12/16/1-cpu%E6%80%A7%E8%83%BD/cpu%E5%88%86%E6%9E%90%E6%B5%81%E7%A8%8B.webp" class="">
+
+<h2 id="CPU-优化"><a href="#CPU-优化" class="headerlink" title="CPU 优化"></a>CPU 优化</h2><h3 id="应用程序优化"><a href="#应用程序优化" class="headerlink" title="应用程序优化"></a>应用程序优化</h3><p>编译器优化：很多编译器都会提供优化选项，适当开启它们，在编译阶段你就可以获得编译器的帮助，来提升性能。比如， gcc 就提供了优化选项 -O2，开启后会自动对应用程序的代码进行优化。<br>算法优化：使用复杂度更低的算法，可以显著加快处理速度。比如，在数据比较大的情况下，可以用 O(nlogn) 的排序算法（如快排、归并排序等），代替 O(n^2) 的排序算法（如冒泡、插入排序等）。<br>异步处理：使用异步处理，可以避免程序因为等待某个资源而一直阻塞，从而提升程序的并发处理能力。比如，把轮询替换为事件通知，就可以避免轮询耗费 CPU 的问题。<br>多线程代替多进程：前面讲过，相对于进程的上下文切换，线程的上下文切换并不切换进程地址空间，因此可以降低上下文切换的成本。<br>善用缓存：经常访问的数据或者计算过程中的步骤，可以放到内存中缓存起来，这样在下次用时就能直接从内存中获取，加快程序的处理速度。</p>
+<h3 id="系统优化"><a href="#系统优化" class="headerlink" title="系统优化"></a>系统优化</h3><p>CPU 绑定：把进程绑定到一个或者多个 CPU 上，可以提高 CPU 缓存的命中率，减少跨 CPU 调度带来的上下文切换问题。<br>CPU 独占：跟 CPU 绑定类似，进一步将 CPU 分组，并通过 CPU 亲和性机制为其分配进程。这样，这些 CPU 就由指定的进程独占，换句话说，不允许其他进程再来使用这些 CPU。<br>优先级调整：使用 nice 调整进程的优先级，正值调低优先级，负值调高优先级。优先级的数值含义前面我们提到过，忘了的话及时复习一下。在这里，适当降低非核心应用的优先级，增高核心应用的优先级，可以确保核心应用得到优先处理。<br>为进程设置资源限制：使用 Linux cgroups 来设置进程的 CPU 使用上限，可以防止由于某个应用自身的问题，而耗尽系统资源。<br>NUMA（Non-Uniform Memory Access）优化：支持 NUMA 的处理器会被划分为多个 node，每个 node 都有自己的本地内存空间。NUMA 优化，其实就是让 CPU 尽可能只访问本地内存。<br>中断负载均衡：无论是软中断还是硬中断，它们的中断处理程序都可能会耗费大量的 CPU。开启 irqbalance 服务或者配置 smp_affinity，就可以把中断处理过程自动负载均衡到多个 CPU 上。</p>
+<h3 id="补充判定"><a href="#补充判定" class="headerlink" title="补充判定"></a>补充判定</h3><ul>
+<li>自愿上下文切换变多了，说明进程都在等待资源，有可能发生了 I/O 等其他问题；</li>
+<li>非自愿上下文切换变多了，说明进程都在被强制调度，也就是都在争抢 CPU，说明 CPU 的确成了瓶颈；</li>
+<li>中断次数变多了，说明 CPU 被中断处理程序占用，还需要通过查看 /proc/interrupts 文件来分析具体的中断类型。</li>
+</ul>
+<p>mpstat pidstat vmstat 联合判断是什么的性能瓶颈</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/12/16/0-%E6%80%A7%E8%83%BD%E6%A6%82%E8%A7%88/" rel="prev" title="0.性能概览">
+      <i class="fa fa-chevron-left"></i> 0.性能概览
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/12/19/2-%E5%86%85%E5%AD%98/" rel="next" title="2.内存">
+      2.内存 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%B7%A5%E5%85%B7"><span class="nav-number">1.</span> <span class="nav-text">性能工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#uptime"><span class="nav-number">1.1.</span> <span class="nav-text">uptime</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stress-mpstat-pidstat"><span class="nav-number">1.2.</span> <span class="nav-text">stress mpstat pidstat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vmstat"><span class="nav-number">1.3.</span> <span class="nav-text">vmstat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ab%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7"><span class="nav-number">1.4.</span> <span class="nav-text">ab测试工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#perf-%E5%B7%A5%E5%85%B7"><span class="nav-number">1.5.</span> <span class="nav-text">perf 工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pidstat"><span class="nav-number">1.6.</span> <span class="nav-text">pidstat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dstat"><span class="nav-number">1.7.</span> <span class="nav-text">dstat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sar-tcpdump"><span class="nav-number">1.8.</span> <span class="nav-text">sar tcpdump</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A"><span class="nav-number">2.</span> <span class="nav-text">名词解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E6%A0%87"><span class="nav-number">3.</span> <span class="nav-text">指标</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B3%E5%9D%87%E8%B4%9F%E8%BD%BD"><span class="nav-number">3.1.</span> <span class="nav-text">平均负载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B3%E5%9D%87%E8%B4%9F%E8%BD%BD%E4%B8%8E-CPU-%E4%BD%BF%E7%94%A8%E7%8E%87"><span class="nav-number">3.2.</span> <span class="nav-text">平均负载与 CPU 使用率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2"><span class="nav-number">3.3.</span> <span class="nav-text">进程上下文切换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CPU-%E7%BC%93%E5%AD%98%E7%9A%84%E5%91%BD%E4%B8%AD%E7%8E%87"><span class="nav-number">3.4.</span> <span class="nav-text">CPU 缓存的命中率</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E6%8C%87%E6%A0%87%E6%89%BE%E5%B7%A5%E5%85%B7"><span class="nav-number">4.1.</span> <span class="nav-text">根据指标找工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E5%B7%A5%E5%85%B7%E6%9F%A5%E6%8C%87%E6%A0%87"><span class="nav-number">4.2.</span> <span class="nav-text">根据工具查指标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E6%B5%81%E7%A8%8B"><span class="nav-number">4.3.</span> <span class="nav-text">分析流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU-%E4%BC%98%E5%8C%96"><span class="nav-number">5.</span> <span class="nav-text">CPU 优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F%E4%BC%98%E5%8C%96"><span class="nav-number">5.1.</span> <span class="nav-text">应用程序优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E4%BC%98%E5%8C%96"><span class="nav-number">5.2.</span> <span class="nav-text">系统优化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A5%E5%85%85%E5%88%A4%E5%AE%9A"><span class="nav-number">5.3.</span> <span class="nav-text">补充判定</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">142</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

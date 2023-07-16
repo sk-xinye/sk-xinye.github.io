@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="Java ByteBuffer与 Chanel引言Java NIO（Socket）由以下几个核心部分组成：  Buffer Channel Selector  Selector 重在实现 Socket 的事件驱动模型，是实现 NIO 的关键。而 Buffer 以及 Channel 则提供了一种面向缓冲区的尽力读写功能。  传统的 I&#x2F;O 操作面向数据流，意味着每次从流中读一个或多个字节，直至完成，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sk-xinyeの博客">
+<meta property="og:url" content="https://sk-xinye.github.io/2023/02/04/5.%20Java%20ByteBuffer%E4%B8%8E%20Channel/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="Java ByteBuffer与 Chanel引言Java NIO（Socket）由以下几个核心部分组成：  Buffer Channel Selector  Selector 重在实现 Socket 的事件驱动模型，是实现 NIO 的关键。而 Buffer 以及 Channel 则提供了一种面向缓冲区的尽力读写功能。  传统的 I&#x2F;O 操作面向数据流，意味着每次从流中读一个或多个字节，直至完成，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/5.%20Java%20ByteBuffer%E4%B8%8E%20Channel/images/image-20200516175258273.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/5.%20Java%20ByteBuffer%E4%B8%8E%20Channel/images/image-20200516175651521.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/5.%20Java%20ByteBuffer%E4%B8%8E%20Channel/images/image-20200520114203738.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/5.%20Java%20ByteBuffer%E4%B8%8E%20Channel/images/image-20200516195346349.png">
+<meta property="article:published_time" content="2023-02-04T02:34:09.220Z">
+<meta property="article:modified_time" content="2023-02-04T02:33:07.976Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sk-xinye.github.io/2023/02/04/5.%20Java%20ByteBuffer%E4%B8%8E%20Channel/images/image-20200516175258273.png">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2023/02/04/5.%20Java%20ByteBuffer%E4%B8%8E%20Channel/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title> | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">142</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2023/02/04/5.%20Java%20ByteBuffer%E4%B8%8E%20Channel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-02-04 10:34:09 / 修改时间：10:33:07" itemprop="dateCreated datePublished" datetime="2023-02-04T10:34:09+08:00">2023-02-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Java-ByteBuffer与-Chanel"><a href="#Java-ByteBuffer与-Chanel" class="headerlink" title="Java ByteBuffer与 Chanel"></a>Java ByteBuffer与 Chanel</h1><h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>Java NIO（Socket）由以下几个核心部分组成：</p>
+<ol>
+<li>Buffer</li>
+<li>Channel</li>
+<li>Selector</li>
+</ol>
+<p>Selector 重在实现 Socket 的事件驱动模型，是实现 NIO 的关键。而 Buffer 以及 Channel 则提供了一种面向缓冲区的尽力读写功能。</p>
+<ul>
+<li>传统的 I/O 操作面向数据流，意味着每次从流中读一个或多个字节，直至完成，数据没有被缓存在任何地方。</li>
+<li>NIO 操作面向缓冲区，数据从 Channel 读取到 Buffer 缓冲区，随后在 Buffer 中处理数据。</li>
+</ul>
+<p>本节会结合 Netty 框架进行说明，因为其是一个出色的高性能 Java NIO 通信框架。</p>
+<h2 id="1-Buffer"><a href="#1-Buffer" class="headerlink" title="1. Buffer"></a>1. Buffer</h2><h3 id="1-1-Buffer-概述"><a href="#1-1-Buffer-概述" class="headerlink" title="1.1 Buffer 概述"></a>1.1 Buffer 概述</h3><blockquote>
+<p>A buffer is a linear, finite sequence of elements of a specific primitive type.</p>
+</blockquote>
+<p>一块缓存区，内部使用字节数组存储数据，并维护几个特殊变量，实现数据的反复利用。</p>
+<blockquote>
+<p>下面虽然会介绍 Buffer 内部字段，但不用过于纠结 Buffer 内部的字段的含义，重要的是了解 Buffer 的特性：</p>
+<ul>
+<li>同一个 Buffer 既可读又可写；</li>
+<li>Buffer 的读模式、写模式之间的相互转换需要调用具体方法，读模式式下写会报错，写模式写读也会报错。</li>
+<li>当我们需要与 NIO Channel 进行交互时，我们就需要使用到 NIO Buffer，即数据从 Buffer 读取到 Channel 中，或者从 Channel 中写入到 Buffer 中。</li>
+<li>实际上，一个 Buffer 其实就是一块内存区域，我们可以在这个内存区域中进行数据的读写。NIO Buffer 其实是这样的内存块的一个封装，并提供了一些操作方法让我们能够方便地进行数据的读写。</li>
+</ul>
+</blockquote>
+<ol>
+<li><strong>mark</strong>：初始值为 - 1，用于备份当前的 position;</li>
+<li><strong>position</strong>：初始值为 0，position 表示当前可以写入或读取数据的位置，当写入或读取一个数据后，position 向前移动到下一个位置；因为仅仅支持顺序读写，所以当 Buffer 的读写模式切换时，position 会切换到可读的初始索引处以及可写的初始索引处。</li>
+<li><strong>limit</strong>：写模式下，limit 表示最多能往 Buffer 里写多少数据，等于 capacity 值；读模式下，limit 表示最多可以读取多少数据。</li>
+<li><strong>capacity</strong>：缓存数组大小。</li>
+</ol>
+<p><img src="./images/image-20200516175258273.png" alt="image-20200516175258273"></p>
+<p>**mark()**：把当前的 position 赋值给 mark</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">mark</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    mark = position;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>**reset()**：把 mark 值还原给 position</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">reset</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> m = mark;</span><br><span class="line">    <span class="keyword">if</span> (m &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> InvalidMarkException();</span><br><span class="line">    position = m;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>**clear()**：一旦读完 Buffer 中的数据，需要让 Buffer 准备好再次被写入，clear 会恢复状态值，但不会擦除数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">clear</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    position = <span class="number">0</span>;</span><br><span class="line">    limit = capacity;</span><br><span class="line">    mark = -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>**flip()**：Buffer 有两种模式，写模式和读模式，flip 后 Buffer 从写模式变成读模式，或者相反。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">flip</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    limit = position;</span><br><span class="line">    position = <span class="number">0</span>;</span><br><span class="line">    mark = -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>**rewind()**：重置 position 为 0，从头读写数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">rewind</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    position = <span class="number">0</span>;</span><br><span class="line">    mark = -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>目前 Buffer 的实现类包括：ByteBuffer、CharBuffer、DoubleBuffer、FloatBuffer、IntBuffer、LongBuffer、ShortBuffer、MappedByteBuffer，继承关系如下图所示：</p>
+<p><img src="./images/image-20200516175651521.png" alt="image-20200516175651521"></p>
+<h3 id="1-2-ByteBuffer-以及-HeapByteBuffer、DirectByteBuffer"><a href="#1-2-ByteBuffer-以及-HeapByteBuffer、DirectByteBuffer" class="headerlink" title="1.2 ByteBuffer 以及 HeapByteBuffer、DirectByteBuffer"></a>1.2 ByteBuffer 以及 HeapByteBuffer、DirectByteBuffer</h3><blockquote>
+<p>它们本质上都是字节数组，只是一个在堆内，一个堆外（直接内存）。</p>
+</blockquote>
+<p>ByteBuffer 的实现类包括 “HeapByteBuffer” 和 “DirectByteBuffer” 两种。</p>
+<p>我们可以调用 ByteBuffer 类的两个静态方法得到上述两个子类实现：</p>
+<ul>
+<li><p><strong>HeapByteBuffer#allocate</strong></p>
+<p>这个实例的构造实际上最终调用的是 Buffer 类的构造器，也就是说内存空间直接上分配在由 JVM 管理的堆空间中，其内部实际上为一个 byte 数组。</p>
+</li>
+<li><p><strong>DirectByteBuffer#allocateDirect</strong></p>
+<p>这个实例通过 unsafe#allocateMemory 方法申请堆外内存，并在 ByteBuffer 的 address 变量中维护指向该内存的地址。</p>
+</li>
+</ul>
+<p>可见，这两种 Buffer 的最大区别于数据在内存何处，是位于 JVM 堆内还是堆外，Java 的 NIO 模式同时支持这两种 Buffer。</p>
+<blockquote>
+<p>注意：Java 中的 Direct 并不是指操作系统的 Direct I/O，不过他们的作用是类似的。</p>
+</blockquote>
+<h3 id="1-3-为什么通常和-NIO-搭配的是-DirectByteBuffer"><a href="#1-3-为什么通常和-NIO-搭配的是-DirectByteBuffer" class="headerlink" title="1.3 为什么通常和 NIO 搭配的是 DirectByteBuffer"></a>1.3 为什么通常和 NIO 搭配的是 DirectByteBuffer</h3><blockquote>
+<p>参考网址：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/60892134">知乎：Java NIO direct buffer 的优势在哪儿？</a></p>
+<p>其它一些平台可能是在错误地把一些概念整混了。</p>
+<p>这个问题也是个伪命题，因为 NIO 和 HeapByteBuffer 以及 DirectByteBuffer 可以随意搭配，没有任何关系。NIO 对比于 BIO 的性能提升并不在于可以使用 DirectByteBuffer（这仅仅是一个影响非常小的优势）。更大的优势在于凭借单线程就能够处理在 BIO 中多线程才能够处理好的众多网络连接。</p>
+</blockquote>
+<ul>
+<li><p>HeapByteBuffer：</p>
+<p>Socket&lt;—-&gt; <strong>内核空间的缓存区 &lt;—-&gt; 堆外 &lt;—-&gt;堆内</strong>。</p>
+</li>
+<li><p>DirectByteBuffer：</p>
+<p>Socket &lt;—-&gt; <strong>内核空间的缓存区 &lt;—-&gt; 堆外</strong>。</p>
+</li>
+</ul>
+<blockquote>
+<p>堆内的数据结构一般称为 Java Heap，而堆外的一般称为 C Heap，它们都处于用户空间。</p>
+<p>Socket/文件到内核空间的缓冲区的数据拷贝现在一般由 DMA 机制负责完成，CPU 并不需要参与这个过程。CPU 可能参与的过程是内核空间到堆外（这里的堆外对于非 JVM 应用而言，就是普通用户空间），堆外到堆内。</p>
+</blockquote>
+<p>结论：DirectByteBuffer 相对于 HeapByteBuffer 的优势仅仅在于少了一次堆内与堆外的数据拷贝过程。</p>
+<p><strong>为什么 HeapByteBuffer 也需要使用堆外的内存空间？</strong></p>
+<p>因为 JVM 对内存中的实例实行 GC 管理，GC 可能会导致实例地址的变动，<strong>堆外内存的好处就在于其地址不受 GC 影响</strong>。地址被要求不能够改变的原因是：当我们把一个地址通过 JNI 传递给底层的 C 库的时候，有一个基本的要求，就是这个地址上的内容不能失效。所以无论我们是否使用 DirectByteBuffer，都需要使用一个堆外内存来保存和内核空间交互的数据。</p>
+<blockquote>
+<p>如果要把一个 Java 里的 byte[] 对象的引用传给 native 代码，让 native 代码直接访问数组的内容的话，就必须要保证 native 代码在访问的时候这个 byte[] 对象不能被移动，也就是要被“pin”（钉）住。</p>
+<p>可惜 HotSpot VM 出于一些取舍而决定不实现单个对象层面的 object pinning，要 pin 的话就得暂时禁用 GC——也就等于把整个 Java 堆都给 pin 住。</p>
+<p>所以 Oracle/Sun JDK / OpenJDK 的这个地方就用了点绕弯的做法。它假设把 HeapByteBuffer 背后的 byte[] 里的内容拷贝一次是一个时间开销可以接受的操作，同时假设真正的 I/O 可能是一个很慢的操作。</p>
+</blockquote>
+<p>因此，DirectByteBuffer 相对于 HeapByteBuffer 的优势是很有限的：</p>
+<ul>
+<li>两种方式都有内核空间与用户空间之间的数据拷贝，只是 HeapByteBuffer 额外多一次堆内、堆外数据的拷贝；</li>
+<li>DirectByteBuffer 本身也是一个内存隐患，使用 DirectByteBuffer 并不能像 HeapByteBuffer 或 byte[] 一样任意使用可以被 GC 及时的回收。所以使用 DirectByteBuffer 最好是分配好缓存起来重复使用，否则很容易出现 OOM 错误（内存事实上管理非常复杂）。</li>
+</ul>
+<p><strong>描述 DirectByteBuffer 的精辟总结</strong>：DirectByteBuffer 只是给了用户(Java 程序员)一个操作堆外内存的机会，并不代表 JVM 没有堆外内存的管理（对于 JVM 来说堆外内一直是搓手可得的，因为本来就都在用户空间内，堆外内存并不是随着 JDK 推出 DirectByteBuffer 才可以进行管理的）。</p>
+<h3 id="1-4-使用-Buffer-的典型案例"><a href="#1-4-使用-Buffer-的典型案例" class="headerlink" title="1.4 使用 Buffer 的典型案例"></a>1.4 使用 Buffer 的典型案例</h3><p>这里举一个使用 Buffer 的典型案例。</p>
+<p>Buffer 由 <code>ByteBuffer.allocate(100);</code> 定义，所以是一个 Java 堆内的 HeapByteBuffer，当然也可以通过 <code>DirectBuffer.allocateDirect()</code> 来构造一个 DirectByteBuffer。</p>
+<p>一个完成的 NIO 流程是这样的：</p>
+<ul>
+<li>将 SocketChannel(与本地的一个 Socket 绑定的) 注册到 Selector 中，注册时的兴趣为可读事件。</li>
+<li>当 <code>Selector.slect()</code> 方法返回时，预示着事件发生了，并且此方法停滞阻塞。</li>
+<li>然后服务器线程去遍历 Socket 队列（epoll/select 遍历的范围有所区别），寻找可读的 Socket；</li>
+<li>找到之后，服务器利用已经创建好的 （Buffer 一般要求是复用的，不要每个事件就创建一个）Buffer 进行非阻塞读取；</li>
+<li>然后遍历 Socket 队列的下一个 Socket。</li>
+<li>Socket 队列遍历完毕，继续调用 <code>Selector.slect()</code> 方法。</li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleNioServer</span> </span>&#123;</span><br><span class="line">    <span class="comment">//这个 map 用于存储分批尽力读取的字节数据</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">static</span> HashMap&lt;SelectionKey, Object&gt; hashMap = <span class="keyword">new</span> HashMap();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Selector selector = <span class="keyword">null</span>;</span><br><span class="line">        ServerSocketChannel serverSocket = <span class="keyword">null</span>;</span><br><span class="line">        ByteBuffer buffer = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//1. 创建 Selector 实例</span></span><br><span class="line">            selector = Selector.open();</span><br><span class="line">            <span class="comment">//2. 创建 ServerSocketChannel 实例</span></span><br><span class="line">            serverSocket = ServerSocketChannel.open();</span><br><span class="line">            <span class="comment">//3. 初始化 ServerSocketChannel 内部的 serverSocket 实例确定绑定的本地端口</span></span><br><span class="line">            serverSocket.bind(<span class="keyword">new</span> InetSocketAddress(<span class="string">&quot;localhost&quot;</span>, <span class="number">2333</span>));</span><br><span class="line">            <span class="comment">//4. 将 ServerSocketChannel 配置成非阻塞模式，这是必要的，</span></span><br><span class="line">            <span class="comment">// 因为 ServerSocketChannel 和由其生产出来的 SocketChannel 实例都在 while 循环中被检查是否触发了事件，</span></span><br><span class="line">            <span class="comment">// 否则，没有新的请求导致 SocketChannel.accept() 阻塞，会影响 selector 去判别 SocketChannel 是否可读。</span></span><br><span class="line">            serverSocket.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line">            <span class="comment">//5. 将 ServerSocketChannel 注册到 Selector 中，事件是 OP_ACCEPT，一旦有 TCP 连接请求就会触发</span></span><br><span class="line">            serverSocket.register(selector, SelectionKey.OP_ACCEPT);</span><br><span class="line">            <span class="comment">// 测试性地尝试注册两次</span></span><br><span class="line">            serverSocket.register(selector, SelectionKey.OP_ACCEPT);</span><br><span class="line">            <span class="comment">//6. 创建 Buffer 用于从 SocketChannel 中读取字节数据</span></span><br><span class="line">            buffer = ByteBuffer.allocate(<span class="number">100</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="comment">// 7. 如果迭代器内部有事件发生，那么不阻塞，否则阻塞</span></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                selector.select();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 8. 阻塞结束，说明 selector 中有事件触发，所以获得其迭代器进行处理</span></span><br><span class="line">            Set&lt;SelectionKey&gt; selectedKeys = selector.selectedKeys();</span><br><span class="line">            Iterator&lt;SelectionKey&gt; iter = selectedKeys.iterator();</span><br><span class="line">            <span class="comment">//9. 迭代器中全体元素的循环</span></span><br><span class="line">            <span class="keyword">while</span> (iter.hasNext()) &#123;</span><br><span class="line"></span><br><span class="line">                SelectionKey key = iter.next();</span><br><span class="line">                <span class="comment">//10. 因为仅仅对 ServerSocketChannel 单例进行了 OP_ACCEPT 事件注册，所以断定地知道来了一个建立 TCP 连接请求。</span></span><br><span class="line">                <span class="comment">//调用此 register 方法得到 ServerSocketChannel 中的一个 SocketChannel 并注册到 Selector 中，事件为 OP_READ</span></span><br><span class="line">                <span class="keyword">if</span> (key.isAcceptable()) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="comment">//这里的含义是将 ServerSocketChannel 实例 serverSocket 注册到 selector 内部</span></span><br><span class="line">                        register(selector, serverSocket);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//11. 我们为所有的 SocketChannel 注册了 OP_READ 事件，所以此事件发生时意味着可读了,于是调用 answerWithEcho 方法进行读</span></span><br><span class="line">                <span class="keyword">if</span> (key.isReadable()) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        read(buffer, key);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//12. 将此 SelectableChannel 移出迭代器是必要的，否则会进行没有必要的事件是否准备好的询问</span></span><br><span class="line">                iter.remove();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">read</span><span class="params">(ByteBuffer buffer, SelectionKey key)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;read 方法被调用了&quot;</span>);</span><br><span class="line">        <span class="comment">//1. 得到 SelectionKey 实例内部的 SocketChannel 实例，因为可读状态下需要利用 Channel 进行读取字节数据</span></span><br><span class="line">        SocketChannel socketChannel = (SocketChannel) key.channel();</span><br><span class="line">        <span class="comment">//2. 构造一组键值对，key 为 SelectionKey 实例，value 为 List，用于存储多次尽力读取的字节数组</span></span><br><span class="line">        <span class="keyword">if</span> (!hashMap.containsKey(key))</span><br><span class="line">            hashMap.put(key, <span class="keyword">new</span> ArrayList&lt;&gt;());</span><br><span class="line">        <span class="comment">//3. 此标志用于判断：</span></span><br><span class="line">        <span class="comment">//0： UNIX 底层的缓冲字节数组被读完了或者 ByteBuffer 没有写一个字节，这里指的是前者，因为每次读取后都 clear 了；</span></span><br><span class="line">        <span class="comment">//-1: 意味这 EOF，即 HTTP 请求数据已经全部传输到服务端 Socket 了。</span></span><br><span class="line">        <span class="comment">//其他大于 0 的数字：意味着这里从底层 UNIX 缓冲字节数组读取了几个字节</span></span><br><span class="line">        <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (buffer.hasRemaining() &amp;&amp; (count = socketChannel.read(buffer)) &gt; <span class="number">0</span>) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//使 Buffer 变成可读</span></span><br><span class="line">            buffer.flip();</span><br><span class="line">            ArrayList list = (ArrayList) hashMap.get(key);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">byte</span>[] arr = <span class="keyword">new</span> <span class="keyword">byte</span>[buffer.remaining()];</span><br><span class="line">            buffer.get(arr);</span><br><span class="line">            buffer.rewind();</span><br><span class="line">            list.add(arr);</span><br><span class="line">            buffer.clear();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//当 socketChannel.read(buffer) 返回 -1 时，意味着此时彼通道数据传输已经完成，因为遇到了流传输中的 EOF 标志</span></span><br><span class="line">        <span class="comment">// 如果没有读到字节流末尾，那么选择不关闭，因为下一次还是要继续读取</span></span><br><span class="line">        <span class="keyword">if</span> (count == -<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="comment">//这些代码用于验证一次次的 Buffer 工作是否正确地转换为 byte 数组保存起来。</span></span><br><span class="line">            ArrayList list = (ArrayList) hashMap.get(key);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">final</span> Iterator iterator = list.iterator();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">                <span class="keyword">final</span> <span class="keyword">byte</span>[] next = (<span class="keyword">byte</span>[]) iterator.next();</span><br><span class="line">                System.out.println(next.length);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            socketChannel.close();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(Selector selector, ServerSocketChannel serverSocket)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="comment">//1. 利用 ServerSocketChannel accept 方法能够得到一个此次连接请求对应的 SocketChannel 实例</span></span><br><span class="line">        SocketChannel client = serverSocket.accept();</span><br><span class="line">        <span class="comment">//2. 将此 SocketChannel 实例设置为非阻塞模式</span></span><br><span class="line">        client.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line">        <span class="comment">//3. 将此 SocketChannel 注册到 Selector 中，事件为 OP_READ，即可读事件，此方法返回的 SelectionKey 并不需要保存并引用起来</span></span><br><span class="line">        client.register(selector, SelectionKey.OP_READ);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-5-Benchmark-of-DirectBuffer"><a href="#1-5-Benchmark-of-DirectBuffer" class="headerlink" title="1.5 Benchmark of DirectBuffer"></a>1.5 Benchmark of DirectBuffer</h3><p>正如前文所述，DirectByteBuffer 与 HeapDirectBuffer 的性能差距不大，实际上应用层的 Buffer 缓存管理分配机制（内存池化）才是影响性能的最重要原因。当然，上述说法需要在具体应用场景下的 benchmark 来证明。</p>
+<p>使用 HeapByteBuffer 的应用可以选择全权把内存管理交给 GC 线程，虽然使用应用层的 Buffer 缓存管理分配机制能得到更好的性能。</p>
+<p>但是使用 DirectByteBuffer 的应用必须使用基于应用层的 Buffer 缓存管理分配机制，这是因为 DirectByteBuffer 在 GC 上存在问题：通常申请再多的 DirectByteBuffer 实例也难以触发 full GC，但是只有触发 full GC，GC 线程才会负责去触发 DirectByteBuffer 实例的回收。因此，使用 DirectByteBuffer 的应用通常需要在应用层实现一个 Buffer 缓存管理分配机制。</p>
+<p>Netty 为 DirectByteBuffer 与 HeapDirectBuffer 都实现了 Buffer 缓存管理分配机制（内存池化）。</p>
+<p>总之，事实上，使用 DirectByteBuffer 虽然可以提升性能，但实际上是出于不提升白不提升的目的，提升性能远远没有想象中那么大，因为其仅仅节约了堆外、堆内的数据复制操作，而这部分工作由 CPU 来完成是非常快的。</p>
+<p>下图是 Twitter 对 Netty 的测试结果：</p>
+<p><img src="./images/image-20200520114203738.png" alt="image-20200520114203738"></p>
+<blockquote>
+<p>数值越大代表时间越长，性能越差。</p>
+</blockquote>
+<ul>
+<li>Polled Heap 和 Polled Direct 相比几乎没有太大的区别；</li>
+<li>Unpolled Heap 和 unpolled Direct 相比区别略为大了一点，但是不够显著。</li>
+</ul>
+<p>由图可知，DirectByteBuffer 相较于 HeapByteBuffer 可以提升一定性能，但是远远没有达到 Poll 相比于 Unpoll 的提升。</p>
+<h3 id="1-6-堆外内存的回收"><a href="#1-6-堆外内存的回收" class="headerlink" title="1.6 堆外内存的回收"></a>1.6 堆外内存的回收</h3><p>这里先回顾一下 JVM 堆内的内存回收的相关概念（粗略）：</p>
+<ul>
+<li><strong>新生代</strong>：一般来说新创建的对象都分配在这里。</li>
+<li><strong>年老代</strong>：经多次垃圾回收仍存活，新生代的对象就会放在年老代中。年老代中的对象保存的 GC 轮次更多。</li>
+<li><strong>永久代</strong>：这里面存放的是 class 相关的信息，一般是不会进行垃圾回收的。</li>
+</ul>
+<p><strong>JVM 的垃圾回收策略</strong>：</p>
+<ul>
+<li><strong>Minor GC</strong>: 当新创建对象，内存空间不够的时候，就会执行这个垃圾回收。由于执行最频繁，因此一般采用标记复制机制。</li>
+<li><strong>Major GC</strong>: 清理年老代的内存，这里一般采用的是标记整理机制。</li>
+<li><strong>Full GC</strong>: 有的说与 Major GC 差不多，有的说相当于执行 minor+major 回收，但在这里我们暂且可以认为 Full GC 就是全面的垃圾回收吧。</li>
+</ul>
+<p>需要我们回收内存的原因有 3 个：</p>
+<ol>
+<li>内存空间有限：如果应用程序不断申请内存空间但是不回收，那么内存很快就会分配完毕，最终导致内存异常异常，包括：<ol>
+<li>java.lang.OutOfMemoryError: Direct buffer memory</li>
+<li>java.lang.OutOfMemoryError: Requested array size exceeds VM limit</li>
+</ol>
+</li>
+<li>内存池化技术性能高：内存池化技术能够实现内存复用，因为反复的内存的申请以及分配代价高昂，池化技术能够提高整体系统性能；</li>
+<li>堆外内存需要应用层自己实现一套内存回收机制，GC 对堆外内存的回收能力非常有限；</li>
+</ol>
+<p><strong>1.DirectByteBuffer 的内存回收</strong></p>
+<p>由前面的文章可知，堆外内存分配很简单，直接调用 ByteBuffer#allocateDirect 方法即可。</p>
+<p>在 C 语言的内存分配和释放函数 malloc/free，必须要一一对应，否则就会出现内存泄露或者是野指针的非法访问。但是 JVM 拥有 GC 机制，通常并不需要应用层负责实例的内存释放。</p>
+<p>DirectByteBuffer 的的内存回收非常受限，因为其所占内存只有发生 full GC 的情况下才会被回收（而且不是 GC 线程负责回收）。而 full GC 的触发是无法通过 Java 代码控制的，例如 System#gc 方法的语义无法确保 JVM 马上执行 GC 线程，它只是建议 JVM 进行垃圾回收。因此，很容易发送堆外内存溢出的问题。</p>
+<p>DirectByteBuffer 的另一个缺陷是即使 GC 线程能够确保不发生堆外内存溢出，但是反复的堆外内存回收、分配会导致不尽人意的性能。</p>
+<p>因此就像 Netty 一样，需要实现一套应用层 DirectByteBuffer 的池化技术，既负责内存回收，也负责内存缓存与分配。</p>
+<blockquote>
+<p>补充说明：</p>
+<p>Netty 的堆外内存分配是直接基于 Unsafe 进行，而不是基于 DirectByteBuffer#allocate 方法。所以 GC 线程完全不会管理 Netty 框架中堆外内存的分配，后者全权由 Netty 应用层逻辑负责回收。</p>
+</blockquote>
+<p><strong>2.源码分析</strong></p>
+<p>先来看一个 jdk nio 的 DirectByteBuffer 类的 package-private 构造器，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">DirectByteBuffer(<span class="keyword">int</span> cap) &#123;</span><br><span class="line">    <span class="keyword">super</span>(-<span class="number">1</span>, <span class="number">0</span>, cap, cap);</span><br><span class="line">    <span class="comment">//是否页对齐</span></span><br><span class="line">    <span class="keyword">boolean</span> pa = VM.isDirectMemoryPageAligned();</span><br><span class="line">    <span class="comment">//页的大小4K</span></span><br><span class="line">    <span class="keyword">int</span> ps = Bits.pageSize();</span><br><span class="line">    <span class="comment">//最小申请1K，若需要页对齐，那么多申请1页，以应对初始地址的页对齐问题</span></span><br><span class="line">    <span class="keyword">long</span> size = Math.max(<span class="number">1L</span>, (<span class="keyword">long</span>)cap + (pa ? ps : <span class="number">0</span>));</span><br><span class="line">    <span class="comment">//检查堆外内存是否够用, 并对分配的直接内存做一个记录</span></span><br><span class="line">    Bits.reserveMemory(size, cap);</span><br><span class="line">    <span class="keyword">long</span> base = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//直接内存的初始地址, 返回初始地址</span></span><br><span class="line">        base = unsafe.allocateMemory(size);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (OutOfMemoryError x) &#123;</span><br><span class="line">        Bits.unreserveMemory(size, cap);</span><br><span class="line">        <span class="keyword">throw</span> x;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//对直接内存初始化</span></span><br><span class="line">    unsafe.setMemory(base, size, (<span class="keyword">byte</span>) <span class="number">0</span>);</span><br><span class="line">    <span class="comment">//若需要页对齐，并且不是页的整数倍，在需要将页对齐（默认是不需要进行页对齐的）</span></span><br><span class="line">    <span class="keyword">if</span> (pa &amp;&amp; (base % ps != <span class="number">0</span>)) &#123;</span><br><span class="line">        <span class="comment">// Round up to page boundary //初始地址取整页，注意申请的地址为取整数页</span></span><br><span class="line">        address = base + ps - (base &amp; (ps - <span class="number">1</span>));</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        address = base;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//声明一个Cleaner对象用于清理该DirectBuffer内存</span></span><br><span class="line">    cleaner = Cleaner.create(<span class="keyword">this</span>, <span class="keyword">new</span> Deallocator(base, size, cap));</span><br><span class="line">    att = <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，DirectByteBuffer 通过直接调用 base=unsafe.allocateMemory (size) 操作堆外内存，返回的是该堆外内存的直接地址，存放在 address 中，以便通过 address 进行堆外数据的读取与写入。</p>
+<p>我们需要了解下，<code>Bits.reserveMemory()</code> 如何判断堆外内存是否可用的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">reserveMemory</span><span class="params">(<span class="keyword">long</span> size, <span class="keyword">int</span> cap)</span> </span>&#123;  <span class="comment">//对分配的直接内存做一个记录</span></span><br><span class="line">       <span class="keyword">synchronized</span> (Bits.class) &#123;</span><br><span class="line">           <span class="keyword">if</span> (!memoryLimitSet &amp;&amp; VM.isBooted())</span><br><span class="line">           &#123;</span><br><span class="line">               <span class="comment">//堆外直接内存默认等于堆内内存大小, 可以通过</span></span><br><span class="line">               maxMemory = VM.maxDirectMemory();</span><br><span class="line">               memoryLimitSet = <span class="keyword">true</span>;</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="comment">// -XX:MaxDirectMemorySize limits the total capacity rather than the</span></span><br><span class="line">           <span class="comment">// actual memory usage, which will differ when buffers are page</span></span><br><span class="line">           <span class="comment">// aligned.</span></span><br><span class="line">           <span class="comment">//如果够分的话，则直接退出</span></span><br><span class="line">           <span class="keyword">if</span> (cap &lt;= maxMemory - totalCapacity) &#123;</span><br><span class="line">               reservedMemory += size;</span><br><span class="line">               totalCapacity += cap; <span class="comment">//</span></span><br><span class="line">               count++;</span><br><span class="line">               <span class="keyword">return</span>;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="comment">//不够分的话，则调用System.gc()进行一次full gc. 一般不要在线程启动时添加-XX:+DisableExplicitGC（禁止代码显示调用gc）</span></span><br><span class="line">       System.gc(); <span class="comment">//只是告知机器，这里应该GC一次， 但是实际并不一定进行垃圾回收</span></span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//再等待100ms使gc有时间完成，然后再看是否够分配</span></span><br><span class="line">           Thread.sleep(<span class="number">100</span>);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (InterruptedException x) &#123;</span><br><span class="line">           <span class="comment">// Restore interrupt status</span></span><br><span class="line">           Thread.currentThread().interrupt();</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">synchronized</span> (Bits.class) &#123;</span><br><span class="line">           <span class="comment">//此时不够分的话，再调用向外抛出oom</span></span><br><span class="line">           <span class="keyword">if</span> (totalCapacity + cap &gt; maxMemory)</span><br><span class="line">               <span class="keyword">throw</span> <span class="keyword">new</span> OutOfMemoryError(<span class="string">&quot;Direct buffer memory&quot;</span>);</span><br><span class="line">           reservedMemory += size;</span><br><span class="line">           totalCapacity += cap;</span><br><span class="line">           count++;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>首先检查堆外内存是否够分</li>
+<li>若不够分的话，再进行一次 full gc 显式推动对堆外内存的回收，再次尝试分配堆外内存，不够分的话，则抛出 OOM 异常。</li>
+</ul>
+<p><strong>堆外内存的回收-JDK-nio 的 DirectByteBuffer</strong></p>
+<p>在 DirectByteBuffer 的构造函数中，我们可以看到这样的一行代码 <code>cleaner = Cleaner.create(this, new Deallocator(base, size, cap));</code>, 没错，<strong>直接内存释放主要由 cleaner 来完成</strong>。我们知道 <strong>JVM GC 并不能直接释放直接内存，但是 GC 可以释放管理直接内存的 DirectByteBuffer 对象</strong>。我们需要注意下 cleaner 的类型:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Cleaner</span>  <span class="keyword">extends</span> <span class="title">PhantomReference</span>&lt;<span class="title">Object</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>PhantomReference 并不会对对象的垃圾回收产生任何影响，当进行 gc 完成后，当发现某个对象只剩下虚引用后，会将该引用迁移至 Reference 类的 pending 队列进行回收。这里可以看到 DirectByteBuffer 被 Cleaner 引用着。Reference 操作回收代码如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">Lock</span> </span>&#123; &#125;;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> Lock lock = <span class="keyword">new</span> Lock();</span><br><span class="line"><span class="comment">/* List of References waiting to be enqueued.  The collector adds</span></span><br><span class="line"><span class="comment"> * References to this list, while the Reference-handler thread removes</span></span><br><span class="line"><span class="comment"> * them.  This list is protected by the above lock object. The</span></span><br><span class="line"><span class="comment"> * list uses the discovered field to link its elements.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">//当gc时，发现DirectByteBuffer除了PhantomReference对象引用,没有其他对象引用， 会把DirectByteBuffer放入其中，等待被回收</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> Reference&lt;Object&gt; pending = <span class="keyword">null</span>;</span><br><span class="line"><span class="comment">/* High-priority thread to enqueue pending References</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ReferenceHandler</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">    ReferenceHandler(ThreadGroup g, String name) &#123;</span><br><span class="line">        <span class="keyword">super</span>(g, name);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">            Reference&lt;Object&gt; r;</span><br><span class="line">            <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">                <span class="keyword">if</span> (pending != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    r = pending;</span><br><span class="line">                    pending = r.discovered;</span><br><span class="line">                    r.discovered = <span class="keyword">null</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// The waiting on the lock may cause an OOME because it may try to allocate</span></span><br><span class="line">                    <span class="comment">// exception objects, so also catch OOME here to avoid silent exit of the</span></span><br><span class="line">                    <span class="comment">// reference handler thread.</span></span><br><span class="line">                    <span class="comment">//</span></span><br><span class="line">                    <span class="comment">// Explicitly define the order of the two exceptions we catch here</span></span><br><span class="line">                    <span class="comment">// when waiting for the lock.</span></span><br><span class="line">                    <span class="comment">//</span></span><br><span class="line">                    <span class="comment">// We do not want to try to potentially load the InterruptedException class</span></span><br><span class="line">                    <span class="comment">// (which would be done if this was its first use, and InterruptedException</span></span><br><span class="line">                    <span class="comment">// were checked first) in this situation.</span></span><br><span class="line">                    <span class="comment">//</span></span><br><span class="line">                    <span class="comment">// This may lead to the VM not ever trying to load the InterruptedException</span></span><br><span class="line">                    <span class="comment">// class again.</span></span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="keyword">try</span> &#123;</span><br><span class="line">                            <span class="comment">//如果没有的话，会一直等待唤醒</span></span><br><span class="line">                            lock.wait();</span><br><span class="line">                        &#125; <span class="keyword">catch</span> (OutOfMemoryError x) &#123; &#125;</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException x) &#123; &#125;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// Fast path for cleaners</span></span><br><span class="line">            <span class="keyword">if</span> (r <span class="keyword">instanceof</span> Cleaner) &#123;</span><br><span class="line">                 <span class="comment">//从头开始进行clena()调用</span></span><br><span class="line">                ((Cleaner)r).clean();</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            ReferenceQueue&lt;Object&gt; q = r.queue;</span><br><span class="line">            <span class="keyword">if</span> (q != ReferenceQueue.NULL) q.enqueue(r);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    ThreadGroup tg = Thread.currentThread().getThreadGroup();</span><br><span class="line">    <span class="keyword">for</span> (ThreadGroup tgn = tg;</span><br><span class="line">         tgn != <span class="keyword">null</span>;</span><br><span class="line">         tg = tgn, tgn = tg.getParent());</span><br><span class="line">    Thread handler = <span class="keyword">new</span> ReferenceHandler(tg, <span class="string">&quot;Reference Handler&quot;</span>);</span><br><span class="line">    <span class="comment">/* If there were a special system-only priority greater than</span></span><br><span class="line"><span class="comment">     * MAX_PRIORITY, it would be used here</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    handler.setPriority(Thread.MAX_PRIORITY);</span><br><span class="line">    handler.setDaemon(<span class="keyword">true</span>);</span><br><span class="line">    handler.start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看出来，JVM 会新建名为 <code>Reference Handler</code> 的线程，时刻回收被挂到 pending 上面的虚拟引用 (该线程在 JVM 启动时就会产生)。 当 DirectByteBuff 对象仅被 Cleaner 引用时，Cleaner 被放入 pending 队列，之后调用 <code>Cleaner.clean()</code> 方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">clean</span><span class="params">()</span> </span>&#123;  <span class="comment">//这里的clean(）会在Reference回收时显示调用</span></span><br><span class="line">        <span class="keyword">if</span> (!remove(<span class="keyword">this</span>))</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            thunk.run();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> Throwable x) &#123;</span><br><span class="line">            AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;Void&gt;() &#123;</span><br><span class="line">                    <span class="function"><span class="keyword">public</span> Void <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                        <span class="keyword">if</span> (System.err != <span class="keyword">null</span>)</span><br><span class="line">                            <span class="keyword">new</span> Error(<span class="string">&quot;Cleaner terminated abnormally&quot;</span>, x)</span><br><span class="line">                                .printStackTrace();</span><br><span class="line">                        System.exit(<span class="number">1</span>);</span><br><span class="line">                        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                    &#125;&#125;);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//就是一个释放直接内存的线程</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Deallocator</span>  <span class="keyword">implements</span> <span class="title">Runnable</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> Unsafe unsafe = Unsafe.getUnsafe();</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">long</span> address;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">long</span> size;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> capacity;</span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="title">Deallocator</span><span class="params">(<span class="keyword">long</span> address, <span class="keyword">long</span> size, <span class="keyword">int</span> capacity)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">assert</span> (address != <span class="number">0</span>);</span><br><span class="line">            <span class="keyword">this</span>.address = address;</span><br><span class="line">            <span class="keyword">this</span>.size = size;</span><br><span class="line">            <span class="keyword">this</span>.capacity = capacity;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (address == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">// Paranoia</span></span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            unsafe.freeMemory(address); <span class="comment">//释放地址</span></span><br><span class="line">            address = <span class="number">0</span>;</span><br><span class="line">            Bits.unreserveMemory(size, capacity); <span class="comment">//修改统计</span></span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也就是说最终是通过调用 <code>Unsafe.freeMemory()</code> 方法来释放直接内存的。</p>
+<p>所以如果简化 JDK nio 中 DirectByteBuffer 的创建与回收，那么步骤为：</p>
+<ul>
+<li><p>利用静态方法 <code>DirectByteBuffer.allocateDirect()</code> 进行堆外内存的分配，本质上是利用 <code>unsafe.allocateMemory(size);</code> 来申请堆外内存。</p>
+</li>
+<li><p>DirectByteBuffer 的构造过程中，在最后将自己作为引用传入 Cleaner 实例中。</p>
+</li>
+<li><p>当 GC 完成后，当发现某个对象只剩下虚引用后，会将该 Cleaner 实例迁移至 Reference 类的 pending 队列进行回收。</p>
+<blockquote>
+<p>GC 本身不负责 DirectByteBuffer 的回收，其只是负责将将 DirectByteBuffer 的引用迁移至 Reference 类的 pending 队列进行回收。</p>
+<p>这个队列始终在进行回收工作。</p>
+</blockquote>
+</li>
+<li><p>在 pending 队列中，会负责回调 cleaner 实例的 clean() 方法，clean() 方法中会调用 Deallocator 实例的 run() 方法，在这个方法中会负责将 cleaner 对应的堆外内存释放。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unsafe.freeMemory(address);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>DirectByteBuffer 就是如此依靠着 JVM 的 GC 进行内存回收的。实际上，通过下面两个组合就能够实现堆外内存的分配和回收：</p>
+<ul>
+<li><code>unsafe.allocateMemory(size);</code></li>
+<li><code>unsafe.freeMemory(address);</code></li>
+</ul>
+<p>因为 Netty 的堆外内存管理自己使用了一套机制：jemalloc，目的就是在应用层实现一套自己的内存管理（内存分配和内存回收），而不依赖 JVM 的 GC 机制。</p>
+<p>本质上，Netty 的内存管理也是依赖于 Unsafe 的两个方法，见上。Netty 选择自己实现另一套（完全没有继承、包含关系）的 ByteBuf，最终的目的就是为了使用自己的应用层内存分配管理机制。</p>
+<h3 id="1-7-ByteBuffer-的-JVM-配置"><a href="#1-7-ByteBuffer-的-JVM-配置" class="headerlink" title="1.7 ByteBuffer 的 JVM 配置"></a>1.7 ByteBuffer 的 JVM 配置</h3><p>堆内、堆外的内存空间都是有限的，当内存申请超过启动时的最大内存配置就会报错：</p>
+<ul>
+<li>HeapByteBuffer 的内存限制主要受到 JVM 内存配置的影响，<code>-Xms</code> 参数用于控制初始堆大小，<code>-Xmx</code> 参数用于控制最大堆大小。由于堆内还需要存放其他实例，因此实际上 HeapByteBuffer 能够申请的内存大小小于 <code>-Xms</code> 配置；</li>
+<li>DirectByteBuffer 的内存限制受到 <code>-XX:MaxDirectMemorySize</code> 参数的影响；</li>
+</ul>
+<p>当然，上述内存配置都无法超过物理机的虚拟内存大小。</p>
+<p>另一方面，单个 HeapByteBuffer 与 DirectByteBuffer 的最大数据量都为 Integer.MAXVALUE 个 byte，也就是 2000 MB 左右的内存大小。如果要申请 4GB 的内存，那么至少需要两个 ByteBuffer 实例。</p>
+<h2 id="2-Channel"><a href="#2-Channel" class="headerlink" title="2. Channel"></a>2. Channel</h2><blockquote>
+<p>A channel represents an open connection to an entity such as a hardware device, a file, a network socket, or a program component that is capable of performing one or more distinct I/O operations, for example reading or writing.</p>
+</blockquote>
+<p>Channel 类位于 java.nio.channels 包中，但并不是 Channel 仅仅支持 NIO，其分为两种类型：</p>
+<ul>
+<li>FileChannel：完全不支持 NIO；</li>
+<li>SocketChannel/ServerSocketChannel 等 Channel 默认情况下并不支持 NIO，只有显式地调用配置方法才能够进入非阻塞模式（<code>ServerSocketChannel.configBlocking(false)</code>）。</li>
+</ul>
+<p>下面主要以 SocketChannel 的角度来介绍 Channel 类。</p>
+<p>Channel 我们可以理解为对应于 BIO 中的 Socket，也可以理解为 Scoket.inputStream/SocketOutputStream。如果认为是流，那么我们做一个比较：</p>
+<ul>
+<li>传统 Socket：我们调用 Socket 的 <code>getInputStream()</code> 以及 <code>getOutputStream()</code> 进行数据的读和写。</li>
+<li>Channel：我们不再需要得到输入输出流进行读和写，而是通过 Channel 的 <code>read()</code> 以及 <code>write()</code> 方法进行读和写。</li>
+</ul>
+<p>Channel 如此实现也付出了代价（如下图所示）：</p>
+<ul>
+<li>读写模式需要调用 <code>flip()</code> 方法进行切换，读模式下调用 <code>write()</code> 试图进行写操作会报错。</li>
+<li>读写不再能够接受一个简单的字节数组，而是必须是封装了字节数组的 Buffer 类型。</li>
+</ul>
+<p><img src="./images/image-20200516195346349.png" alt="image-20200516195346349"></p>
+<p>目前已知 Channel 的实现类有：</p>
+<ul>
+<li><p>FileChannel</p>
+<blockquote>
+<p>一个用来写、读、映射和操作文件的通道。</p>
+</blockquote>
+</li>
+<li><p>DatagramChannel</p>
+</li>
+<li><p>SocketChannel</p>
+<p>SocketChannel 可以看做是具有非阻塞模式的 Socket。其可以运行在阻塞模式，也可以运行在非阻塞模式。其只能依靠 ByteBuffer 进行读写，而且是尽力读写，尽力的含义是：</p>
+<ul>
+<li>ByteBuffer 满了就不能在读了；</li>
+<li>即使此次 Socket 流没有传输完毕，但是一旦 Channel 中的数据读完了，那么就返回了，这就是非阻塞读。所以读的方法有 -1（EOF），0（Channel 中的数据读完了，但是整个数据流本身没有消耗完），其他整数，此次读的数据（因为 ByteBuffer 并不是每次都是空的，原来就有数据时只能够尽力装满）。</li>
+</ul>
+</li>
+<li><p>ServerSocketChannel</p>
+<p>这个类似于 ServerSocket 起到的作用。</p>
+</li>
+</ul>
+<h2 id="3-为什么-Netty-要封装原有的-Buffer-以及-Channel"><a href="#3-为什么-Netty-要封装原有的-Buffer-以及-Channel" class="headerlink" title="3. 为什么 Netty 要封装原有的 Buffer 以及 Channel"></a>3. 为什么 Netty 要封装原有的 Buffer 以及 Channel</h2><ul>
+<li>原生的 Buffer + Channel 的读写方式容易导致错误，比如写和读共用一个 index，经常容易犯的错误是写完在读的时候忘记 <code>flip()</code>。Netty 的有 readerindex 和 writerindex，用起来更方便了。</li>
+<li>提供更高层次的封装，提供更为丰富的功能。比如 Netty 的 Buffer 可以让我们方便的将两个小 Buffer 合并为一个大 Buffer 而不需要进行 byte 的复制。</li>
+<li>Netty 提供了更好的内存管理：<strong>JDK 的 DirectBytebuffer 虽然也使用堆外内存，但是依赖 JVM 进行 GC</strong>。但是 Netty 自己实现了 ByteBuf 的内存管理 jemalloc，性能更好，且完全不受到 GC 的管理。</li>
+</ul>
+<h2 id="REFERENCE"><a href="#REFERENCE" class="headerlink" title="REFERENCE"></a>REFERENCE</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/60892134">知乎：Java NIO direct buffer 的优势在哪儿？</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/57374068/answer/152691891">Java NIO中，关于DirectBuffer，HeapBuffer的疑问？</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/duanxz/p/6089485.html">Java堆外内存之三：堆外内存回收方法</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.datascienceassn.org/sites/default/files/Netty%20-%20Asynchronous%20Network%20Application%20Framework.pdf">Netty - One Framework to rule them all</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/02/04/4.%20%E6%96%87%E4%BB%B6%E5%88%86%E5%8C%BA/" rel="prev" title="">
+      <i class="fa fa-chevron-left"></i> 
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/02/04/6.%20FileChannel/" rel="next" title="">
+       <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Java-ByteBuffer%E4%B8%8E-Chanel"><span class="nav-number">1.</span> <span class="nav-text">Java ByteBuffer与 Chanel</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">1.1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Buffer"><span class="nav-number">1.2.</span> <span class="nav-text">1. Buffer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Buffer-%E6%A6%82%E8%BF%B0"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.1 Buffer 概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-ByteBuffer-%E4%BB%A5%E5%8F%8A-HeapByteBuffer%E3%80%81DirectByteBuffer"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2 ByteBuffer 以及 HeapByteBuffer、DirectByteBuffer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%9A%E5%B8%B8%E5%92%8C-NIO-%E6%90%AD%E9%85%8D%E7%9A%84%E6%98%AF-DirectByteBuffer"><span class="nav-number">1.2.3.</span> <span class="nav-text">1.3 为什么通常和 NIO 搭配的是 DirectByteBuffer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E4%BD%BF%E7%94%A8-Buffer-%E7%9A%84%E5%85%B8%E5%9E%8B%E6%A1%88%E4%BE%8B"><span class="nav-number">1.2.4.</span> <span class="nav-text">1.4 使用 Buffer 的典型案例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-Benchmark-of-DirectBuffer"><span class="nav-number">1.2.5.</span> <span class="nav-text">1.5 Benchmark of DirectBuffer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-%E5%A0%86%E5%A4%96%E5%86%85%E5%AD%98%E7%9A%84%E5%9B%9E%E6%94%B6"><span class="nav-number">1.2.6.</span> <span class="nav-text">1.6 堆外内存的回收</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-ByteBuffer-%E7%9A%84-JVM-%E9%85%8D%E7%BD%AE"><span class="nav-number">1.2.7.</span> <span class="nav-text">1.7 ByteBuffer 的 JVM 配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Channel"><span class="nav-number">1.3.</span> <span class="nav-text">2. Channel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%B8%BA%E4%BB%80%E4%B9%88-Netty-%E8%A6%81%E5%B0%81%E8%A3%85%E5%8E%9F%E6%9C%89%E7%9A%84-Buffer-%E4%BB%A5%E5%8F%8A-Channel"><span class="nav-number">1.4.</span> <span class="nav-text">3. 为什么 Netty 要封装原有的 Buffer 以及 Channel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#REFERENCE"><span class="nav-number">1.5.</span> <span class="nav-text">REFERENCE</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">142</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

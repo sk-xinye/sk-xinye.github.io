@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sk-xinye.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.yml"};
+  </script>
+
+  <meta name="description" content="DMA 与零拷贝技术 注意事项：除了 Direct I&#x2F;O，与磁盘相关的文件读写操作都有使用到 page cache 技术。   1. 数据的四次拷贝与四次上下文切换很多应用程序在面临客户端请求时，可以等价为进行如下的系统调用：  File.read(file, buf, len); Socket.send(socket, buf, len);  例如消息中间件 Kafka 就是这个应用场景，从磁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sk-xinyeの博客">
+<meta property="og:url" content="https://sk-xinye.github.io/2023/02/04/2.%20DMA%20%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/index.html">
+<meta property="og:site_name" content="sk-xinyeの博客">
+<meta property="og:description" content="DMA 与零拷贝技术 注意事项：除了 Direct I&#x2F;O，与磁盘相关的文件读写操作都有使用到 page cache 技术。   1. 数据的四次拷贝与四次上下文切换很多应用程序在面临客户端请求时，可以等价为进行如下的系统调用：  File.read(file, buf, len); Socket.send(socket, buf, len);  例如消息中间件 Kafka 就是这个应用场景，从磁">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/2.%20DMA%20%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/images/NoOptimization.jpg">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/2.%20DMA%20%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/images/image-20210202234430674.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/2.%20DMA%20%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/images/image-20210202234656779.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/2.%20DMA%20%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/images/image-20210202233454550.png">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/2.%20DMA%20%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/images/v2-8e275190c982f08d06bc5e629f8b8215_1440w.jpg">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/2.%20DMA%20%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/images/v2-c8a276f3cece45e8b66a2a1344e0cd54_1440w.jpg">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/2.%20DMA%20%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/images/sendfile.jpg">
+<meta property="og:image" content="https://sk-xinye.github.io/2023/02/04/2.%20DMA%20%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/images/directIO.jpg">
+<meta property="article:published_time" content="2023-02-04T02:34:09.206Z">
+<meta property="article:modified_time" content="2023-02-04T02:33:07.973Z">
+<meta property="article:author" content="sk-xinye">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sk-xinye.github.io/2023/02/04/2.%20DMA%20%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/images/NoOptimization.jpg">
+
+<link rel="canonical" href="https://sk-xinye.github.io/2023/02/04/2.%20DMA%20%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title> | sk-xinyeの博客</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">sk-xinyeの博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">记录学习的脚步</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">142</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sk-xinye.github.io/2023/02/04/2.%20DMA%20%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="sk-xinye">
+      <meta itemprop="description" content="愿所有努力都不被辜负">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="sk-xinyeの博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-02-04 10:34:09 / 修改时间：10:33:07" itemprop="dateCreated datePublished" datetime="2023-02-04T10:34:09+08:00">2023-02-04</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="DMA-与零拷贝技术"><a href="#DMA-与零拷贝技术" class="headerlink" title="DMA 与零拷贝技术"></a>DMA 与零拷贝技术</h1><blockquote>
+<p><strong>注意事项</strong>：除了 Direct I/O，与磁盘相关的文件读写操作都有使用到 page cache 技术。 </p>
+</blockquote>
+<h2 id="1-数据的四次拷贝与四次上下文切换"><a href="#1-数据的四次拷贝与四次上下文切换" class="headerlink" title="1. 数据的四次拷贝与四次上下文切换"></a>1. 数据的四次拷贝与四次上下文切换</h2><p>很多应用程序在面临客户端请求时，可以等价为进行如下的系统调用：</p>
+<ol>
+<li>File.read(file, buf, len);</li>
+<li>Socket.send(socket, buf, len);</li>
+</ol>
+<p>例如消息中间件 Kafka 就是这个应用场景，从磁盘中读取一批消息后原封不动地写入网卡（NIC，Network interface controller）进行发送。</p>
+<p>在没有任何优化技术使用的背景下，操作系统为此会进行 4 次数据拷贝，以及 4 次上下文切换，如下图所示：</p>
+<p><img src="images/NoOptimization.jpg" alt="NoOptimization"></p>
+<p>如果没有优化，读取磁盘数据，再通过网卡传输的场景性能比较差：</p>
+<p>4 次 copy：</p>
+<ul>
+<li>物理设备 &lt;-&gt; 内存：<ul>
+<li>CPU 负责将数据从磁盘搬运到内核空间的 Page Cache 中；</li>
+<li>CPU 负责将数据从内核空间的 Socket 缓冲区搬运到的网络中；</li>
+</ul>
+</li>
+<li>内存内部拷贝：<ul>
+<li>CPU 负责将数据从内核空间的 Page Cache 搬运到用户空间的缓冲区；</li>
+<li>CPU 负责将数据从用户空间的缓冲区搬运到内核空间的 Socket 缓冲区中；</li>
+</ul>
+</li>
+</ul>
+<p>4 次上下文切换：</p>
+<ol>
+<li>read 系统调用时：用户态切换到内核态；</li>
+<li>read 系统调用完毕：内核态切换回用户态；</li>
+<li>write 系统调用时：用户态切换到内核态；</li>
+<li>write 系统调用完毕：内核态切换回用户态；</li>
+</ol>
+<p>我们不免发出抱怨：</p>
+<ol>
+<li>CPU 全程负责内存内部的数据拷贝还可以接受，因为内存的数据拷贝效率还行（不过还是比 CPU 慢很多），但是如果要 CPU 全程负责内存与磁盘、内存与网卡的数据拷贝，这将难以接受，因为磁盘、网卡的 I/O 速度远小于内存；</li>
+<li>4 次 copy 太多了，4 次上下文切换也太频繁了；</li>
+</ol>
+<h2 id="2-DMA-参与下的数据四次拷贝"><a href="#2-DMA-参与下的数据四次拷贝" class="headerlink" title="2. DMA 参与下的数据四次拷贝"></a>2. DMA 参与下的数据四次拷贝</h2><p>DMA 技术很容易理解，本质上，DMA 技术就是我们在主板上放一块独立的芯片。在进行内存和 I/O 设备的数据传输的时候，我们不再通过 CPU 来控制数据传输，而直接通过 DMA 控制器（DMA Controller，简称 DMAC）。这块芯片，我们可以认为它其实就是一个协处理器（Co-Processor）。</p>
+<p>DMAC 的价值在如下情况中尤其明显：当我们要传输的数据特别大、速度特别快，或者传输的数据特别小、速度特别慢的时候。</p>
+<p>比如说，我们用千兆网卡或者硬盘传输大量数据的时候，如果都用 CPU 来搬运的话，肯定忙不过来，所以可以选择 DMAC。而当数据传输很慢的时候，DMAC 可以等数据到齐了，再发送信号，给到 CPU 去处理，而不是让 CPU 在那里忙等待。</p>
+<p><strong>注意</strong>：这里面的“协”字。DMAC 是在“协助”CPU，完成对应的数据传输工作。在 DMAC 控制数据传输的过程中，DMAC 还是被 CPU 控制，只是数据的拷贝行为不再由 CPU 来完成。</p>
+<p>原本，计算机所有组件之间的数据拷贝（流动）必须经过 CPU。以磁盘读写为例，如下图所示：</p>
+<img src="./images/image-20210202234430674.png" alt="image-20210202234430674" style="zoom: 33%;" />
+
+<p>现在，DMAC 代替了 CPU 负责内存与磁盘、内存与网卡之间的数据搬运，CPU 作为 DMAC 的控制者，如下图所示：</p>
+<img src="./images/image-20210202234656779.png" alt="image-20210202234656779" style="zoom:33%;" />
+
+<p>但是 DMAC 有其局限性，DMAC 仅仅能用于设备<strong>间</strong>交换数据时进行数据拷贝，但是<strong>设备内部的数据拷贝还需要 CPU 来亲力亲为</strong>。例如， CPU 需要负责内核空间与用户空间之间的数据拷贝（内存内部的拷贝），如下图所示：</p>
+<img src="./images/image-20210202233454550.png" alt="image-20210202233454550" style="zoom: 50%;" />
+
+<p>上图中的 read buffer 也就是 page cache，socket buffer 也就是 Socket 缓冲区。</p>
+<h2 id="3-零拷贝技术"><a href="#3-零拷贝技术" class="headerlink" title="3. 零拷贝技术"></a>3. 零拷贝技术</h2><h3 id="3-1-什么是零拷贝技术？"><a href="#3-1-什么是零拷贝技术？" class="headerlink" title="3.1 什么是零拷贝技术？"></a>3.1 什么是零拷贝技术？</h3><p>零拷贝技术是一个思想[3]，指的是指计算机执行操作时，CPU 不需要先将数据从某处内存复制到另一个特定区域。</p>
+<p>可见，零拷贝的特点是 CPU 不全程负责内存中的数据写入其他组件，CPU 仅仅起到管理的作用。但注意，零拷贝不是不进行拷贝，而是 CPU 不再全程负责数据拷贝时的搬运工作。如果数据本身不在内存中，那么必须先通过某种方式拷贝到内存中（这个过程 CPU 可以仅仅负责管理，DMAC 来负责具体数据拷贝），因为数据只有在内存中，才能被转移，才能被 CPU 直接读取计算。</p>
+<p>零拷贝技术的具体实现方式有很多，例如：</p>
+<ul>
+<li>sendfile</li>
+<li>mmap</li>
+<li>直接 Direct I/O</li>
+<li>splice</li>
+</ul>
+<p>不同的零拷贝技术适用于不同的应用场景，下面依次进行 sendfile、mmap、Direct I/O 的分析。</p>
+<p>不过，我们不妨先在这里做一个前瞻性的技术总结。</p>
+<ul>
+<li>DMA 技术：DMA 负责内存与其他组件之间的数据拷贝，CPU 仅需负责管理，而无需负责全程的数据拷贝；</li>
+<li>使用 page cache 的 zero copy：<ul>
+<li>sendfile：一次代替 read/write 系统调用，通过使用 DMA 技术以及传递文件描述符，实现了 zero copy</li>
+<li>mmap：仅代替 read 系统调用，将内核空间地址映射为用户空间地址，write 操作直接作用于内核空间。通过 DMA 技术以及地址映射技术，用户空间与内核空间无须数据拷贝，实现了 zero copy</li>
+</ul>
+</li>
+<li>不使用 page cache 的 Direct I/O：读写操作直接在磁盘上进行，不使用 page cache 机制，通常结合用户空间的用户缓存使用。通过 DMA 技术直接与磁盘/网卡进行数据交互，实现了 zero copy</li>
+</ul>
+<h3 id="3-2-sendfile"><a href="#3-2-sendfile" class="headerlink" title="3.2 sendfile"></a>3.2 sendfile</h3><p>snedfile 的应用场景是：<strong>用户从磁盘读取一些文件数据后不需要经过任何计算与处理就通过网络传输出去</strong>。此场景的典型应用是消息队列。</p>
+<p>在传统 I/O 下，正如第一节所示，上述应用场景的一次数据传输需要四次 CPU 全权负责的拷贝与四次上下文切换，正如本文第一节所述。</p>
+<p>sendfile 主要使用到了两个技术：</p>
+<ol>
+<li>DMA 技术；</li>
+<li>传递文件描述符代替数据拷贝；</li>
+</ol>
+<p>下面依次讲解这两个技术的作用。</p>
+<p><strong>1.利用 DMA 技术</strong></p>
+<p>sendfile 依赖于 DMA 技术，将四次 CPU 全程负责的拷贝与四次上下文切换减少到两次，如下图所示：</p>
+<img src="./images/v2-8e275190c982f08d06bc5e629f8b8215_1440w.jpg" alt="img" style="zoom:67%;" />
+
+<blockquote>
+<p>利用 DMA 技术减少 2 次 CPU 全程参与的拷贝</p>
+</blockquote>
+<p>DMA 负责磁盘到内核空间中的 Page cache（read buffer）的数据拷贝以及从内核空间中的 socket buffer 到网卡的数据拷贝。</p>
+<p><strong>2.传递文件描述符代替数据拷贝</strong></p>
+<p>传递文件描述可以代替数据拷贝，这是由于两个原因：</p>
+<ul>
+<li>page cache 以及 socket buffer 都在内核空间中；</li>
+<li>数据在传输中没有被更新；</li>
+</ul>
+<img src="./images/v2-c8a276f3cece45e8b66a2a1344e0cd54_1440w.jpg" alt="img" style="zoom:50%;" />
+
+<blockquote>
+<p>利用传递文件描述符代替内核中的数据拷贝</p>
+</blockquote>
+<p><strong>注意事项</strong>：只有网卡支持 SG-DMA（The Scatter-Gather Direct Memory Access）技术才可以通过传递文件描述符的方式避免内核空间内的一次 CPU 拷贝。这意味着此优化取决于 Linux 系统的物理网卡是否支持（Linux 在内核 2.4 版本里引入了 DMA 的 scatter/gather – 分散/收集功能，只要确保 Linux 版本高于 2.4 即可）。</p>
+<p><strong>3.一次系统调用代替两次系统调用</strong></p>
+<p>由于 sendfile 仅仅对应一次系统调用，而传统文件操作则需要使用 read 以及 write 两个系统调用。</p>
+<p>正因为如此，sendfile 能够将用户态与内核态之间的上下文切换从 4 次讲到 2 次。</p>
+<p><img src="images/sendfile.jpg" alt="sendfile"></p>
+<blockquote>
+<p>sendfile 系统调用仅仅需要两次上下文切换</p>
+</blockquote>
+<p>另一方面，我们需要注意 sendfile 系统调用的局限性。如果应用程序需要对从磁盘读取的数据进行写操作，例如解密或加密，那么 sendfile 系统调用就完全没法用。这是因为用户线程根本就不能够通过 sendfile 系统调用得到传输的数据。</p>
+<h3 id="3-3-mmap"><a href="#3-3-mmap" class="headerlink" title="3.3 mmap"></a>3.3 mmap</h3><p>mmap 技术在[4] 中单独展开，请移步阅读。</p>
+<h3 id="3-4-Direct-I-O"><a href="#3-4-Direct-I-O" class="headerlink" title="3.4 Direct I/O"></a>3.4 Direct I/O</h3><p>Direct I/O 即直接 I/O。其名字中的”直接”二字用于区分使用 page cache 机制的缓存 I/O。</p>
+<ul>
+<li>缓存文件 I/O：用户空间要读写一个文件并<strong>不直接</strong>与磁盘交互，而是中间夹了一层缓存，即 page cache；</li>
+<li>直接文件 I/O：用户空间读取的文件<strong>直接</strong>与磁盘交互，没有中间 page cache 层；</li>
+</ul>
+<p>“直接”在这里还有另一层语义：其他所有技术中，数据至少需要在内核空间存储一份，但是在 Direct I/O 技术中，数据直接存储在用户空间中，绕过了内核。</p>
+<p>Direct I/O 模式如下图所示：</p>
+<p><img src="images/directIO.jpg" alt="directIO"></p>
+<blockquote>
+<p>Direct I/O 示意图</p>
+</blockquote>
+<p>此时用户空间直接通过 DMA 的方式与磁盘以及网卡进行数据拷贝。</p>
+<p><strong>Direct I/O 的读写非常有特点</strong>：</p>
+<ul>
+<li>Write 操作：由于其不使用 page cache，所以其进行写文件，如果返回成功，数据就真的落盘了（不考虑磁盘自带的缓存）；</li>
+<li>Read 操作：由于其不使用 page cache，每次读操作是真的从磁盘中读取，不会从文件系统的缓存中读取。</li>
+</ul>
+<p><strong>事实上，即使 Direct I/O 还是可能需要使用操作系统的 fsync 系统调用。为什么？</strong></p>
+<p>这是因为虽然文件的数据本身没有使用任何缓存，但是文件的元数据仍然需要缓存，包括 VFS 中的 inode cache 和 dentry cache 等。</p>
+<p>在部分操作系统中，在 Direct I/O 模式下进行 write 系统调用能够确保文件数据落盘，但是文件元数据不一定落盘。如果在此类操作系统上，那么还需要执行一次 fsync 系统调用确保文件元数据也落盘。否则，可能会导致文件异常、元数据确实等情况。MySQL 的 O_DIRECT 与 O_DIRECT_NO_FSYNC 配置是一个具体案例[9]。</p>
+<p>Direct I/O 的优缺点：</p>
+<p><strong>（1）优点</strong></p>
+<ol>
+<li>Linux 中的直接 I/O 技术省略掉缓存 I/O 技术中操作系统内核缓冲区的使用，数据直接在应用程序地址空间和磁盘之间进行传输，从而使得自缓存应用程序可以省略掉复杂的系统级别的缓存结构，而执行程序自己定义的数据读写管理，从而<strong>降低系统级别的管理对应用程序访问数据的影响</strong>。</li>
+<li>与其他零拷贝技术一样，避免了内核空间到用户空间的数据拷贝，如果要传输的数据量很大，使用直接 I/O 的方式进行数据传输，而不需要操作系统内核地址空间拷贝数据操作的参与，这将会大大提高性能。</li>
+</ol>
+<p><strong>（2）缺点</strong></p>
+<ol>
+<li>由于设备之间的数据传输是通过 DMA 完成的，因此<strong>用户空间的数据缓冲区内存页必须进行 page pinning（页锁定）</strong>，这是为了防止其物理页框地址被交换到磁盘或者被移动到新的地址而导致 DMA 去拷贝数据的时候在指定的地址找不到内存页从而引发缺页错误，而页锁定的开销并不比 CPU 拷贝小，所以为了避免频繁的页锁定系统调用，应用程序必须分配和注册一个持久的内存池，用于数据缓冲。</li>
+<li>如果访问的数据不在应用程序缓存中，那么每次数据都会直接从磁盘进行加载，这种直接加载会非常缓慢。</li>
+<li>在应用层引入直接 I/O 需要应用层自己管理，这带来了额外的系统复杂性；</li>
+</ol>
+<p><strong>谁会使用 Direct I/O？</strong></p>
+<p>IBM[5]的一篇文章指出，自缓存应用程序（ self-caching applications）可以选择使用 Direct I/O。</p>
+<blockquote>
+<p>自缓存应用程序</p>
+<p>对于某些应用程序来说，它会有它自己的数据缓存机制，比如，它会将数据缓存在应用程序地址空间，这类应用程序完全不需要使用操作系统内核中的高速缓冲存储器，这类应用程序就被称作是自缓存应用程序（ self-caching applications ）。</p>
+<p>例如，应用内部维护一个缓存空间，当有读操作时，首先读取应用层的缓存数据，如果没有，那么就通过 Direct I/O 直接通过磁盘 I/O 来读取数据。缓存仍然在应用，只不过应用觉得自己实现一个缓存比操作系统的缓存更高效。</p>
+<p><strong>数据库管理系统是这类应用程序的一个代表</strong>。自缓存应用程序倾向于使用数据的逻辑表达方式，而非物理表达方式；当系统内存较低的时候，自缓存应用程序会让这种数据的逻辑缓存被换出，而并非是磁盘上实际的数据被换出。自缓存应用程序对要操作的数据的语义了如指掌，所以它可以采用更加高效的缓存替换算法。自缓存应用程序有可能会在多台主机之间共享一块内存，那么自缓存应用程序就需要提供一种能够有效地将用户地址空间的缓存数据置为无效的机制，从而确保应用程序地址空间缓存数据的一致性。</p>
+<p>page cache 是 Linux 为所有应用提供的缓存机制，但是数据库应用太特殊了，page cache 影响了数据对特性的追求。</p>
+</blockquote>
+<p>另一方面，目前 Linux 上的异步 IO 库，其依赖于文件使用 O_DIRECT 模式打开，它们通常一起配合使用。</p>
+<p><strong>如何使用 Direct I/O？</strong></p>
+<p>用户应用需要实现用户空间内的缓存区，读/写操作应当尽量通过此缓存区提供。如果有性能上的考虑，那么尽量避免频繁地基于 Direct I/O 进行读/写操作。</p>
+<h2 id="4-典型案例"><a href="#4-典型案例" class="headerlink" title="4. 典型案例"></a>4. 典型案例</h2><h3 id="4-1-Kakfa"><a href="#4-1-Kakfa" class="headerlink" title="4.1 Kakfa"></a>4.1 Kakfa</h3><p>Kafka 作为一个消息队列，涉及到磁盘 I/O 主要有两个操作：</p>
+<ul>
+<li>Provider 向 Kakfa 发送消息，Kakfa 负责将消息以日志的方式持久化落盘；</li>
+<li>Consumer 向 Kakfa 进行拉取消息，Kafka 负责从磁盘中读取一批日志消息，然后再通过网卡发送；</li>
+</ul>
+<p>Kakfa 服务端接收 Provider 的消息并持久化的场景下使用 mmap 机制[6]，能够基于顺序磁盘 I/O 提供高效的持久化能力，使用的 Java 类为 java.nio.MappedByteBuffer。</p>
+<p>Kakfa 服务端向 Consumer 发送消息的场景下使用 sendfile 机制[7]，这种机制主要两个好处：</p>
+<ul>
+<li>sendfile 避免了内核空间到用户空间的 CPU 全程负责的数据移动；</li>
+<li>sendfile 基于 Page Cache 实现，因此如果有多个 Consumer 在同时消费一个主题的消息，那么由于消息一直在 page cache 中进行了缓存，因此只需一次磁盘 I/O，就可以服务于多个 Consumer；</li>
+</ul>
+<blockquote>
+<p>使用 mmap 来对接收到的数据进行持久化，使用 sendfile 从持久化介质中读取数据然后对外发送是一对常用的组合。但是注意，你无法利用 sendfile 来持久化数据，利用 mmap 来实现 CPU 全程不参与数据搬运的数据拷贝。</p>
+</blockquote>
+<h3 id="4-2-MySQL"><a href="#4-2-MySQL" class="headerlink" title="4.2 MySQL"></a>4.2 MySQL</h3><p>MySQL 的具体实现比 Kakfa 复杂很多，这是因为支持 SQL 查询的数据库本身比消息队列对复杂很多。</p>
+<p>MySQL 的零拷贝技术使用方式请移步我的另一篇文章[8]。</p>
+<h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h2><p>DMA 技术使得内存与其他组件，例如磁盘、网卡进行数据拷贝时，CPU 仅仅需要发出控制信号，而拷贝数据的过程则由 DMAC 负责完成。</p>
+<p>Linux 的零拷贝技术有多种实现策略，但根据策略可以分为如下几种类型：</p>
+<ul>
+<li><strong>减少甚至避免用户空间和内核空间之间的数据拷贝</strong>：在一些场景下，用户进程在数据传输过程中并不需要对数据进行访问和处理，那么数据在 Linux 的 <code>Page Cache</code> 和用户进程的缓冲区之间的传输就完全可以避免，让数据拷贝完全在内核里进行，甚至可以通过更巧妙的方式避免在内核里的数据拷贝。这一类实现一般是是通过增加新的系统调用来完成的，比如 Linux 中的 mmap()，sendfile() 以及 splice() 等。</li>
+<li><strong>绕过内核的直接 I/O</strong>：允许在用户态进程绕过内核直接和硬件进行数据传输，内核在传输过程中只负责一些管理和辅助的工作。这种方式其实和第一种有点类似，也是试图避免用户空间和内核空间之间的数据传输，只是第一种方式是把数据传输过程放在内核态完成，而这种方式则是直接绕过内核和硬件通信，效果类似但原理完全不同。</li>
+<li><strong>内核缓冲区和用户缓冲区之间的传输优化</strong>：这种方式侧重于在用户进程的缓冲区和操作系统的页缓存之间的 CPU 拷贝的优化。这种方法延续了以往那种传统的通信方式，但更灵活。</li>
+</ul>
+<h1 id="REFERENCE"><a href="#REFERENCE" class="headerlink" title="REFERENCE"></a>REFERENCE</h1><ul>
+<li>[1]<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/272200286">CPU：一个故事看懂DMA</a></li>
+<li>[2]<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/308054212">Linux I/O 原理和 Zero-copy 技术全面揭秘</a></li>
+<li>[3]<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E9%9B%B6%E5%A4%8D%E5%88%B6">零复制 - 维基百科，自由的百科全书</a></li>
+<li>[4][mmap](<a target="_blank" rel="noopener" href="https://spongecaptain.cool/SimpleClearFileIO/3">https://spongecaptain.cool/SimpleClearFileIO/3</a>. mmap.html)</li>
+<li>[5]<a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/linux/l-cn-directio/">直接 I/O 的动机</a></li>
+<li>[6]<a target="_blank" rel="noopener" href="https://github.com/apache/kafka/blob/trunk/core/src/main/scala/kafka/log/AbstractIndex.scala">kafka.log.AbstractIndex</a></li>
+<li>[7]<a target="_blank" rel="noopener" href="https://kafka.apache.org/08/documentation.html">Apache Kafka DOCUMENTATION</a></li>
+<li>[8]<a target="_blank" rel="noopener" href="https://spongecaptain.cool/post/mysql/zerocopyofmysql/">MySQL 的零拷贝技术</a></li>
+<li>[9]<a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/innodb-parameters.html">InnoDB Startup Options and System Variables</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/02/04/10.%20RDMA/" rel="prev" title="">
+      <i class="fa fa-chevron-left"></i> 
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/02/04/3.%20mmap/" rel="next" title="">
+       <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#DMA-%E4%B8%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF"><span class="nav-number">1.</span> <span class="nav-text">DMA 与零拷贝技术</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%95%B0%E6%8D%AE%E7%9A%84%E5%9B%9B%E6%AC%A1%E6%8B%B7%E8%B4%9D%E4%B8%8E%E5%9B%9B%E6%AC%A1%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2"><span class="nav-number">1.1.</span> <span class="nav-text">1. 数据的四次拷贝与四次上下文切换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-DMA-%E5%8F%82%E4%B8%8E%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%9B%9B%E6%AC%A1%E6%8B%B7%E8%B4%9D"><span class="nav-number">1.2.</span> <span class="nav-text">2. DMA 参与下的数据四次拷贝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF"><span class="nav-number">1.3.</span> <span class="nav-text">3. 零拷贝技术</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E4%BB%80%E4%B9%88%E6%98%AF%E9%9B%B6%E6%8B%B7%E8%B4%9D%E6%8A%80%E6%9C%AF%EF%BC%9F"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 什么是零拷贝技术？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-sendfile"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 sendfile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-mmap"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3 mmap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-Direct-I-O"><span class="nav-number">1.3.4.</span> <span class="nav-text">3.4 Direct I&#x2F;O</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%85%B8%E5%9E%8B%E6%A1%88%E4%BE%8B"><span class="nav-number">1.4.</span> <span class="nav-text">4. 典型案例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Kakfa"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1 Kakfa</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-MySQL"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2 MySQL</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93"><span class="nav-number">1.5.</span> <span class="nav-text">5. 总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#REFERENCE"><span class="nav-number">2.</span> <span class="nav-text">REFERENCE</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">sk-xinye</p>
+  <div class="site-description" itemprop="description">愿所有努力都不被辜负</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">142</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">sk-xinye</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
