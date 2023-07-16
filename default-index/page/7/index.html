@@ -124,12 +124,12 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">1</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">18</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
@@ -224,6 +224,15 @@
                 <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2021-06-23 07:13:18" itemprop="dateModified" datetime="2021-06-23T07:13:18+08:00">2021-06-23</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+                </span>
+            </span>
 
           
 
@@ -434,6 +443,15 @@
                 <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2023-07-16 21:14:55" itemprop="dateModified" datetime="2023-07-16T21:14:55+08:00">2023-07-16</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+                </span>
+            </span>
 
           
 
@@ -631,6 +649,15 @@
                 <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2021-06-23 07:13:18" itemprop="dateModified" datetime="2021-06-23T07:13:18+08:00">2021-06-23</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+                </span>
+            </span>
 
           
 
@@ -813,6 +840,15 @@
                 <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2021-08-08 21:43:29" itemprop="dateModified" datetime="2021-08-08T21:43:29+08:00">2021-08-08</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kafka/" itemprop="url" rel="index"><span itemprop="name">kafka</span></a>
+                </span>
+            </span>
 
           
 
@@ -894,6 +930,15 @@
                 <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2021-12-19 15:12:26" itemprop="dateModified" datetime="2021-12-19T15:12:26+08:00">2021-12-19</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zookeeper/" itemprop="url" rel="index"><span itemprop="name">zookeeper</span></a>
+                </span>
+            </span>
 
           
 
@@ -1029,6 +1074,15 @@
                 <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2023-07-16 21:14:55" itemprop="dateModified" datetime="2023-07-16T21:14:55+08:00">2023-07-16</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
+                </span>
+            </span>
 
           
 
@@ -1327,7 +1381,7 @@
 <h3 id="顺序读"><a href="#顺序读" class="headerlink" title="顺序读"></a>顺序读</h3><p>fio -name=read -direct=1 -iodepth=64 -rw=read -ioengine=libaio -bs=4k -size=1G -numjobs=1 -runtime=1000 -group_reporting -filename=/dev/sda   （根据实际盘符来写）</p>
 <h3 id="顺序写"><a href="#顺序写" class="headerlink" title="顺序写"></a>顺序写</h3><p>fio -name=write -direct=1 -iodepth=64 -rw=write -ioengine=libaio -bs=4k -size=1G -numjobs=1 -runtime=1000 -group_reporting -filename=/dev/sda  （根据实际盘符来写）</p>
 <p>执行完命令后将打印结果粘贴到文本中</p>
-<h3 id="免密登录"><a href="#免密登录" class="headerlink" title="免密登录"></a>免密登录</h3><p>ssh-keygen -t rsa 一直按回车<br>ssh-copy-id -p 10022 <a href="mailto:&#x7a;&#115;&#104;&#x69;&#101;&#x6c;&#x64;&#64;&#49;&#57;&#x32;&#46;&#49;&#x36;&#x38;&#x2e;&#x38;&#51;&#46;&#x32;&#x35;&#x32;">&#x7a;&#115;&#104;&#x69;&#101;&#x6c;&#x64;&#64;&#49;&#57;&#x32;&#46;&#49;&#x36;&#x38;&#x2e;&#x38;&#51;&#46;&#x32;&#x35;&#x32;</a></p>
+<h3 id="免密登录"><a href="#免密登录" class="headerlink" title="免密登录"></a>免密登录</h3><p>ssh-keygen -t rsa 一直按回车<br>ssh-copy-id -p 10022 <a href="mailto:&#122;&#115;&#x68;&#105;&#x65;&#x6c;&#x64;&#64;&#x31;&#x39;&#50;&#46;&#x31;&#x36;&#x38;&#46;&#x38;&#x33;&#x2e;&#50;&#x35;&#x32;">&#122;&#115;&#x68;&#105;&#x65;&#x6c;&#x64;&#64;&#x31;&#x39;&#50;&#46;&#x31;&#x36;&#x38;&#46;&#x38;&#x33;&#x2e;&#50;&#x35;&#x32;</a></p>
 <h3 id="下载包"><a href="#下载包" class="headerlink" title="下载包"></a>下载包</h3><p>yum -y install yum-utils  下载工具包</p>
 <p>repotrack ansible -p /home/zshield  #下载rpm包<br>rpm -Uvh –force –nodeps *.rpm 安装<br>rpm -ivh foo-1.0-l.i386.rpm</p>
 <h3 id="查看进程内存"><a href="#查看进程内存" class="headerlink" title="查看进程内存"></a>查看进程内存</h3><p>cat /proc/2913/status<br>top res<br>ps aux | sort -k4,4nr | head -n 10 查看内存占用前10名的程序</p>
@@ -1394,6 +1448,15 @@
                 <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2021-06-17 21:06:33" itemprop="dateModified" datetime="2021-06-17T21:06:33+08:00">2021-06-17</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
+                </span>
+            </span>
 
           
 
@@ -1848,6 +1911,15 @@
                 <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2021-06-16 21:14:06" itemprop="dateModified" datetime="2021-06-16T21:14:06+08:00">2021-06-16</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
 
           
 
@@ -2578,6 +2650,15 @@
 
               <time title="创建时间：2021-06-15 10:40:14 / 修改时间：21:39:48" itemprop="dateCreated datePublished" datetime="2021-06-15T10:40:14+08:00">2021-06-15</time>
             </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
 
           
 
@@ -2660,6 +2741,15 @@
               
 
               <time title="创建时间：2021-06-15 10:24:37 / 修改时间：21:39:48" itemprop="dateCreated datePublished" datetime="2021-06-15T10:24:37+08:00">2021-06-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
             </span>
 
           
@@ -2765,6 +2855,18 @@
           <span class="site-state-item-count">142</span>
           <span class="site-state-item-name">日志</span>
         </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
 </div>

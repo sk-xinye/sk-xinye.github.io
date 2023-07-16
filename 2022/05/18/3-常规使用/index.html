@@ -126,12 +126,12 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">0</span></a>
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">1</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">0</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">18</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
@@ -226,6 +226,15 @@
                 <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2023-07-16 21:14:55" itemprop="dateModified" datetime="2023-07-16T21:14:55+08:00">2023-07-16</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+            </span>
 
           
 
@@ -245,7 +254,7 @@
 <h2 id="参数传递使用"><a href="#参数传递使用" class="headerlink" title="参数传递使用"></a>参数传递使用</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parser_arg</span>(<span class="params">namespace=<span class="literal">None</span></span>):</span></span><br><span class="line">    _parse = argparse.ArgumentParser(description=<span class="string">&quot;check index data&quot;</span>)</span><br><span class="line">    _parse.add_argument(<span class="string">&#x27;-e&#x27;</span>, <span class="string">&#x27;--hosts&#x27;</span>,  <span class="built_in">help</span>=<span class="string">&#x27;es hosts list&#x27;</span>,default=[<span class="string">&quot;192.168.81.192&quot;</span>],nargs=<span class="string">&quot;+&quot;</span>)</span><br><span class="line">    _parse.add_argument(<span class="string">&#x27;-i&#x27;</span>, <span class="string">&#x27;--index_list&#x27;</span>,  <span class="built_in">help</span>=<span class="string">&#x27;es index list&#x27;</span>,nargs=<span class="string">&quot;+&quot;</span>,default=[<span class="string">&quot;180_binary_e_mp_day_read-13404&quot;</span>,<span class="string">&quot;180_binary_e_mp_cur_curve-13404&quot;</span>,<span class="string">&quot;180_binary_e_mp_power_curve-13404&quot;</span>,<span class="string">&quot;180_binary_e_mp_vol_curve-13404&quot;</span>])</span><br><span class="line">    _parse.add_argument(<span class="string">&#x27;-d&#x27;</span>, <span class="string">&#x27;--doc_id&#x27;</span>, <span class="built_in">type</span>=<span class="built_in">str</span>, <span class="built_in">help</span>=<span class="string">&#x27;search _id data&#x27;</span>,default=<span class="literal">None</span>)</span><br><span class="line">    _parse.add_argument(<span class="string">&#x27;-m&#x27;</span>, <span class="string">&#x27;--meter_message&#x27;</span>,nargs=<span class="string">&quot;+&quot;</span>, <span class="built_in">help</span>=<span class="string">&#x27;search meter message&#x27;</span>,default=<span class="literal">None</span>)</span><br><span class="line">    _parse.add_argument(<span class="string">&#x27;-f&#x27;</span>, <span class="string">&#x27;--flag&#x27;</span>, nargs=<span class="string">&quot;+&quot;</span>, <span class="built_in">help</span>=<span class="string">&#x27;search flag&#x27;</span>, default=<span class="literal">None</span>)</span><br><span class="line">    _parse.add_argument(<span class="string">&#x27;-s&#x27;</span>, <span class="string">&#x27;--save_path&#x27;</span>,  <span class="built_in">help</span>=<span class="string">&#x27;save result path&#x27;</span>, default=<span class="literal">None</span>)</span><br><span class="line">    <span class="keyword">return</span> _parse.parse_args(namespace=namespace)</span><br><span class="line"></span><br><span class="line">args = parser_arg()</span><br><span class="line">index_list = args.index_list</span><br><span class="line">hosts = args.hosts</span><br></pre></td></tr></table></figure>
 
 <h2 id="py-spy-使用"><a href="#py-spy-使用" class="headerlink" title="py-spy 使用"></a>py-spy 使用</h2><p>../.nox/zs_power-opt-py-ve1-bin-python/bin/py-spy <br>record -o /home/zshield/logs/profile.svg – <br>../.nox/zs_power-opt-py-ve1-bin-python/bin/python3.8 -m main.pp2_main <br>-e 192.168.82.86:19200,192.168.80.230:19200 <br>-B –sz_open <br>–sz=/home/zshield/conf/sz_app/sz.conf <br>–process_num ‘{“data”:1,”sz”:1,”comp”:1,”write”:1,”dg”:1,”fs”:1}’ <br>–use-pro-data-mode –high_open</p>
-<p>/home/zdzhou/miniconda3/bin/py-spy record -o /home/zdzhou/profile.svg – /home/zdzhou/miniconda3/bin/python -m main.pp2_main -e zxtech:<a href="mailto:&#x5a;&#x78;&#x6f;&#100;&#49;&#49;&#50;&#95;&#x73;&#x68;&#105;&#110;&#105;&#x6e;&#x67;&#49;&#48;&#x40;&#x31;&#x39;&#x32;&#x2e;&#x31;&#54;&#x38;&#x2e;&#x38;&#51;&#x2e;&#52;&#x32;">&#x5a;&#x78;&#x6f;&#100;&#49;&#49;&#50;&#95;&#x73;&#x68;&#105;&#110;&#105;&#x6e;&#x67;&#49;&#48;&#x40;&#x31;&#x39;&#x32;&#x2e;&#x31;&#54;&#x38;&#x2e;&#x38;&#51;&#x2e;&#52;&#x32;</a>:19400 -a 219762232 –on5 13403 –sz_open –comp_topo m<br>onitor_p0_topo_v3.yml -p0 –high_open –day_v2 –use-pro-data-mode –v3_test</p>
+<p>/home/zdzhou/miniconda3/bin/py-spy record -o /home/zdzhou/profile.svg – /home/zdzhou/miniconda3/bin/python -m main.pp2_main -e zxtech:<a href="mailto:&#90;&#120;&#x6f;&#x64;&#x31;&#x31;&#x32;&#x5f;&#x73;&#104;&#105;&#110;&#x69;&#x6e;&#x67;&#49;&#x30;&#x40;&#x31;&#57;&#x32;&#x2e;&#49;&#54;&#56;&#x2e;&#x38;&#x33;&#x2e;&#x34;&#50;">&#90;&#120;&#x6f;&#x64;&#x31;&#x31;&#x32;&#x5f;&#x73;&#104;&#105;&#110;&#x69;&#x6e;&#x67;&#49;&#x30;&#x40;&#x31;&#57;&#x32;&#x2e;&#49;&#54;&#56;&#x2e;&#x38;&#x33;&#x2e;&#x34;&#50;</a>:19400 -a 219762232 –on5 13403 –sz_open –comp_topo m<br>onitor_p0_topo_v3.yml -p0 –high_open –day_v2 –use-pro-data-mode –v3_test</p>
 <h2 id="python-rocksdb的基本使用"><a href="#python-rocksdb的基本使用" class="headerlink" title="python-rocksdb的基本使用"></a>python-rocksdb的基本使用</h2><p>1.打开数据库</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> rocksdb</span><br><span class="line">db = rocksdb.DB(<span class="string">&quot;test.db&quot;</span>,rocksdb.Options(create_if_missing=<span class="literal">True</span>))</span><br><span class="line"><span class="comment"># create_if_missing=True 如果不存在则创建名为&#x27;test.db&#x27;的数据库</span></span><br></pre></td></tr></table></figure>
 
@@ -371,6 +380,18 @@
           <span class="site-state-item-count">142</span>
           <span class="site-state-item-name">日志</span>
         </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
 </div>
